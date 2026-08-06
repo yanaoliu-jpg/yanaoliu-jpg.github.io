@@ -1,0 +1,377 @@
+/* ════════════════════════════════════════════════════════════════
+   Good Night — 深色摄影作品集
+
+   为什么整站是深色：这组照片 91% 的像素亮度在 32 以下（满值 255）。
+   放在白底上，读者的眼睛会适应白色，照片就退化成一块块黑方块。
+   背景用 #0d0e11 而不是纯黑——纯黑会让画面最暗处和页面融成一片，
+   照片就失去了边界。
+   ════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Newsreader';
+  src: url('fonts/newsreader-latin.woff2') format('woff2-variations');
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #0d0e11;
+  --bg-lift: #14161a;
+  /*
+    三档灰阶都在 #0d0e11 底色上过了 WCAG AA（小字需 4.5:1）。
+    最初调得更暗更"高级"，但实测序号和参数那行只有 1.95:1——
+    招生官在明亮办公室里用笔记本看就是一片糊。好看不能以读不清为代价。
+  */
+  --ink: #e9e5dd;        /* 暖白，呼应照片里钨丝灯的窗光 —— 15.4:1 */
+  --ink-dim: #b4b6bd;    /* 9.5:1 */
+  --ink-mute: #9a9ca4;   /* 7.1:1 */
+  --ink-faint: #7a7d85;  /* 4.7:1 —— 底线，别再往下调 */
+  --amber: #d9a05b;      /* 亮着的窗户的颜色，极少量使用 */
+
+  --serif: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --plate-vh: 84;        /* 图片高度上限，跟 build.py 里的 MAX_VH 保持一致 */
+  --gutter: clamp(1.5rem, 6vw, 6rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: #2a2d34 var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-weight: 350;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--amber); color: #14100a; }
+
+img { display: block; max-width: 100%; height: auto; }
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  z-index: 100;
+}
+.skip:focus { left: 0; }
+
+:where(a, button):focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+}
+
+/* ── 小号等宽标签：日期、参数、页码 ──────────────────────────── */
+
+.masthead__eyebrow,
+.masthead__meta,
+.masthead__scroll,
+.plate__caption,
+.colophon,
+.viewer__caption {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ── 标题页 ──────────────────────────────────────────────────── */
+
+.masthead {
+  padding: 0 var(--gutter);
+}
+
+/* 标题卡片：整块文字沉在首屏底部，像一张片头字幕卡 */
+.masthead__card {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: clamp(3rem, 13vh, 8rem);
+}
+
+.masthead__eyebrow {
+  margin: 0 0 1.4rem;
+  color: var(--ink-faint);
+}
+
+.masthead__title {
+  margin: 0;
+  font-size: clamp(3.4rem, 13vw, 9rem);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 72;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.masthead__meta {
+  margin: 1.8rem 0 0;
+  color: var(--ink-mute);
+}
+
+.masthead__meta span { white-space: nowrap; }
+.masthead__meta span + span::before {
+  content: '·';
+  margin: 0 0.7em;
+  color: var(--ink-faint);
+}
+
+/* 自述：单独一栏，宽度控制在一眼能读完一行的范围 */
+.statement {
+  max-width: 34em;
+  margin: clamp(6rem, 16vh, 12rem) 0 0;
+  font-size: clamp(1.06rem, 0.95rem + 0.4vw, 1.24rem);
+  line-height: 1.78;
+  color: #d3cfc7;
+}
+
+.statement p { margin: 0 0 1.5em; }
+.statement p:last-child { margin-bottom: 0; }
+
+/* 没填的占位符做成一眼看得见的样子，免得不小心就这么发出去了 */
+.statement .placeholder {
+  padding: 1rem 1.15rem;
+  border: 1px dashed rgba(217, 160, 91, 0.4);
+  border-radius: 2px;
+  background: rgba(217, 160, 91, 0.04);
+  color: #b99164;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.masthead__scroll {
+  margin: clamp(3.5rem, 9vh, 6rem) 0 0;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.masthead__scroll::after {
+  content: '';
+  width: 1px;
+  height: 3.5rem;
+  background: linear-gradient(var(--ink-faint), transparent);
+}
+
+/* ── 照片序列 ────────────────────────────────────────────────── */
+
+.plates {
+  margin: clamp(5rem, 12vh, 9rem) 0 0;
+  padding: 0 var(--gutter);
+}
+
+/*
+  按高度对齐，不是按宽度。
+  这组有 7 横 2 竖；若按宽度铺满，竖构图会大得离谱、横构图显得小气，
+  节奏就散了。限制高度、宽度自然生长，横竖片的视觉重量才相等——
+  跟画廊挂画时对齐画心水平线是同一个道理。
+*/
+.plate {
+  width: min(92vw, 1500px, calc(var(--plate-vh) * 1vh * var(--ar)));
+  margin: 0 auto clamp(7rem, 17vh, 13rem);
+  /* 每张都有 #plate-1 … #plate-9 锚点，可以直接把某一张的链接发给别人 */
+  scroll-margin-top: 6vh;
+}
+.plate:last-child { margin-bottom: 0; }
+
+.plate__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  color: inherit;
+}
+
+.plate__frame {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ar);
+  /* 内嵌的 20px 模糊缩图：图没加载完时是一团暗影，而不是一个空白框 */
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.plate__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+  进场动效一律挂在 .js-reveal 下面。
+
+  这个类由 gallery.js 亲手加上。也就是说：默认状态是「照片可见」，
+  动效是加上去的，不是减出来的。JS 没加载、报错、被拦截——
+  任何一种情况下照片都照常显示。
+  反过来写（默认 opacity:0，靠 JS 点亮）省不了几行，
+  但代价是任何一个小故障都会让招生官看到一片空白。
+*/
+.js-reveal .plate__frame img {
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.js-reveal .plate__frame img.is-loaded { opacity: 1; }
+
+.plate__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 1.1rem;
+  margin-top: 1.15rem;
+}
+
+.plate__num { color: var(--ink-faint); }
+.plate__time { color: var(--ink-faint); }
+.plate__exif { margin-left: auto; color: var(--ink-faint); }
+
+@media (max-width: 640px) {
+  .plate__exif { margin-left: 0; width: 100%; margin-top: 0.4rem; }
+}
+
+/* 滚动进入时轻微上浮。克制——过度动效在作品集里是减分的 */
+.js-reveal .plate {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.js-reveal .plate.is-in { opacity: 1; transform: none; }
+
+/* ── 页脚 ────────────────────────────────────────────────────── */
+
+.colophon {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: clamp(9rem, 22vh, 16rem) 0 0;
+  padding: 2.2rem var(--gutter) clamp(4rem, 10vh, 7rem);
+  border-top: 1px solid #1c1f25;
+}
+.colophon p { margin: 0; }
+.colophon__name { color: var(--ink-dim); }
+
+/* ── 全屏查看 ────────────────────────────────────────────────── */
+
+.viewer {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #08090b;
+  color: var(--ink);
+  overflow: hidden;
+}
+.viewer::backdrop { background: #08090b; }
+
+.viewer__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  height: 100%;
+  margin: 0;
+  /* 边距收到够用就行，多出来的高度全给照片 */
+  padding: clamp(0.75rem, 2vh, 1.5rem) clamp(1rem, 6vw, 4.5rem);
+}
+
+.viewer__picture { display: contents; }
+
+.viewer__stage img {
+  max-width: 100%;
+  max-height: calc(100dvh - 6.5rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.viewer__stage img.is-loaded { opacity: 1; }
+
+.viewer__caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 1.25rem;
+  text-align: center;
+}
+.viewer__count { color: var(--ink-faint); }
+.viewer__exif { color: var(--ink-faint); }
+
+.viewer__close,
+.viewer__nav {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.viewer__close:hover,
+.viewer__nav:hover { background: rgba(255, 255, 255, 0.12); color: var(--ink); }
+
+.viewer__close { top: clamp(0.75rem, 2vh, 1.5rem); right: clamp(0.75rem, 2vw, 1.5rem); }
+.viewer__nav--prev { left: clamp(0.5rem, 1.5vw, 1.5rem); top: 50%; transform: translateY(-50%); }
+.viewer__nav--next { right: clamp(0.5rem, 1.5vw, 1.5rem); top: 50%; transform: translateY(-50%); }
+
+.viewer__close svg,
+.viewer__nav svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.viewer[data-single] .viewer__nav { display: none; }
+
+body.is-locked { overflow: hidden; }
+
+/* ── 无障碍与降级 ────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal .plate { opacity: 1; transform: none; transition: none; }
+  .js-reveal .plate__frame img,
+  .viewer__stage img { transition: none; opacity: 1; }
+  * { scroll-behavior: auto !important; }
+}
+
+/* 没有 JS 时点击放大用不了，光标就别再暗示可以点了 */
+.no-js .plate__open { cursor: default; }

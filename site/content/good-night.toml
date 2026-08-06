@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════
+#  Good Night —— 这个文件就是网页上所有的文字。
+#  改完存盘，然后跑：  python3 build.py
+#
+#  【】括起来的都是占位符，等你来填。填完把【】去掉。
+# ═══════════════════════════════════════════════════════════════════
+
+slug = "good-night"          # 网址会是 .../good-night/ ，别随便改，改了旧链接就失效
+title = "Good Night"
+source = "第一年/Good night"  # 原图在 ../素材/ 下的哪个文件夹
+
+# 标题上方那行小字
+eyebrow = "Series 01"
+year = "2023"
+place = "Beijing"
+
+# 你的名字，会出现在页脚和浏览器标签页上
+author = "【你的英文名 / 拼音，比如 Yanao Liu】"
+
+# 搜索引擎和别人分享链接时看到的一句话描述（120 字以内）
+description = "【一句话英文描述，比如：Nine photographs made after dark in Beijing, November–December 2023.】"
+
+# ─────────────────────────────────────────────────────────────────
+#  创作自述 —— 整个网页最重要的一段文字。
+#
+#  招生官会读这段。他们想知道的不是「我喜欢摄影」，而是：
+#    · 你为什么在连着好几周的深夜端着相机站在窗边？
+#    · 你在这些亮着灯的窗户里看到了什么？
+#    · 拍完这组之后，你对某件事的看法变了吗？
+#
+#  建议 150–250 词。先用中文写，写完告诉我，我帮你转成克制、地道的英文。
+#  空一行就是分段。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+【第一段：一个具体的场景开头。不要总结，直接把人放到那个晚上。
+比如那天几点、你在哪、为什么手里会有相机。越具体越好。】
+
+【第二段：你在拍的过程中注意到了什么、想到了什么。
+这一段是招生官真正在读的部分——他们在找你思考的方式，不是你的形容词。】
+
+【第三段：这组照片对你意味着什么，或者它改变了你什么。
+一两句就够，别拔高，别喊口号。诚实比漂亮重要。】
+"""
+
+# 页脚的器材说明
+colophon = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"
+
+
+# ─────────────────────────────────────────────────────────────────
+#  每张照片的替代文字（alt text）
+#
+#  用途有二：图片没加载出来时显示这行字；视障招生官用读屏软件时听到这行字。
+#  美国大学对无障碍访问很在意，这不是可有可无的。
+#
+#  下面是我按画面内容写好的，客观描述。你可以直接用，也可以改。
+# ─────────────────────────────────────────────────────────────────
+[alt]
+DSC05398 = "A lit gatehouse doorway at night; two figures stand in its orange light while dark apartment blocks rise behind."
+"DSC05407-2" = "An empty schoolyard after dark, faintly floodlit; a single runner crosses the far side of the track."
+DSC05414 = "A running track and basketball hoops at night, a lit corridor glowing at the right, city towers stacked beyond."
+DSC05536 = "The view from inside an unlit room, through a window frame: apartment towers with lit windows under a magenta night sky."
+DSC05547 = "A wall of residential towers at night, hundreds of windows lit in warm and cool tones above bare winter trees."
+DSC05548 = "One apartment tower seen close at night; a handful of balconies glow amber against the surrounding darkness."
+DSC05553 = "City lights at dusk thrown completely out of focus, dissolving into soft circles of colour."
+DSC05557 = "Looking down at a street through misted glass; a red tail light and a few pedestrians blur in the haze."
+DSC05565 = "A snow-dusted courtyard seen from above at night: a pavilion, a drained pond, and a construction lot lit by the towers around it."

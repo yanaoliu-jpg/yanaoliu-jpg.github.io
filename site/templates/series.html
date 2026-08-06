@@ -1,0 +1,57 @@
+<a class="skip" href="#plates">Skip to the photographs</a>
+
+<main class="page">
+
+  <header class="masthead">
+    <div class="masthead__card">
+      <p class="masthead__eyebrow">{{ eyebrow }} <span aria-hidden="true">·</span> {{ year }}</p>
+      <h1 class="masthead__title">{{ title }}</h1>
+      <!-- 每段各自成块：换行时分隔点不会孤零零跑到行首 -->
+      <p class="masthead__meta"><span>{{ count }} photographs</span><span>{{ span }}</span><span>{{ place }}</span></p>
+    </div>
+
+    <div class="statement">
+      {{ statement }}
+    </div>
+
+    <p class="masthead__scroll" aria-hidden="true">Scroll</p>
+  </header>
+
+  <section class="plates" id="plates">
+{{ plates }}
+  </section>
+
+  <footer class="colophon">
+    <p class="colophon__gear">{{ colophon }}</p>
+    <p class="colophon__name">{{ author }}</p>
+  </footer>
+
+</main>
+
+<dialog class="viewer" id="viewer" aria-label="Full screen photograph">
+  <button class="viewer__close" type="button" data-act="close" aria-label="Close">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+  </button>
+  <button class="viewer__nav viewer__nav--prev" type="button" data-act="prev"
+          aria-label="Previous photograph">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4L7 12l8 8"/></svg>
+  </button>
+  <button class="viewer__nav viewer__nav--next" type="button" data-act="next"
+          aria-label="Next photograph">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>
+  </button>
+
+  <figure class="viewer__stage">
+    <picture class="viewer__picture">
+      <source type="image/avif"><source type="image/webp">
+      <img alt="">
+    </picture>
+    <figcaption class="viewer__caption">
+      <span class="viewer__count"></span>
+      <span class="viewer__date"></span>
+      <span class="viewer__exif"></span>
+    </figcaption>
+  </figure>
+</dialog>
+
+<script type="application/json" id="photo-data">{{ photo_data }}</script>
