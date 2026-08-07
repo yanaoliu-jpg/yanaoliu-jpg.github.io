@@ -1,0 +1,68 @@
+# ═══════════════════════════════════════════════════════════════════
+#  旧时光 —— 这个文件就是网页上所有的文字。
+#  改完存盘，跑：  python3 build.py
+#  改了中文还要跑：python3 tools/subset_font.py 然后再 build 一次
+# ═══════════════════════════════════════════════════════════════════
+
+slug = "the-old-days"          # 网址：.../the-old-days/ ，定了别再改
+title = "The Old Days"
+source = "第一年/旧时光"
+
+order = 3                      # 目录页上排第三
+cover = "DSC09243"             # 阳光穿过树、跑道上一地影子的那张
+
+eyebrow = "Series 03"
+year = "2025"
+place = "Beijing"
+
+author = "Yanao (Leo) Liu"
+
+description = "Nine photographs of an emptying school on one May afternoon, Beijing, 2025."
+
+# 这一期 EXIF 完整（2025-05-13 下午 16:29–18:28），
+# 不需要写 date，页面会自动按拍摄时间排序并逐张标注时刻。
+
+statement = """
+I went back on an afternoon in May 2025, a few days after my AP exams, carrying a camera. This is the middle school I came from, and everything in these photographs was still exactly where I had left it a year before — which made the whole place feel like two things at once, a little dreamlike and completely real.
+
+Walking through it, I kept feeling that what had happened in those rooms, and the people I had known there, were only a day old. The late sun was coming into every corner of the campus, and it brought back things I had not thought about in a long time.
+
+The last thing I did was look back at the school gate. It is not much to look at, and it opens on the same schedule every morning. But that is where my middle school years stop, and where they stay.
+"""
+
+colophon = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"
+
+
+# ─────────────────────────────────────────────────────────────────
+#  替代文字（alt text）：图片没加载出来、或读屏软件读页面时用
+# ─────────────────────────────────────────────────────────────────
+[alt]
+DSC09221 = "A school library in the afternoon: built-in wooden window seats scattered with round cushions, bookshelves along the wall, daylight coming through the windows."
+DSC09231 = "A running track curving around a small green pitch between red-brick school buildings, with a rainbow banner hanging on the fence."
+DSC09240 = "A large tree in full leaf standing over a red-walled courtyard, a high apartment block rising behind the school wall."
+DSC09243 = "Late sun breaking through the leaves of a tree and throwing long shadows across an empty running track."
+DSC09246 = "A wide view of the schoolyard: basketball courts, a running track, red-brick teaching buildings, and residential towers beyond."
+DSC09247 = "A red-brick teaching block seen across the track, a single figure in white walking past, a national flag on the roof."
+DSC09260 = "An empty auditorium, rows of pale grey seats under long ceiling lights and stage lamps."
+DSC09269 = "A stairwell landing where the red wall is covered in chalked names and messages from students, daylight coming up from the doorway below."
+DSC09275 = "A dim lecture hall at the end of the day, wooden benches in rows, a projector still lit on the board at the front."
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/the-old-days/）
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "旧时光"
+eyebrow = "第三组"
+place = "北京"
+author = "刘延奥"
+description = "2025 年 5 月的一个下午，拍于正在空下来的校园。"
+colophon = "索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"
+
+statement = """
+这是我于 2025 年五月，参加完 AP 考试以后带着相机重返初中母校时拍下的一组照片，对我有纪念意义。照片里的场景都是一年前历历在目的地方，既梦幻又现实，仿佛在那里发生过的事、遇到过的人，昨天才刚刚经历。
+
+黄昏的夕阳洒在校园的每个角落，也把我尘封的记忆重新唤起。
+
+最后我回望着那扇不起眼、但按部就班打开的校门——我的初中时光和回忆，就此定格。
+"""
