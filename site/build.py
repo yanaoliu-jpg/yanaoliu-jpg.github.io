@@ -707,11 +707,16 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
     """目录页上的一个作品条目。"""
     cfg, cover, L = s["cfg"], s["cover"], LANGS[lang]
     sizes = f"min(100%, {52 * cover.aspect:.0f}vh)"
-    detail = " · ".join(
-        x for x in (
+    # 每段各自成块，段与段之间留一个空格。
+    # 那个空格不是排版失误，是**唯一的断行机会**——每个 span 都是 nowrap，
+    # 中间不留空白的话整行没法折断，窄栏里会直接撑破容器。
+    # 目录页只写「张数 · 时间」，不写城市：三组都在北京，重复三遍不提供任何新信息，
+    # 却会把窄栏的说明挤成两行、底边参差。城市在各自的系列页里仍然写着。
+    detail = " ".join(
+        f"<span>{esc(x)}</span>"
+        for x in (
             f"{s['count']} {L['photographs']}",
             format_span(s, lang),
-            text_of(cfg, lang, "place"),
         ) if x
     )
     eyebrow = text_of(cfg, lang, "eyebrow")
@@ -734,7 +739,7 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
           <span class="work__meta">
             <span class="work__eyebrow">{esc(eyebrow)}{' · ' + esc(year) if year else ''}</span>
             <span class="work__title">{esc(text_of(cfg, lang, 'title'))}</span>
-            <span class="work__detail">{esc(detail)}</span>
+            <span class="work__detail">{detail}</span>
           </span>
         </a>
       </li>"""

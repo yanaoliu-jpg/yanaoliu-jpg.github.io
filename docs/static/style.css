@@ -79,9 +79,19 @@ body {
 
 img { display: block; max-width: 100%; height: auto; }
 
+/*
+  跳转链接：平时藏起来，键盘 Tab 到它时才出现。
+  不用 left:-9999px —— 那会把元素真的放到画布外，
+  在做横向溢出排查时永远是一条假警报。
+*/
 .skip {
   position: absolute;
-  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  left: 0;
   top: 0;
   padding: 0.75rem 1.25rem;
   background: var(--ink);
@@ -90,7 +100,12 @@ img { display: block; max-width: 100%; height: auto; }
   font-size: 0.8rem;
   z-index: 100;
 }
-.skip:focus { left: 0; }
+.skip:focus {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+}
 
 :where(a, button):focus-visible {
   outline: 2px solid var(--amber);
@@ -210,9 +225,10 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 .masthead__meta span { white-space: nowrap; }
-.masthead__meta span + span::before {
+/* 同 .work__detail：分隔点跟在前一段后面，换行时不会甩到行首 */
+.masthead__meta span:not(:last-child)::after {
   content: '·';
-  margin: 0 0.7em;
+  margin: 0 0.15em 0 0.6em;
   color: var(--ink-faint);
 }
 
@@ -343,25 +359,50 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* ── 作品总目录 ──────────────────────────────────────────────── */
 
-.works {
-  max-width: 1100px;
-  margin: clamp(5rem, 12vh, 9rem) auto 0;
-  padding: 0 var(--gutter);
-  list-style: none;
-}
-
 /*
-  封面按高度对齐（52vh），横竖构图的视觉重量才相等——跟系列页里照片的处理一致。
+  三组作品横向并排，一屏看全。
 
-  但这里的条目**左对齐**而不是各自居中：目录是用来一条条扫下来的，
-  各自居中会让每条的文字起点随封面宽窄左右跳动，读起来是毛的。
-  统一的左边缘才能让人一眼看清这是一份清单。
+  关键是**等高对齐**：三张封面的比例差很大（1.5 : 0.8 : 0.67），
+  按宽度平分的话横构图会被压扁、竖构图会顶破屏幕。
+  用 flex + `flex: <aspect> 1 0` 让每一栏的宽度正比于自己的宽高比，
+  三张的高度就自动相等了——跟画廊并排挂不同画幅的照片是同一件事。
+
+  `--ar` 由 build.py 写在每个 <li> 的 style 里。
 */
-.work {
-  width: min(100%, calc(52vh * var(--ar)));
-  margin: 0 0 clamp(5rem, 13vh, 10rem);
+.works {
+  max-width: 1500px;
+  margin: clamp(4rem, 10vh, 7rem) auto 0;
+  /* 并排模式下左右留白比正文窄：三栏要分这点宽度，
+     留白按 6vw 算的话中等屏上最窄那栏会挤到说明折行 */
+  padding: 0 clamp(1.5rem, 3.5vw, 6rem);
+  list-style: none;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(1.25rem, 2.4vw, 2.75rem);
 }
-.work:last-child { margin-bottom: 0; }
+
+.work {
+  flex: var(--ar) 1 0;
+  min-width: 0;
+  /* 高度上限：太高会顶掉下面的标题，太矮照片就没分量了 */
+  max-width: calc(46vh * var(--ar));
+}
+
+/* 窄屏放不下三列，改成竖向堆叠，回到原来那套左对齐清单 */
+@media (max-width: 900px) {
+  .works {
+    display: block;
+    max-width: 1100px;
+  }
+  .work {
+    max-width: none;
+    width: min(100%, calc(52vh * var(--ar)));
+    margin-bottom: clamp(4rem, 11vh, 8rem);
+  }
+  .work:last-child { margin-bottom: 0; }
+  /* 堆叠时每条独占一行，标题可以放大回去 */
+  .work__title { font-size: clamp(1.8rem, 6vw, 2.6rem); }
+}
 
 .work__link {
   display: block;
@@ -409,16 +450,35 @@ img { display: block; max-width: 100%; height: auto; }
   text-transform: uppercase;
 }
 .work__eyebrow { color: var(--ink-faint); }
-.work__detail { color: var(--ink-mute); margin-top: 0.6rem; }
 
+.work__detail { color: var(--ink-mute); margin-top: 0.6rem; }
+.work__detail span { white-space: nowrap; }
+/*
+  分隔点挂在**前一段的末尾**，不是下一段的开头。
+  换行时行尾出现「…2023 ·」是正常排版；
+  行首出现「· BEIJING」则像是漏字。
+*/
+.work__detail span:not(:last-child)::after {
+  content: '·';
+  margin: 0 0.1em 0 0.45em;
+  color: var(--ink-faint);
+}
+
+/*
+  并排时字号要跟**栏宽**匹配，不能跟视口匹配。
+  最初沿用了系列页的 clamp(1.9rem, 4.5vw, 3.1rem)，在 1440px 屏上算出 49.6px，
+  可栏宽只有 265–318px——「Goodbye, Renfen」直接折成两行，
+  三个标题高度 52 / 104 / 104，一排下来底线全是毛的。
+*/
 .work__title {
   display: block;
   margin: 0.5rem 0 0;
-  font-size: clamp(1.9rem, 4.5vw, 3.1rem);
+  font-size: clamp(1.3rem, 1.9vw, 1.95rem);
   font-weight: 300;
-  font-variation-settings: 'opsz' 48;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-variation-settings: 'opsz' 36;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
   color: var(--ink);
   transition: color 0.25s;
 }
