@@ -1,0 +1,74 @@
+# ═══════════════════════════════════════════════════════════════════
+#  夜风沉醉的旅程 —— 这个文件就是网页上所有的文字。
+#  改完存盘，跑 python3 build.py
+# ═══════════════════════════════════════════════════════════════════
+
+slug = "night-wind"
+title = "Drunk on the Night Wind"
+source = "第一年/夜风沉醉的旅程"
+
+order = 4
+cover = "DSC00692"   # WHARF FISHMARKET 的蓝绿色外墙，缩小了也一眼认得出
+
+eyebrow = "Series 04"
+year = "2025"
+place = "Aranya, Beidaihe"
+
+author = "Yanao (Leo) Liu"
+
+description = "Nine photographs made after dark in Aranya, on the coast at Beidaihe, July 2025."
+
+# ─────────────────────────────────────────────────────────────────
+#  你原文里写的沙滩、浪花、海岛风光，这九张照片里一张都没有——
+#  全是 20:16 到 21:09 之间拍的夜晚建筑和街头。
+#  所以写成了一个转折：为海而去，留下的却是入夜之后。
+#  你原文的后半段（阿那亚的慢节奏、人文风光）原样保留，那部分跟照片完全吻合。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+In the summer of 2025 I went to Aranya, a resort on the coast at Beidaihe, a few hours from Beijing, with a friend and their family. We went for what everyone goes for: the sand, the waves, the slow kind of day you only get beside the sea.
+
+The photographs I came back with are all from after the sun went down.
+
+I don't think I decided this. It was just that the place at night was the part I couldn't stop looking at. An empty restaurant terrace with the ceiling fans still turning. A courtyard lit yellow between two buildings. Two kids at a floodlit skate park, one of them crouched down filming the other. A man walking past a café window with all the stools inside still empty.
+
+None of it is the scenery we came for. It is what the town looks like once the day lets go of it — people still out, still moving at the pace the place was built for. That pace is the thing I actually wanted to keep.
+"""
+
+colophon = "Sony α7 IV"
+
+
+# ─────────────────────────────────────────────────────────────────
+#  替代文字（alt text）
+# ─────────────────────────────────────────────────────────────────
+[alt]
+DSC00680 = "A lit shopfront at night seen across a dark street; a few people sit on a bench outside while others stand at the counter within."
+DSC00691 = "A café window at night with all the bar stools inside still empty; a person walks past in silhouette, blurred by the exposure."
+DSC00692 = "A teal concrete building at night with WHARF FISHMARKET lit above the entrance; people sit on the steps below."
+"20250716-DSC00722" = "An empty restaurant terrace at night, tables laid and ceiling fans still turning, warm light falling down the far wall."
+"20250716-DSC00724" = "A courtyard between two buildings at night, the walls washed yellow and green by lamplight, a young tree and an empty bench."
+"20250716-DSC00746" = "A girl sits alone on a step in front of an illuminated wall installation built to look like a robot holding a heart."
+"20250716-DSC00763" = "Two young skaters at a floodlit skate park at night: one crouches with a camera while the other stands with a board."
+"20250716-DSC00729" = "Through a window at night: staff working behind the counter of a small shop, stacked cups and equipment around them."
+"20250716-DSC00778" = "A floodlit skate park after dark, seen wide: one skater rides a ledge while another crouches nearby, filming."
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/night-wind/）
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "夜风沉醉的旅程"
+eyebrow = "第四组"
+place = "北戴河 · 阿那亚"
+author = "刘延奥"
+description = "2025 年 7 月，入夜之后的阿那亚，九张照片。"
+colophon = "索尼 α7 IV"
+
+statement = """
+2025 年的暑假，我和朋友一家一起去了阿那亚——北戴河海边，离北京不算远的一个度假地。我们是奔着所有人都奔着的东西去的：沙滩、浪花，还有只有海边才有的那种慢下来的日子。
+
+可我带回来的照片，全是太阳落山之后拍的。
+
+这大概不是我决定的。只是入夜之后的那个地方，是我怎么也看不够的部分。空着的餐厅露台，吊扇还在转。两楼之间被灯照成黄绿色的小院。泛光灯下的滑板场，一个蹲着给另一个拍。一个人走过咖啡馆的橱窗，里面的高脚凳还空着。
+
+这些都不是我们奔着去的风景。这是白天松开手之后，这座小镇的样子——人还在外面，还是慢慢地走着，用这地方本来就是为之而建的那种节奏。而那个节奏，才是我真正想留住的东西。
+"""

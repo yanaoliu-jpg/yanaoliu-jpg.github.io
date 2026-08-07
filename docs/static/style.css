@@ -175,8 +175,13 @@ img { display: block; max-width: 100%; height: auto; }
   font-size: clamp(2.8rem, 10vw, 7rem);
   letter-spacing: 0.02em;   /* 中文不能像拉丁字母那样收紧字距 */
 }
+/*
+  中文标题也要跟栏宽匹配。原来这条是给「一屏一条」的旧版式写的，
+  并排之后「夜风沉醉的旅程」七个字在 227px 的栏里会直接折行。
+  堆叠时（窄屏）再放大回去，见文件末尾的 media query。
+*/
 :lang(zh-Hans) .work__title {
-  font-size: clamp(1.7rem, 4vw, 2.7rem);
+  font-size: clamp(1.15rem, 1.6vw, 1.6rem);
   letter-spacing: 0.02em;
 }
 /* 等宽小标签里的中文不该被拉成大写间距 */
@@ -400,8 +405,9 @@ img { display: block; max-width: 100%; height: auto; }
     margin-bottom: clamp(4rem, 11vh, 8rem);
   }
   .work:last-child { margin-bottom: 0; }
-  /* 堆叠时每条独占一行，标题可以放大回去 */
-  .work__title { font-size: clamp(1.8rem, 6vw, 2.6rem); }
+  /* 堆叠时每条独占整行，标题放大回去，也不需要预留行数 */
+  .work__title { font-size: clamp(1.8rem, 6vw, 2.6rem); min-height: 0; }
+  :lang(zh-Hans) .work__title { font-size: clamp(1.7rem, 6vw, 2.5rem); }
 }
 
 .work__link {
@@ -451,8 +457,23 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .work__eyebrow { color: var(--ink-faint); }
 
-.work__detail { color: var(--ink-mute); margin-top: 0.6rem; }
+/*
+  并排时最窄的那一栏只有 180px 上下，说明行会折成两行，而旁边几栏是一行——
+  四个条目的底边就参差了。预留两行高度，折不折都对齐。
+  代价是不折的那几栏下面多一点空白，比底边毛掉划算。
+*/
+.work__detail {
+  color: var(--ink-mute);
+  margin-top: 0.6rem;
+  line-height: 1.6;
+  min-height: 3.2em;
+}
 .work__detail span { white-space: nowrap; }
+
+/* 堆叠时每条独占整行，不会折行，不需要预留 */
+@media (max-width: 900px) {
+  .work__detail { min-height: 0; }
+}
 /*
   分隔点挂在**前一段的末尾**，不是下一段的开头。
   换行时行尾出现「…2023 ·」是正常排版；
@@ -481,6 +502,9 @@ img { display: block; max-width: 100%; height: auto; }
   text-wrap: balance;
   color: var(--ink);
   transition: color 0.25s;
+  /* 长标题（Drunk on the Night Wind）在窄栏里会折成两行，短的只有一行——
+     跟说明行同理，预留两行，四个条目的底边才对得齐 */
+  min-height: 2.24em;
 }
 
 /* 进场动效跟系列页保持一致 */
