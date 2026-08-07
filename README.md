@@ -1,6 +1,13 @@
 # 摄影作品集
 
-给美国大学招生官看的网页版作品集。目前收录一期：**Good Night**（2023 年 11–12 月，北京，9 张）。
+给美国大学招生官看的网页版作品集。线上地址：**https://yanaoliu-jpg.github.io/**
+
+目前两期：
+
+| | | |
+|---|---|---|
+| Good Night | 2023 年 11–12 月 | 9 张 |
+| Goodbye, Renfen | 2024 年 5 月 | 9 张 |
 
 - 源码在 `site/`
 - 生成的网站在 `docs/`
@@ -31,11 +38,18 @@ python3 site/build.py --serve
 
 ## 改文字
 
-所有文字都在 `site/content/good-night.toml` 这一个文件里。
-改完存盘，重新跑一次 `python3 site/build.py` 就生效。
+网页上所有文字都在 `site/content/` 里，一个作品一个文件：
 
-**创作自述目前还是占位符**，网页上会显示成橙色虚线框——那是故意的，
-就是为了让你（和我）不可能在没写完的情况下不小心发出去。
+| 文件 | 管什么 |
+|---|---|
+| `_site.toml` | 首页：你的名字、开头那段 intro、页脚 |
+| `good-night.toml` | Good Night 那一期 |
+| `goodbye-renfen.toml` | 再见，人分 那一期 |
+
+下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
+
+**没填完的地方写成【这样】，网页上会显示成橙色虚线框**——故意做得刺眼，
+就是为了不可能在没写完的情况下不小心发出去。
 
 ---
 
@@ -45,12 +59,14 @@ python3 site/build.py --serve
 cp site/content/good-night.toml site/content/新系列名.toml
 ```
 
-打开新文件，改这三行：
+打开新文件，改这几行：
 
 ```toml
-slug   = "new-series"        # 网址会是 .../new-series/
+slug   = "new-series"        # 网址会是 .../new-series/，定了别再改
 title  = "New Series"
 source = "第一年/某个文件夹"    # 指向 素材/ 下面的文件夹
+order  = 3                   # 目录页上排第几
+cover  = "DSC01234"          # 目录页封面（文件名，不含扩展名）
 ```
 
 把 `[alt]` 那一段整个删掉重写（对应新的文件名），然后：
@@ -60,6 +76,17 @@ python3 site/build.py
 ```
 
 照片会自动按拍摄时间排序，横竖构图自动处理。
+
+### 如果照片的 EXIF 被抹掉了
+
+经过微信或手机相册导出的照片，拍摄时间常常会丢。这时候在 toml 里加一行：
+
+```toml
+date = "2024-05"     # 只写到月份
+```
+
+写了之后，页面上只标月份，逐张不再标日期——我们只知道月份却标出"某月某日"，
+那是在编造精确度，而且很容易跟你自述里写的时间对不上。
 
 ---
 
