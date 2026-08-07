@@ -1,19 +1,21 @@
-<a class="skip" href="#works">Skip to the work</a>
+<a class="skip" href="#works">{{ skip }}</a>
+
+<a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
 
 <main class="page">
 
   <header class="masthead">
     <div class="masthead__card">
-      <p class="masthead__eyebrow">Photographs</p>
+      <p class="masthead__eyebrow">{{ home_eyebrow }}</p>
       <h1 class="masthead__title">{{ name }}</h1>
-      <p class="masthead__meta"><span>{{ count }} series</span><span>{{ total }} photographs</span></p>
+      <p class="masthead__meta"><span>{{ count_label }}</span><span>{{ total_label }}</span></p>
     </div>
 
     <div class="statement">
       {{ intro }}
     </div>
 
-    <p class="masthead__scroll" aria-hidden="true">Scroll</p>
+    <p class="masthead__scroll" aria-hidden="true">{{ scroll }}</p>
   </header>
 
   <ul class="works" id="works">

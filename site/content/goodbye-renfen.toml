@@ -2,9 +2,8 @@
 #  再见，人分 —— 这个文件就是网页上所有的文字。
 #  改完存盘，然后跑：  python3 build.py
 #
-#  ⚠️ 下面 statement 里的【】是占位符，还没填。
-#     只要它还在，网页上就会显示成醒目的橙色虚线框，
-#     提醒你（和我）这一期还不能对外。
+#  【】括起来的是占位符。只要它还在，网页上就会显示成醒目的橙色虚线框，
+#  提醒你（和我）这一期还不能对外。目前这个文件已经填完了。
 # ═══════════════════════════════════════════════════════════════════
 
 slug = "goodbye-renfen"      # 网址：.../goodbye-renfen/
@@ -66,3 +65,25 @@ colophon = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"
 "ade26d47940376f140409ee2caf9b51" = "Three views stacked vertically: a white 'I love RDF' sculpture above the school's name plate; the school gate at dismissal, with guards and students passing through; basketball courts seen from above against a wall of apartment blocks."
 "f2394a50ea97f2c1baca8d297bb531f" = "An instant photograph of classmates in white sports uniforms, propped in a clear acrylic frame on a desk, shot through the blur of objects in the foreground."
 "fd02c564f86ada4f8f2d73fdb20d061" = "Three views stacked vertically: a desk crowded with a globe, ornaments and handwritten notes; a student reading alone in an empty classroom; a closed door labelled as the ninth-grade examination office."
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/goodbye-renfen/）
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "再见，人分"
+eyebrow = "第二组"
+place = "北京"
+author = "刘延奥"
+description = "2024 年 5 月，重返初中母校时拍下的九张照片。"
+colophon = "索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"
+
+statement = """
+人分——人大附中分校，是我一直放不下的学校。三年发生在那里，能说的太多了。大概正因为太多，我最后是带着相机回去的，而不是带着话。
+
+那是 2024 年五月，刚考完 AP。结果我拍下的全是这栋楼里最不起眼的地方：一条走廊、一段楼道、操场、一间没有人的教室。走过它们的时候是两种感觉同时发生——完全平常，又不太真实，好像那些教室里发生过的事就在昨天，人马上就要回来了。
+
+那天是下午晚些时候，夕阳正沿着每一面墙走。我想是那束光把它打开的。有些一年没想起过的事，随着我一步步走过去，又回来了。
+
+最后我拍的是校门。那不是一扇好看的门。它每天早上按时打开，没人会多看它一眼。可我的三年就停在那里。这些照片是碎片，把它们重新拼回去，是我能离那三年最近的方式。
+"""

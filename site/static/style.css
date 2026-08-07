@@ -15,6 +15,21 @@
   font-display: swap;
 }
 
+/*
+  中文衬线体，按页面实际用到的字裁过（完整思源宋体有 15MB，裁完只剩几十 KB）。
+  unicode-range 限定它只对中日韩字符生效，拉丁字母仍然走 Newsreader——
+  两种字体各管各的，混排时不会互相抢。
+*/
+@font-face {
+  font-family: 'Noto Serif SC';
+  src: url('fonts/noto-serif-sc-subset.woff2') format('woff2');
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+2014-2015, U+2018-201D, U+2026, U+3001-303F, U+4E00-9FFF,
+                 U+FF01-FF65, U+3000;
+}
+
 :root {
   --bg: #0d0e11;
   --bg-lift: #14161a;
@@ -29,8 +44,12 @@
   --ink-faint: #7a7d85;  /* 4.7:1 —— 底线，别再往下调 */
   --amber: #d9a05b;      /* 亮着的窗户的颜色，极少量使用 */
 
-  --serif: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* Newsreader 在前、中文衬线在后：拉丁字母走 Newsreader，
+     它没有的中文字符自动落到思源宋体。系统字体只是最后的保险。 */
+  --serif: 'Newsreader', 'Noto Serif SC', 'Iowan Old Style', 'Palatino Linotype',
+           Georgia, 'Songti SC', 'Source Han Serif SC', serif;
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+          'PingFang SC', 'Hiragino Sans GB', monospace;
 
   --plate-vh: 84;        /* 图片高度上限，跟 build.py 里的 MAX_VH 保持一致 */
   --gutter: clamp(1.5rem, 6vw, 6rem);
@@ -111,6 +130,49 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .backlink:hover { color: var(--ink); }
 .backlink span { margin-right: 0.5em; }
+
+/* 语言切换：跟返回链接对称，放在右上角 */
+.langswitch {
+  position: absolute;
+  top: clamp(1.5rem, 4vh, 2.75rem);
+  right: var(--gutter);
+  z-index: 3;
+  padding: 0.35em 0.85em;
+  border: 1px solid #23262d;
+  border-radius: 2em;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-mute);
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+.langswitch:hover { color: var(--ink); border-color: #3a3e47; }
+
+/* 中文正文比拉丁文视觉上更"重"，字号和行距要单独调，
+   否则同样的 1.1rem 中文会显得又挤又黑 */
+:lang(zh-Hans) .statement {
+  font-size: clamp(1rem, 0.9rem + 0.35vw, 1.12rem);
+  line-height: 1.95;
+  letter-spacing: 0.02em;
+}
+:lang(zh-Hans) .masthead__title {
+  font-size: clamp(2.8rem, 10vw, 7rem);
+  letter-spacing: 0.02em;   /* 中文不能像拉丁字母那样收紧字距 */
+}
+:lang(zh-Hans) .work__title {
+  font-size: clamp(1.7rem, 4vw, 2.7rem);
+  letter-spacing: 0.02em;
+}
+/* 等宽小标签里的中文不该被拉成大写间距 */
+:lang(zh-Hans) .masthead__meta,
+:lang(zh-Hans) .work__eyebrow,
+:lang(zh-Hans) .work__detail,
+:lang(zh-Hans) .colophon,
+:lang(zh-Hans) .backlink {
+  text-transform: none;
+  letter-spacing: 0.06em;
+}
 
 /* ── 标题页 ──────────────────────────────────────────────────── */
 

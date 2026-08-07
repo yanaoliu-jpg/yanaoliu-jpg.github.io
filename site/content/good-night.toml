@@ -66,3 +66,25 @@ DSC05548 = "One apartment tower seen close at night; a handful of balconies glow
 DSC05553 = "City lights at dusk thrown completely out of focus, dissolving into soft circles of colour."
 DSC05557 = "Looking down at a street through misted glass; a red tail light and a few pedestrians blur in the haze."
 DSC05565 = "A snow-dusted courtyard seen from above at night: a pavilion, a drained pond, and a construction lot lit by the towers around it."
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/good-night/）。没写的项自动回落到上面的英文。
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "晚安"
+eyebrow = "第一组"
+place = "北京"
+author = "刘延奥"
+description = "2023 年 11 至 12 月，四个夜晚，拍摄于北京。"
+colophon = "索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"
+
+statement = """
+这些照片拍于 2023 年十一月到十二月的四个晚上，都在我最熟的两个地方：人大附中分校——我读初中的学校，和逸成东苑——我住的小区。
+
+前三张是晚自习课间拍的。那天我是特意带了相机去学校的，同学过生日，我负责拍照。铃一响我却把相机端到了操场上。那片操场我走了三年，每天都走，却从没在天黑以后见过它。跑道上空无一人，只有一个人还在跑。
+
+剩下的是十二月，第一场正经的雪之后——就是那种下了才算真正入冬的雪。我在没开灯的房间里拍，拍着拍着发现自己拍的全是窗户。从黑暗里往外看，一百扇亮着的窗同时在你眼前。我一直在想，此刻那一户户人家正在做什么，他们的思绪会不会也随着这场雪飘出了这座城市。
+
+后来我觉得，相机给你的不只是照片。它给你的是记住一个季节的方式——记住你活在里面的时候，天气正在做什么。
+"""

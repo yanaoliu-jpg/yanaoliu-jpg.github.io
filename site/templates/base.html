@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
+<html lang="{{ html_lang }}" class="no-js">
 <head>
 <meta charset="utf-8">
 <script>document.documentElement.classList.remove('no-js')</script>
@@ -12,6 +12,8 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ title }}">
 <meta property="og:description" content="{{ description }}">
+
+{{ alternates }}
 
 <link rel="icon" href="{{ root }}/static/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="{{ root }}/static/favicon-32.png" sizes="32x32">

@@ -21,6 +21,12 @@
 brew install imagemagick webp
 ```
 
+生成中文字体子集还需要（只在你电脑上用，访客不需要）：
+
+```bash
+pip3 install fonttools brotli
+```
+
 Python 用系统自带的就行（要 3.11 以上，因为用到了内置的 `tomllib`）。
 没有其他依赖——没有 npm，没有框架，没有 `node_modules`。
 
@@ -36,6 +42,38 @@ python3 site/build.py --serve
 
 ---
 
+## 双语
+
+网站有中英两版，图片只存一份，两边共用：
+
+```
+/                      英文（招生官默认看到这个）
+├─ /good-night/
+├─ /goodbye-renfen/
+└─ /zh/                中文
+   ├─ /zh/good-night/
+   └─ /zh/goodbye-renfen/
+```
+
+右上角的 `EN / 中` 按钮会跳到**对方语言的同一个页面**，不是跳回首页。
+
+每个 toml 文件底部的 `[zh]` 那一段就是中文版。**没写的项会自动用英文，不会开天窗**——
+所以加新作品时可以先只写英文，中文之后补。
+
+### 改完中文一定要重新生成字体
+
+```bash
+python3 site/build.py && python3 site/tools/subset_font.py && python3 site/build.py
+```
+
+看着啰嗦，但顺序是必须的：先生成网页 → 扫描网页里用到的字 → 裁字体 → 再生成一次把新字体复制过去。
+
+原因：完整的思源宋体有 15MB，不可能整个塞进网页。脚本只打包你实际用到的字（目前 265 个，约 95KB）。
+**如果加了新字却忘了跑，那几个字会悄悄掉回系统默认字体**，不报错但很难看。
+脚本最后会自己检查覆盖率，缺字会直接报错。
+
+---
+
 ## 改文字
 
 网页上所有文字都在 `site/content/` 里，一个作品一个文件：
@@ -43,8 +81,8 @@ python3 site/build.py --serve
 | 文件 | 管什么 |
 |---|---|
 | `_site.toml` | 首页：你的名字、开头那段 intro、页脚 |
-| `good-night.toml` | Good Night 那一期 |
-| `goodbye-renfen.toml` | 再见，人分 那一期 |
+| `good-night.toml` | Good Night / 晚安 |
+| `goodbye-renfen.toml` | Goodbye, Renfen / 再见，人分 |
 
 下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
 

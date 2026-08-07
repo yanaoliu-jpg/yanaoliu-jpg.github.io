@@ -67,6 +67,50 @@ SHARPEN_ARGS = ["-unsharp", "0x0.6+0.35+0.02"]
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".JPG", ".JPEG"}
 
+# ── 双语 ────────────────────────────────────────────────────────
+# 英文站在根目录，中文站在 /zh/。图片只生成一份，两边共用。
+# 每个 toml 里 [zh] 那一段是中文文案，没写的项自动回落到英文。
+LANGS = {
+    "en": {
+        "dir": "",
+        "html_lang": "en",
+        "photographs": "photographs",
+        "all_work": "All work",
+        "scroll": "Scroll",
+        "skip_photos": "Skip to the photographs",
+        "skip_work": "Skip to the work",
+        "series_count": "series",
+        "home_eyebrow": "Photographs",
+        "switch_label": "中文",
+        "switch_title": "Read in Chinese",
+        "open_full": "Open photograph {n} of {total} full screen",
+        "viewer_label": "Full screen photograph",
+        "close": "Close",
+        "prev": "Previous photograph",
+        "next": "Next photograph",
+    },
+    "zh": {
+        "dir": "zh",
+        "html_lang": "zh-Hans",
+        "photographs": "张",
+        "all_work": "全部作品",
+        "scroll": "向下",
+        "skip_photos": "跳到照片",
+        "skip_work": "跳到作品",
+        "series_count": "组",
+        "home_eyebrow": "摄影",
+        "switch_label": "EN",
+        "switch_title": "Read in English",
+        "open_full": "放大查看第 {n} 张，共 {total} 张",
+        "viewer_label": "全屏查看",
+        "close": "关闭",
+        "prev": "上一张",
+        "next": "下一张",
+    },
+}
+
+ZH_MONTHS = {m: f"{m} 月" for m in range(1, 13)}
+
 # 版面：图片高度上限 84vh，宽度上限 min(92vw, 1500px)。
 # sizes 属性要跟 CSS 里的 .plate__frame 保持一致，否则浏览器会挑错尺寸。
 MAX_VH = 84
@@ -362,8 +406,10 @@ def build_images(photos: list[Photo], slug: str, force: bool) -> int:
         photo.variants = {}
         for ext in ("avif", "webp", "jpg"):
             useful = [w for w in widths if ext in formats_for(w)]
+            # 存成相对 dist/ 根目录的路径。页面在哪一层由 prefix 决定——
+            # 英文系列页在 /slug/，中文系列页在 /zh/slug/，深度不同。
             photo.variants[ext] = [
-                (w, f"../img/{slug}/{photo.stem}-{w}.{ext}") for w in useful
+                (w, f"img/{slug}/{photo.stem}-{w}.{ext}") for w in useful
             ]
             total_bytes += sum(
                 (out_dir / f"{photo.stem}-{w}.{ext}").stat().st_size for w in useful
@@ -380,8 +426,8 @@ def build_images(photos: list[Photo], slug: str, force: bool) -> int:
 # ---------------------------------------------------------------------------
 
 
-def srcset(variants: list[tuple[int, str]]) -> str:
-    return ", ".join(f"{url} {w}w" for w, url in variants)
+def srcset(variants: list[tuple[int, str]], prefix: str) -> str:
+    return ", ".join(f"{prefix}{url} {w}w" for w, url in variants)
 
 
 def sizes_attr(photo: Photo) -> str:
@@ -389,22 +435,22 @@ def sizes_attr(photo: Photo) -> str:
     return f"min({MAX_VW}vw, {MAX_PX}px, {MAX_VH * photo.aspect:.0f}vh)"
 
 
-def plate_html(photo: Photo, index: int, total: int) -> str:
-    largest = photo.variants["jpg"][-1]
+def plate_html(photo: Photo, index: int, total: int, prefix: str, L: dict) -> str:
+    largest = prefix + photo.variants["jpg"][-1][1]
     return f"""
         <figure class="plate{' plate--portrait' if photo.is_portrait else ''}"
                 id="plate-{index + 1}"
                 style="--ar: {photo.aspect:.4f}">
           <button class="plate__open" type="button" data-index="{index}"
-                  aria-label="放大查看第 {index + 1} 张，共 {total} 张">
+                  aria-label="{esc(L['open_full'].format(n=index + 1, total=total))}">
             <span class="plate__frame"
                   style="background-image: url(data:image/jpeg;base64,{photo.lqip})">
               <picture>
-                <source type="image/avif" srcset="{srcset(photo.variants['avif'])}"
+                <source type="image/avif" srcset="{srcset(photo.variants['avif'], prefix)}"
                         sizes="{sizes_attr(photo)}">
-                <source type="image/webp" srcset="{srcset(photo.variants['webp'])}"
+                <source type="image/webp" srcset="{srcset(photo.variants['webp'], prefix)}"
                         sizes="{sizes_attr(photo)}">
-                <img src="{largest[1]}" srcset="{srcset(photo.variants['jpg'])}"
+                <img src="{largest}" srcset="{srcset(photo.variants['jpg'], prefix)}"
                      sizes="{sizes_attr(photo)}"
                      width="{photo.width}" height="{photo.height}"
                      alt="{esc(photo.alt)}"
@@ -426,17 +472,17 @@ def plate_html(photo: Photo, index: int, total: int) -> str:
         </figure>"""
 
 
-def photo_data(photos: list[Photo]) -> str:
+def photo_data(photos: list[Photo], prefix: str) -> str:
     """给全屏浏览用的数据。手写 JSON，避免为一点点数据引入依赖。"""
     import json
 
     return json.dumps(
         [
             {
-                "avif": srcset(p.variants["avif"]),
-                "webp": srcset(p.variants["webp"]),
-                "jpg": srcset(p.variants["jpg"]),
-                "src": p.variants["jpg"][-1][1],
+                "avif": srcset(p.variants["avif"], prefix),
+                "webp": srcset(p.variants["webp"], prefix),
+                "jpg": srcset(p.variants["jpg"], prefix),
+                "src": prefix + p.variants["jpg"][-1][1],
                 "w": p.width,
                 "h": p.height,
                 "alt": p.alt,
@@ -471,6 +517,7 @@ def build_series(cfg: dict, force: bool) -> dict:
     # TOML 里可以写 date = "2024-05"：用于 EXIF 被抹掉、只知道大概月份的系列。
     # 写了就不再逐张标日期——只知道月份却标出"某月某日"是在编造精确度。
     forced = cfg.get("date")
+    when = None
     if forced:
         try:
             when = datetime.strptime(str(forced), "%Y-%m")
@@ -478,22 +525,9 @@ def build_series(cfg: dict, force: bool) -> dict:
             sys.exit(f"{cfg['title']} 的 date 要写成 \"YYYY-MM\"，现在是 {forced!r}")
         for p in photos:
             p.show_date = False
-        span = when.strftime("%B %Y")
-        print(f"  日期按 TOML 指定的 {span}（不逐张标注）")
-    else:
-        span = ""
-        dated = [p.shot_at for p in photos if p.shot_at]
-        if dated:
-            lo, hi = min(dated), max(dated)
-            span = (
-                lo.strftime("%B %Y")
-                if lo.strftime("%Y%m") == hi.strftime("%Y%m")
-                else f"{lo.strftime('%B')} – {hi.strftime('%B %Y')}"
-            )
+        print(f"  日期按 TOML 指定的 {when:%Y-%m}（不逐张标注）")
 
     total_bytes = build_images(photos, slug, force)
-
-    plates = "\n".join(plate_html(p, i, len(photos)) for i, p in enumerate(photos))
 
     # 目录页要用的封面。TOML 里可以写 cover = "文件名（不含扩展名）"，不写就用第一张。
     cover = photos[0]
@@ -505,47 +539,130 @@ def build_series(cfg: dict, force: bool) -> dict:
         else:
             print(f"  ⚠ 找不到指定的封面 {wanted}，改用第一张 {cover.stem}")
 
+    return {
+        "cfg": cfg,
+        "slug": slug,
+        "order": cfg.get("order", 999),
+        "forced_date": when,
+        "count": len(photos),
+        "bytes": total_bytes,
+        "cover": cover,
+        "photos": photos,
+    }
+
+
+def text_of(cfg: dict, lang: str, key: str, default: str = "") -> str:
+    """取某个语言的文案。中文没写的项自动回落到英文，不会开天窗。"""
+    if lang != "en":
+        val = cfg.get(lang, {}).get(key)
+        if val is not None:
+            return val
+    return cfg.get(key, default)
+
+
+def format_span(s: dict, lang: str) -> str:
+    """把拍摄时间跨度写成人话。中英文的日期写法完全不同，分开处理。"""
+    when = s["forced_date"]
+    if when:
+        return (f"{when.year} 年 {when.month} 月" if lang == "zh"
+                else when.strftime("%B %Y"))
+
+    dated = [p.shot_at for p in s["photos"] if p.shot_at]
+    if not dated:
+        return ""
+    lo, hi = min(dated), max(dated)
+    same_month = lo.strftime("%Y%m") == hi.strftime("%Y%m")
+    if lang == "zh":
+        if same_month:
+            return f"{lo.year} 年 {lo.month} 月"
+        if lo.year == hi.year:
+            return f"{lo.year} 年 {lo.month}–{hi.month} 月"
+        return f"{lo.year} 年 {lo.month} 月 – {hi.year} 年 {hi.month} 月"
+    if same_month:
+        return lo.strftime("%B %Y")
+    return f"{lo.strftime('%B')} – {hi.strftime('%B %Y')}"
+
+
+def render_series(s: dict, lang: str, site: dict) -> None:
+    """把一个系列渲染成某一种语言的页面。图片是共用的，只有文字和路径不同。"""
+    cfg, L = s["cfg"], LANGS[lang]
+    # 英文系列页在 /slug/，中文在 /zh/slug/ ——到 dist 根目录的深度不一样
+    depth = 2 if L["dir"] else 1
+    prefix = "../" * depth
+    root = "/".join([".."] * depth)
+
+    title = text_of(cfg, lang, "title")
+    author = text_of(cfg, lang, "author", text_of(site, lang, "name"))
+    span = format_span(s, lang)
+    photos = s["photos"]
+
+    count_label = f"{s['count']} {L['photographs']}"
+
     body = render(
         (TEMPLATES / "series.html").read_text(encoding="utf-8"),
-        title=esc(cfg["title"]),
-        eyebrow=esc(cfg.get("eyebrow", "")),
-        year=esc(cfg.get("year", "")),
-        statement=paragraphs(cfg.get("statement", "")),
-        count=len(photos),
+        title=esc(title),
+        eyebrow=esc(text_of(cfg, lang, "eyebrow")),
+        year=esc(str(text_of(cfg, lang, "year"))),
+        statement=paragraphs(text_of(cfg, lang, "statement")),
+        count_label=esc(count_label),
         span=esc(span),
-        place=esc(cfg.get("place", "")),
-        plates=plates,
-        colophon=esc(cfg.get("colophon", "")),
-        author=esc(cfg.get("author", "")),
-        photo_data=photo_data(photos),
+        place=esc(text_of(cfg, lang, "place")),
+        plates="\n".join(
+            plate_html(p, i, len(photos), prefix, L) for i, p in enumerate(photos)
+        ),
+        colophon=esc(text_of(cfg, lang, "colophon")),
+        author=esc(author),
+        photo_data=photo_data(photos, prefix),
+        back_href=f"{root}/",
+        back_label=esc(L["all_work"]),
+        scroll=esc(L["scroll"]),
+        skip=esc(L["skip_photos"]),
+        switch_href=switch_href(lang, s["slug"]),
+        switch_label=esc(L["switch_label"]),
+        switch_title=esc(L["switch_title"]),
+        viewer_label=esc(L["viewer_label"]),
+        close_label=esc(L["close"]),
+        prev_label=esc(L["prev"]),
+        next_label=esc(L["next"]),
     )
 
     page = render(
         (TEMPLATES / "base.html").read_text(encoding="utf-8"),
-        title=f"{esc(cfg['title'])} — {esc(cfg.get('author', 'Photographs'))}",
-        description=esc(cfg.get("description", "")),
-        root="..",
+        html_lang=L["html_lang"],
+        title=f"{esc(title)} — {esc(author)}",
+        description=esc(text_of(cfg, lang, "description")),
+        root=root,
+        alternates=alternate_links(s["slug"]),
         body=body,
     )
 
-    out = DIST / slug / "index.html"
+    out = DIST / L["dir"] / s["slug"] / "index.html" if L["dir"] else DIST / s["slug"] / "index.html"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(page, encoding="utf-8")
 
-    return {
-        "slug": slug,
-        "title": cfg["title"],
-        "eyebrow": cfg.get("eyebrow", ""),
-        "year": cfg.get("year", ""),
-        "place": cfg.get("place", ""),
-        "order": cfg.get("order", 999),
-        "span": span,
-        "count": len(photos),
-        "bytes": total_bytes,
-        "cover": cover,
-        "has_placeholder": "【" in cfg.get("statement", ""),
-        "photos": photos,
-    }
+
+def switch_href(lang: str, slug: str = "") -> str:
+    """语言切换按钮：指向对方语言的**同一个**页面，不是跳回首页。
+
+      英文系列 /slug/      → ../zh/slug/
+      中文系列 /zh/slug/   → ../../slug/
+      英文首页 /           → ./zh/
+      中文首页 /zh/        → ../
+    """
+    if lang == "en":
+        return f"../zh/{slug}/" if slug else "./zh/"
+    return f"../../{slug}/" if slug else "../"
+
+
+def alternate_links(slug: str = "") -> str:
+    """告诉搜索引擎这两个网址是同一内容的不同语言版本。"""
+    base = "https://yanaoliu-jpg.github.io"
+    tail = f"/{slug}/" if slug else "/"
+    return (
+        f'<link rel="alternate" hreflang="en" href="{base}{tail}">\n'
+        f'<link rel="alternate" hreflang="zh-Hans" href="{base}/zh{tail}">\n'
+        f'<link rel="alternate" hreflang="x-default" href="{base}{tail}">'
+    )
 
 
 def typography(text: str) -> str:
@@ -586,18 +703,19 @@ def copy_static() -> None:
     (DIST / ".nojekyll").write_text("")
 
 
-def work_card(s: dict) -> str:
+def work_card(s: dict, lang: str, prefix: str) -> str:
     """目录页上的一个作品条目。"""
-    cover = s["cover"]
-    # 系列页在 /<slug>/ 下，图片路径是 ../img/…；目录页在根目录，要改成 ./img/…
-    def fix(variants):
-        return ", ".join(f"{url.replace('../', './', 1)} {w}w" for w, url in variants)
-
-    sizes = f"min(92vw, 1100px, {52 * cover.aspect:.0f}vh)"
-    fallback = cover.variants["jpg"][-1][1].replace("../", "./", 1)
+    cfg, cover, L = s["cfg"], s["cover"], LANGS[lang]
+    sizes = f"min(100%, {52 * cover.aspect:.0f}vh)"
     detail = " · ".join(
-        x for x in (f"{s['count']} photographs", s["span"], s["place"]) if x
+        x for x in (
+            f"{s['count']} {L['photographs']}",
+            format_span(s, lang),
+            text_of(cfg, lang, "place"),
+        ) if x
     )
+    eyebrow = text_of(cfg, lang, "eyebrow")
+    year = str(text_of(cfg, lang, "year"))
 
     return f"""
       <li class="work" style="--ar: {cover.aspect:.4f}">
@@ -605,47 +723,63 @@ def work_card(s: dict) -> str:
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,{cover.lqip})">
             <picture>
-              <source type="image/avif" srcset="{fix(cover.variants['avif'])}" sizes="{sizes}">
-              <source type="image/webp" srcset="{fix(cover.variants['webp'])}" sizes="{sizes}">
-              <img src="{fallback}" srcset="{fix(cover.variants['jpg'])}" sizes="{sizes}"
+              <source type="image/avif" srcset="{srcset(cover.variants['avif'], prefix)}" sizes="{sizes}">
+              <source type="image/webp" srcset="{srcset(cover.variants['webp'], prefix)}" sizes="{sizes}">
+              <img src="{prefix}{cover.variants['jpg'][-1][1]}"
+                   srcset="{srcset(cover.variants['jpg'], prefix)}" sizes="{sizes}"
                    width="{cover.width}" height="{cover.height}"
                    alt="{esc(cover.alt)}" loading="lazy" decoding="async">
             </picture>
           </span>
           <span class="work__meta">
-            <span class="work__eyebrow">{esc(s['eyebrow'])}{
-              ' · ' + esc(s['year']) if s['year'] else ''}</span>
-            <span class="work__title">{esc(s['title'])}</span>
+            <span class="work__eyebrow">{esc(eyebrow)}{' · ' + esc(year) if year else ''}</span>
+            <span class="work__title">{esc(text_of(cfg, lang, 'title'))}</span>
             <span class="work__detail">{esc(detail)}</span>
           </span>
         </a>
       </li>"""
 
 
-def write_index(series: list[dict], site: dict) -> None:
+def write_index(series: list[dict], site: dict, lang: str) -> None:
     """作品总目录页。
 
-    放在根路径，而每个系列仍然住在 /<slug>/ ——
-    这样已经发给招生官的系列链接永远不会失效。
+    英文在 /，中文在 /zh/。每个系列仍然住在 /<slug>/ 和 /zh/<slug>/ ——
+    已经发给招生官的链接永远不会失效。
     """
-    ordered = sorted(series, key=lambda s: (s["order"], s["title"]))
+    L = LANGS[lang]
+    depth = 1 if L["dir"] else 0
+    prefix = "../" * depth
+    root = "/".join([".."] * depth) if depth else "."
+    name = text_of(site, lang, "name")
+
+    ordered = sorted(series, key=lambda s: (s["order"], text_of(s["cfg"], lang, "title")))
     body = render(
         (TEMPLATES / "index.html").read_text(encoding="utf-8"),
-        name=esc(site.get("name", "")),
-        intro=paragraphs(site.get("intro", "")),
-        works="\n".join(work_card(s) for s in ordered),
-        count=len(ordered),
-        total=sum(s["count"] for s in ordered),
-        footer=esc(site.get("footer", "")),
+        name=esc(name),
+        home_eyebrow=esc(L["home_eyebrow"]),
+        intro=paragraphs(text_of(site, lang, "intro")),
+        works="\n".join(work_card(s, lang, prefix) for s in ordered),
+        count_label=esc(f"{len(ordered)} {L['series_count']}"),
+        total_label=esc(f"{sum(s['count'] for s in ordered)} {L['photographs']}"),
+        footer=esc(text_of(site, lang, "footer")),
+        scroll=esc(L["scroll"]),
+        skip=esc(L["skip_work"]),
+        switch_href=switch_href(lang),
+        switch_label=esc(L["switch_label"]),
+        switch_title=esc(L["switch_title"]),
     )
     page = render(
         (TEMPLATES / "base.html").read_text(encoding="utf-8"),
-        title=esc(site.get("name", "Photographs")),
-        description=esc(site.get("description", "")),
-        root=".",
+        html_lang=L["html_lang"],
+        title=esc(name),
+        description=esc(text_of(site, lang, "description")),
+        root=root,
+        alternates=alternate_links(),
         body=body,
     )
-    (DIST / "index.html").write_text(page, encoding="utf-8")
+    out = DIST / L["dir"] / "index.html" if L["dir"] else DIST / "index.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(page, encoding="utf-8")
 
 
 def main() -> None:
@@ -675,16 +809,35 @@ def main() -> None:
             cfg = tomllib.load(f)
         built.append(build_series(cfg, args.force))
 
+    # 图片只生成一次，页面按语言各渲染一遍
+    for lang in LANGS:
+        for s in built:
+            render_series(s, lang, site)
+        write_index(built, site, lang)
+
     copy_static()
-    write_index(built, site)
     WORK.exists() and shutil.rmtree(WORK, ignore_errors=True)
 
     print("\n构建完成：")
+    warnings = []
     for b in built:
-        flag = "  ⚠ 自述还是占位符" if b["has_placeholder"] else ""
-        print(f"  {b['title']}: {b['count']} 张，图片共 {b['bytes'] / 1e6:.1f} MB"
-              f"，封面 {b['cover'].stem}{flag}")
-    print(f"  目录页：{len(built)} 个系列，共 {sum(b['count'] for b in built)} 张")
+        cfg = b["cfg"]
+        print(f"  {text_of(cfg, 'en', 'title')}: {b['count']} 张，"
+              f"图片共 {b['bytes'] / 1e6:.1f} MB，封面 {b['cover'].stem}")
+        for lang in LANGS:
+            for key in ("title", "statement", "description"):
+                if "【" in str(text_of(cfg, lang, key)):
+                    warnings.append(f"{text_of(cfg, 'en', 'title')} 的 {lang}.{key} 还是占位符")
+    for lang in LANGS:
+        for key in ("name", "intro", "description"):
+            if "【" in str(text_of(site, lang, key)):
+                warnings.append(f"首页 {lang}.{key} 还是占位符")
+
+    langs = " / ".join(f"/{LANGS[l]['dir']}" if LANGS[l]["dir"] else "/" for l in LANGS)
+    print(f"  语言：{langs}（图片共用，不重复生成）")
+    print(f"  共 {len(built)} 个系列 {sum(b['count'] for b in built)} 张")
+    for w in warnings:
+        print(f"  ⚠ {w}")
     print(f"  产物目录：{DIST}")
 
     if args.serve:
