@@ -15,10 +15,10 @@ year = "2023"
 place = "Beijing"
 
 # 你的名字，会出现在页脚和浏览器标签页上
-author = "【你的英文名 / 拼音，比如 Yanao Liu】"
+author = "Yanao (Leo) Liu"
 
 # 搜索引擎和别人分享链接时看到的一句话描述（120 字以内）
-description = "【一句话英文描述，比如：Nine photographs made after dark in Beijing, November–December 2023.】"
+description = "Nine photographs made after dark in Beijing over four evenings, November–December 2023."
 
 # ─────────────────────────────────────────────────────────────────
 #  创作自述 —— 整个网页最重要的一段文字。
@@ -32,14 +32,13 @@ description = "【一句话英文描述，比如：Nine photographs made after d
 #  空一行就是分段。
 # ─────────────────────────────────────────────────────────────────
 statement = """
-【第一段：一个具体的场景开头。不要总结，直接把人放到那个晚上。
-比如那天几点、你在哪、为什么手里会有相机。越具体越好。】
+These photographs were made on four evenings between November and December of 2023, in the two places in Beijing I knew best: the campus of RDFZ Branch School, where I went to middle school, and Yicheng Dongyuan, the compound where I live.
 
-【第二段：你在拍的过程中注意到了什么、想到了什么。
-这一段是招生官真正在读的部分——他们在找你思考的方式，不是你的形容词。】
+The first three come from a break between evening study sessions. I had brought my camera to school on purpose that day — a classmate's birthday, and I was the one taking the pictures. When the break came I carried it out to the yard instead. I had crossed that yard every day for three years and had never once seen it after dark. The track was empty except for one person still running.
 
-【第三段：这组照片对你意味着什么，或者它改变了你什么。
-一两句就够，别拔高，别喊口号。诚实比漂亮重要。】
+The rest are from December, after the first real snow — the one that means winter has officially arrived. I was shooting from an unlit room, and what I kept photographing turned out to be windows. From the dark you can see a hundred lit ones at once. I kept wondering what each of those households was doing at that exact moment, and whether their thoughts had drifted out of the city along with the snow.
+
+I've come to think a camera gives you more than photographs. It gives you a way of remembering a season — of what the weather was doing while you were living inside it.
 """
 
 # 页脚的器材说明

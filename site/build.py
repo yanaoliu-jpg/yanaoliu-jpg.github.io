@@ -485,6 +485,19 @@ def build_series(cfg: dict, force: bool) -> dict:
             "bytes": total_bytes, "photos": photos}
 
 
+def typography(text: str) -> str:
+    """把直引号换成印刷体的弯引号。
+
+    衬线正文里 don't 和 don’t 的差别一眼就能看出来。
+    放在这里自动处理，比要求写文案的人记得敲特殊字符靠谱。
+    """
+    text = text.replace("--", "—")
+    text = re.sub(r'"([^"\n]*)"', "“\\1”", text)   # 成对双引号
+    text = re.sub(r"(?<=\w)'(?=\w)", "’", text)          # don't / classmate's
+    text = re.sub(r"(?<=\w)'(?![\w])", "’", text)        # students'
+    return text
+
+
 def paragraphs(text: str) -> str:
     """把纯文本按空行切成 <p>。占位符（【】包起来的）加个记号，方便一眼看到还没填。"""
     out = []
@@ -492,7 +505,7 @@ def paragraphs(text: str) -> str:
         if not block.strip():
             continue
         cls = ' class="placeholder"' if "【" in block else ""
-        out.append(f"<p{cls}>{esc(block.strip())}</p>")
+        out.append(f"<p{cls}>{esc(typography(block.strip()))}</p>")
     return "\n          ".join(out)
 
 
