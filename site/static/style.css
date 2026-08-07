@@ -51,7 +51,13 @@
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
           'PingFang SC', 'Hiragino Sans GB', monospace;
 
-  --plate-vh: 84;        /* 图片高度上限，跟 build.py 里的 MAX_VH 保持一致 */
+  /*
+    照片高度上限。84 时整块（照片+说明）占掉 87% 视口——几乎顶满，四周没有余地，
+    说明行被挤在屏幕最底下。72 之后整块约占 75%，上下留得出空气，
+    照片仍然有分量。想再调就改这一个数字，但**必须同步改 build.py 里的 MAX_VH**，
+    否则 sizes 属性会跟 CSS 对不上，浏览器就会挑错分辨率。
+  */
+  --plate-vh: 72;
   --gutter: clamp(1.5rem, 6vw, 6rem);
 }
 
@@ -289,8 +295,9 @@ img { display: block; max-width: 100%; height: auto; }
   跟画廊挂画时对齐画心水平线是同一个道理。
 */
 .plate {
-  width: min(92vw, 1500px, calc(var(--plate-vh) * 1vh * var(--ar)));
-  margin: 0 auto clamp(7rem, 17vh, 13rem);
+  width: min(92vw, 1400px, calc(var(--plate-vh) * 1vh * var(--ar)));
+  /* 照片小了，间距也跟着收一点，否则节奏会显得空 */
+  margin: 0 auto clamp(6rem, 14vh, 11rem);
   /* 每张都有 #plate-1 … #plate-9 锚点，可以直接把某一张的链接发给别人 */
   scroll-margin-top: 6vh;
 }
@@ -350,8 +357,22 @@ img { display: block; max-width: 100%; height: auto; }
 .plate__time { color: var(--ink-faint); }
 .plate__exif { margin-left: auto; color: var(--ink-faint); }
 
-@media (max-width: 640px) {
-  .plate__exif { margin-left: 0; width: 100%; margin-top: 0.4rem; }
+/*
+  参数靠右、日期靠左，铺满照片宽度——一行放得下时这样最好看。
+
+  但竖构图窄得多（72vh 下只有 600px），一行放不下就会折行，
+  而 margin-left:auto 会让折下去的那行**右对齐孤零零挂着**。
+  所以按**照片自身的宽度**判断，不是按视口——同一个屏幕上
+  横片有 972px、竖片只有 600px，视口断点区分不了这两者。
+*/
+.plate { container-type: inline-size; }
+
+@container (max-width: 660px) {
+  .plate__exif {
+    margin-left: 0;
+    width: 100%;
+    margin-top: 0.4rem;
+  }
 }
 
 /* 滚动进入时轻微上浮。克制——过度动效在作品集里是减分的 */
