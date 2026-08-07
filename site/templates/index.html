@@ -1,0 +1,28 @@
+<a class="skip" href="#works">Skip to the work</a>
+
+<main class="page">
+
+  <header class="masthead">
+    <div class="masthead__card">
+      <p class="masthead__eyebrow">Photographs</p>
+      <h1 class="masthead__title">{{ name }}</h1>
+      <p class="masthead__meta"><span>{{ count }} series</span><span>{{ total }} photographs</span></p>
+    </div>
+
+    <div class="statement">
+      {{ intro }}
+    </div>
+
+    <p class="masthead__scroll" aria-hidden="true">Scroll</p>
+  </header>
+
+  <ul class="works" id="works">
+{{ works }}
+  </ul>
+
+  <footer class="colophon">
+    <p class="colophon__gear">{{ footer }}</p>
+    <p class="colophon__name">{{ name }}</p>
+  </footer>
+
+</main>

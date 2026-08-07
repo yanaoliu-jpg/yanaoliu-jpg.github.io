@@ -144,10 +144,16 @@ class Photo:
     width: int  # 转正之后的宽（EXIF 里标了旋转的，这里已经换过来了）
     height: int
     shot_at: datetime | None
-    iso: int | None
-    aperture: float | None
-    shutter: str | None
-    focal: int | None
+    # 时间是不是真的来自 EXIF。有些照片经过微信、手机相册导出之后元数据被清空，
+    # 只能退而用文件创建时间——那个日期大致可信，但几点几分纯属文件系统的产物，
+    # 不能当成快门时刻显示出来。
+    time_is_real: bool
+    # 系列级 date 覆盖了逐张日期时置 False（见 date_label）
+    show_date: bool = True
+    iso: int | None = None
+    aperture: float | None = None
+    shutter: str | None = None
+    focal: int | None = None
     alt: str = ""
     lqip: str = ""
     variants: dict = field(default_factory=dict)
@@ -162,15 +168,25 @@ class Photo:
 
     @property
     def date_label(self) -> str:
-        return self.shot_at.strftime("%Y.%m.%d") if self.shot_at else ""
+        # 系列在 TOML 里写了 date 时，说明我们只知道月份、不知道具体哪天，
+        # 那就一天都不标——标一个来自文件系统的假日期，比留空糟糕得多。
+        if not self.show_date or not self.shot_at:
+            return ""
+        return self.shot_at.strftime("%Y.%m.%d")
 
     @property
     def time_label(self) -> str:
-        return self.shot_at.strftime("%H:%M") if self.shot_at else ""
+        # 只有真·EXIF 时间才显示到分钟
+        if not (self.shot_at and self.time_is_real):
+            return ""
+        return self.shot_at.strftime("%H:%M")
 
     @property
     def datetime_attr(self) -> str:
-        return self.shot_at.strftime("%Y-%m-%dT%H:%M") if self.shot_at else ""
+        if not self.shot_at:
+            return ""
+        fmt = "%Y-%m-%dT%H:%M" if self.time_is_real else "%Y-%m-%d"
+        return self.shot_at.strftime(fmt)
 
     @property
     def exif_label(self) -> str:
@@ -200,12 +216,20 @@ def read_photo(path: Path) -> Photo:
     width, height = (raw_h, raw_w) if orientation in (5, 6, 7, 8) else (raw_w, raw_h)
 
     shot_at = None
+    time_is_real = False
     stamp = sub.get("DateTimeOriginal") or base.get("DateTime")
     if stamp:
         try:
             shot_at = datetime.strptime(str(stamp), "%Y:%m:%d %H:%M:%S")
+            time_is_real = True
         except ValueError:
             pass
+
+    if shot_at is None:
+        # EXIF 被抹掉了（微信、手机相册导出常见）。退而求其次用文件创建时间，
+        # 至少排序不会乱成随机。macOS 有 st_birthtime，其他系统退回修改时间。
+        st = path.stat()
+        shot_at = datetime.fromtimestamp(getattr(st, "st_birthtime", st.st_mtime))
 
     focal = sub.get("FocalLength")
     aperture = sub.get("FNumber")
@@ -219,6 +243,7 @@ def read_photo(path: Path) -> Photo:
         width=width,
         height=height,
         shot_at=shot_at,
+        time_is_real=time_is_real,
         iso=int(iso) if iso else None,
         aperture=float(aperture) if aperture else None,
         shutter=fmt_shutter(sub.get("ExposureTime")),
@@ -390,9 +415,12 @@ def plate_html(photo: Photo, index: int, total: int) -> str:
             </span>
           </button>
           <figcaption class="plate__caption">
-            <span class="plate__num">{index + 1:02d}</span>
-            <time datetime="{photo.datetime_attr}">{photo.date_label}<span
-              class="plate__time"> · {photo.time_label}</span></time>
+            <span class="plate__num">{index + 1:02d}</span>{
+              f'''
+            <time datetime="{photo.datetime_attr}">{photo.date_label}{
+                f'<span class="plate__time"> · {photo.time_label}</span>'
+                if photo.time_label else ''}</time>'''
+              if photo.date_label else ''}
             <span class="plate__exif">{esc(photo.exif_label)}</span>
           </figcaption>
         </figure>"""
@@ -440,19 +468,42 @@ def build_series(cfg: dict, force: bool) -> dict:
     if missing_alt:
         print(f"  ⚠ 这几张没有 alt 文字（读屏软件会读不出来）：{', '.join(missing_alt)}")
 
+    # TOML 里可以写 date = "2024-05"：用于 EXIF 被抹掉、只知道大概月份的系列。
+    # 写了就不再逐张标日期——只知道月份却标出"某月某日"是在编造精确度。
+    forced = cfg.get("date")
+    if forced:
+        try:
+            when = datetime.strptime(str(forced), "%Y-%m")
+        except ValueError:
+            sys.exit(f"{cfg['title']} 的 date 要写成 \"YYYY-MM\"，现在是 {forced!r}")
+        for p in photos:
+            p.show_date = False
+        span = when.strftime("%B %Y")
+        print(f"  日期按 TOML 指定的 {span}（不逐张标注）")
+    else:
+        span = ""
+        dated = [p.shot_at for p in photos if p.shot_at]
+        if dated:
+            lo, hi = min(dated), max(dated)
+            span = (
+                lo.strftime("%B %Y")
+                if lo.strftime("%Y%m") == hi.strftime("%Y%m")
+                else f"{lo.strftime('%B')} – {hi.strftime('%B %Y')}"
+            )
+
     total_bytes = build_images(photos, slug, force)
 
     plates = "\n".join(plate_html(p, i, len(photos)) for i, p in enumerate(photos))
 
-    span = ""
-    dated = [p.shot_at for p in photos if p.shot_at]
-    if dated:
-        lo, hi = min(dated), max(dated)
-        span = (
-            lo.strftime("%B %Y")
-            if lo.strftime("%Y%m") == hi.strftime("%Y%m")
-            else f"{lo.strftime('%B')} – {hi.strftime('%B %Y')}"
-        )
+    # 目录页要用的封面。TOML 里可以写 cover = "文件名（不含扩展名）"，不写就用第一张。
+    cover = photos[0]
+    wanted = cfg.get("cover")
+    if wanted:
+        match = next((p for p in photos if p.stem == wanted), None)
+        if match:
+            cover = match
+        else:
+            print(f"  ⚠ 找不到指定的封面 {wanted}，改用第一张 {cover.stem}")
 
     body = render(
         (TEMPLATES / "series.html").read_text(encoding="utf-8"),
@@ -481,8 +532,20 @@ def build_series(cfg: dict, force: bool) -> dict:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(page, encoding="utf-8")
 
-    return {"slug": slug, "title": cfg["title"], "count": len(photos),
-            "bytes": total_bytes, "photos": photos}
+    return {
+        "slug": slug,
+        "title": cfg["title"],
+        "eyebrow": cfg.get("eyebrow", ""),
+        "year": cfg.get("year", ""),
+        "place": cfg.get("place", ""),
+        "order": cfg.get("order", 999),
+        "span": span,
+        "count": len(photos),
+        "bytes": total_bytes,
+        "cover": cover,
+        "has_placeholder": "【" in cfg.get("statement", ""),
+        "photos": photos,
+    }
 
 
 def typography(text: str) -> str:
@@ -523,27 +586,66 @@ def copy_static() -> None:
     (DIST / ".nojekyll").write_text("")
 
 
-def write_root_redirect(slug: str) -> None:
-    """现在网站只有一个系列，根路径直接转到它。
+def work_card(s: dict) -> str:
+    """目录页上的一个作品条目。"""
+    cover = s["cover"]
+    # 系列页在 /<slug>/ 下，图片路径是 ../img/…；目录页在根目录，要改成 ./img/…
+    def fix(variants):
+        return ", ".join(f"{url.replace('../', './', 1)} {w}w" for w, url in variants)
 
-    以后加了作品总目录，根路径换成目录页，而 /<slug>/ 这个网址不变——
-    已经发出去给招生官的链接不会失效。
-    """
-    (DIST / "index.html").write_text(
-        f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Redirecting…</title>
-<meta http-equiv="refresh" content="0; url=./{slug}/">
-<link rel="canonical" href="./{slug}/">
-<meta name="robots" content="noindex">
-</head>
-<body><p><a href="./{slug}/">继续 →</a></p></body>
-</html>
-""",
-        encoding="utf-8",
+    sizes = f"min(92vw, 1100px, {52 * cover.aspect:.0f}vh)"
+    fallback = cover.variants["jpg"][-1][1].replace("../", "./", 1)
+    detail = " · ".join(
+        x for x in (f"{s['count']} photographs", s["span"], s["place"]) if x
     )
+
+    return f"""
+      <li class="work" style="--ar: {cover.aspect:.4f}">
+        <a class="work__link" href="./{s['slug']}/">
+          <span class="work__frame"
+                style="background-image: url(data:image/jpeg;base64,{cover.lqip})">
+            <picture>
+              <source type="image/avif" srcset="{fix(cover.variants['avif'])}" sizes="{sizes}">
+              <source type="image/webp" srcset="{fix(cover.variants['webp'])}" sizes="{sizes}">
+              <img src="{fallback}" srcset="{fix(cover.variants['jpg'])}" sizes="{sizes}"
+                   width="{cover.width}" height="{cover.height}"
+                   alt="{esc(cover.alt)}" loading="lazy" decoding="async">
+            </picture>
+          </span>
+          <span class="work__meta">
+            <span class="work__eyebrow">{esc(s['eyebrow'])}{
+              ' · ' + esc(s['year']) if s['year'] else ''}</span>
+            <span class="work__title">{esc(s['title'])}</span>
+            <span class="work__detail">{esc(detail)}</span>
+          </span>
+        </a>
+      </li>"""
+
+
+def write_index(series: list[dict], site: dict) -> None:
+    """作品总目录页。
+
+    放在根路径，而每个系列仍然住在 /<slug>/ ——
+    这样已经发给招生官的系列链接永远不会失效。
+    """
+    ordered = sorted(series, key=lambda s: (s["order"], s["title"]))
+    body = render(
+        (TEMPLATES / "index.html").read_text(encoding="utf-8"),
+        name=esc(site.get("name", "")),
+        intro=paragraphs(site.get("intro", "")),
+        works="\n".join(work_card(s) for s in ordered),
+        count=len(ordered),
+        total=sum(s["count"] for s in ordered),
+        footer=esc(site.get("footer", "")),
+    )
+    page = render(
+        (TEMPLATES / "base.html").read_text(encoding="utf-8"),
+        title=esc(site.get("name", "Photographs")),
+        description=esc(site.get("description", "")),
+        root=".",
+        body=body,
+    )
+    (DIST / "index.html").write_text(page, encoding="utf-8")
 
 
 def main() -> None:
@@ -556,9 +658,16 @@ def main() -> None:
     require_tools()
     DIST.mkdir(parents=True, exist_ok=True)
 
-    configs = sorted(CONTENT.glob("*.toml"))
+    # 下划线开头的是站点级配置，不是作品系列
+    site = {}
+    site_path = CONTENT / "_site.toml"
+    if site_path.exists():
+        with site_path.open("rb") as f:
+            site = tomllib.load(f)
+
+    configs = sorted(p for p in CONTENT.glob("*.toml") if not p.name.startswith("_"))
     if not configs:
-        sys.exit(f"{CONTENT} 里没有找到 .toml 文案文件")
+        sys.exit(f"{CONTENT} 里没有找到作品系列的 .toml 文件")
 
     built = []
     for cfg_path in configs:
@@ -567,12 +676,15 @@ def main() -> None:
         built.append(build_series(cfg, args.force))
 
     copy_static()
-    write_root_redirect(built[0]["slug"])
+    write_index(built, site)
     WORK.exists() and shutil.rmtree(WORK, ignore_errors=True)
 
     print("\n构建完成：")
     for b in built:
-        print(f"  {b['title']}: {b['count']} 张，图片共 {b['bytes'] / 1e6:.1f} MB")
+        flag = "  ⚠ 自述还是占位符" if b["has_placeholder"] else ""
+        print(f"  {b['title']}: {b['count']} 张，图片共 {b['bytes'] / 1e6:.1f} MB"
+              f"，封面 {b['cover'].stem}{flag}")
+    print(f"  目录页：{len(built)} 个系列，共 {sum(b['count'] for b in built)} 张")
     print(f"  产物目录：{DIST}")
 
     if args.serve:

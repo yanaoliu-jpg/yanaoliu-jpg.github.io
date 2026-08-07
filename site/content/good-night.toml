@@ -7,7 +7,10 @@
 
 slug = "good-night"          # 网址会是 .../good-night/ ，别随便改，改了旧链接就失效
 title = "Good Night"
-source = "第一年/Good night"  # 原图在 ../素材/ 下的哪个文件夹
+source = "第一年/Good night"   # 原图在 ../素材/ 下的哪个文件夹
+
+order = 1              # 目录页上的排列顺序
+cover = "DSC05547"     # 目录页封面（文件名，不含扩展名）
 
 # 标题上方那行小字
 eyebrow = "Series 01"

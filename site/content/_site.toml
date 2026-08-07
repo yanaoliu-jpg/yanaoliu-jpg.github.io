@@ -1,0 +1,31 @@
+# ═══════════════════════════════════════════════════════════════════
+#  站点级设置 —— 只管首页（作品总目录）上的文字。
+#  下划线开头的文件不会被当成作品系列。
+#
+#  每期作品自己的文字在同目录下的 good-night.toml / goodbye-renfen.toml。
+# ═══════════════════════════════════════════════════════════════════
+
+name = "Yanao (Leo) Liu"
+
+# 搜索引擎和别人分享链接时看到的一句话
+description = "Photographs made in Beijing between 2023 and 2024."
+
+# ─────────────────────────────────────────────────────────────────
+#  首页开头那段话 —— 招生官点开链接第一眼读到的东西。
+#
+#  不用长，三到五句就够。可以说：
+#    · 你从什么时候开始拍、用什么拍
+#    · 你一般拍什么、为什么是这些
+#    · 这个网站是什么（几组作品的合集）
+#
+#  跟作品自述一样：先写中文给我，我转英文。
+#  空一行就是分段。
+# ─────────────────────────────────────────────────────────────────
+intro = """
+This is my album. What it holds is memory — the kind I can only keep by photographing it.
+
+The camera is my brush and my way of looking. I use it to set down the world as it appears to me, and the countless small moments that ordinary life is made of.
+"""
+
+# 页脚。想留联系方式就写在这里，不想留就留空。
+footer = "Beijing"

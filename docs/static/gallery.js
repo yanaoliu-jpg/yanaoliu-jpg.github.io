@@ -9,7 +9,10 @@
 
   var root = document.documentElement;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var plates = Array.prototype.slice.call(document.querySelectorAll('.plate'));
+  // 系列页里是 .plate（照片），目录页里是 .work（作品条目），两边共用同一套进场逻辑
+  var plates = Array.prototype.slice.call(
+    document.querySelectorAll('.plate, .work')
+  );
 
   /* ── 图片加载完再淡入 ──────────────────────────────────────── */
 
@@ -37,9 +40,8 @@
     // 先让 CSS 里的动效规则生效，再立刻把首屏内的照片点亮。
     // 顺序很重要：类加上之后照片才会隐藏，所以下面必须马上把该显示的显示出来。
     root.classList.add('js-reveal');
-    document.querySelectorAll('.plate__frame img').forEach(function (img) {
-      watchLoading(img);
-    });
+    document.querySelectorAll('.plate__frame img, .work__frame img')
+      .forEach(function (img) { watchLoading(img); });
 
     plates.forEach(function (p) {
       if (p.getBoundingClientRect().top < window.innerHeight * 1.1) {
