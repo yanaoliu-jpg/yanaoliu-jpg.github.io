@@ -12,8 +12,6 @@ source = "第一年/Good night"   # 原图在 ../素材/ 下的哪个文件夹
 order = 1              # 目录页上的排列顺序
 cover = "DSC05547"     # 目录页封面（文件名，不含扩展名）
 
-# 标题上方那行小字
-eyebrow = "Series 01"
 year = "2023"
 place = "Beijing"
 
@@ -73,7 +71,6 @@ DSC05565 = "A snow-dusted courtyard seen from above at night: a pavilion, a drai
 # ═══════════════════════════════════════════════════════════════════
 [zh]
 title = "晚安"
-eyebrow = "第一组"
 place = "北京"
 author = "刘延奥"
 description = "2023 年 11 至 12 月，四个夜晚，拍摄于北京。"

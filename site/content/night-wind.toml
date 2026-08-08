@@ -10,7 +10,6 @@ source = "第一年/夜风沉醉的旅程"
 order = 4
 cover = "DSC00692"   # WHARF FISHMARKET 的蓝绿色外墙，缩小了也一眼认得出
 
-eyebrow = "Series 04"
 year = "2025"
 place = "Aranya, Beidaihe"
 
@@ -57,7 +56,6 @@ DSC00692 = "A teal concrete building at night with WHARF FISHMARKET lit above th
 # ═══════════════════════════════════════════════════════════════════
 [zh]
 title = "夜风沉醉的旅程"
-eyebrow = "第四组"
 place = "北戴河 · 阿那亚"
 author = "刘延奥"
 description = "2025 年 7 月，入夜之后的阿那亚，九张照片。"

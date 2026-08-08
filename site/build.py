@@ -83,6 +83,8 @@ LANGS = {
         "home_eyebrow": "Photographs",
         "switch_label": "中文",
         "switch_title": "Read in Chinese",
+        "next_series": "Next series",
+        "series_word": "Series",
         "open_full": "Open photograph {n} of {total} full screen",
         "viewer_label": "Full screen photograph",
         "close": "Close",
@@ -101,6 +103,8 @@ LANGS = {
         "home_eyebrow": "摄影",
         "switch_label": "EN",
         "switch_title": "Read in English",
+        "next_series": "下一组",
+        "series_word": "第{n}组",
         "open_full": "放大查看第 {n} 张，共 {total} 张",
         "viewer_label": "全屏查看",
         "close": "关闭",
@@ -110,6 +114,9 @@ LANGS = {
 }
 
 ZH_MONTHS = {m: f"{m} 月" for m in range(1, 13)}
+
+# 「第五组」里的那个「五」。到 99 组够用了，超过了他也早就该精选而不是堆量。
+CN_DIGITS = "〇一二三四五六七八九"
 
 # 版面：照片高度上限 72vh，宽度上限 min(92vw, 1400px)。
 #
@@ -571,6 +578,28 @@ def text_of(cfg: dict, lang: str, key: str, default: str = "") -> str:
     return cfg.get(key, default)
 
 
+def cn_number(n: int) -> str:
+    """5 -> 五，10 -> 十，15 -> 十五，20 -> 二十，25 -> 二十五。"""
+    if n < 10:
+        return CN_DIGITS[n]
+    tens, ones = divmod(n, 10)
+    return ("" if tens == 1 else CN_DIGITS[tens]) + "十" + (CN_DIGITS[ones] if ones else "")
+
+
+def eyebrow_for(cfg: dict, lang: str, order: int) -> str:
+    """标题上方那行「Series 05 / 第五组」。
+
+    默认由 order 自动生成——手写的话，加到第十组时迟早会写重号或跳号，
+    而这行字出现在系列页和目录页两处，错了很显眼。
+    真要特殊写法（比如某组不想编号），在 toml 里写 eyebrow 就能覆盖。
+    """
+    written = text_of(cfg, lang, "eyebrow")
+    if written:
+        return written
+    word = LANGS[lang]["series_word"]
+    return word.format(n=cn_number(order)) if "{n}" in word else f"{word} {order:02d}"
+
+
 def format_span(s: dict, lang: str) -> str:
     """把拍摄时间跨度写成人话。中英文的日期写法完全不同，分开处理。"""
     when = s["forced_date"]
@@ -594,8 +623,14 @@ def format_span(s: dict, lang: str) -> str:
     return f"{lo.strftime('%B')} – {hi.strftime('%B %Y')}"
 
 
-def render_series(s: dict, lang: str, site: dict) -> None:
-    """把一个系列渲染成某一种语言的页面。图片是共用的，只有文字和路径不同。"""
+def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
+    """把一个系列渲染成某一种语言的页面。图片是共用的，只有文字和路径不同。
+
+    nxt 是**下一组**（最后一组绕回第一组）。看完一组之后如果只有左上角
+    一个「全部作品」，招生官就得退回目录、重新找、再点进去；十组就是十次往返。
+    绕回去而不是在最后一组停下，是为了任何一个入口进来都不会走到死路——
+    直接点开第三组链接的人，同样能一路读完剩下的。
+    """
     cfg, L = s["cfg"], LANGS[lang]
     # 英文系列页在 /slug/，中文在 /zh/slug/ ——到 dist 根目录的深度不一样
     depth = 2 if L["dir"] else 1
@@ -612,7 +647,7 @@ def render_series(s: dict, lang: str, site: dict) -> None:
     body = render(
         (TEMPLATES / "series.html").read_text(encoding="utf-8"),
         title=esc(title),
-        eyebrow=esc(text_of(cfg, lang, "eyebrow")),
+        eyebrow=esc(eyebrow_for(cfg, lang, s["order"])),
         year=esc(str(text_of(cfg, lang, "year"))),
         statement=paragraphs(text_of(cfg, lang, "statement")),
         count_label=esc(count_label),
@@ -624,6 +659,26 @@ def render_series(s: dict, lang: str, site: dict) -> None:
         colophon=esc(text_of(cfg, lang, "colophon")),
         author=esc(author),
         photo_data=photo_data(photos, prefix),
+        # 前缀是 nextup_ 不是 next_：next_label 已经被全屏查看的「下一张」占了
+        #
+        # ⚠️ 是 ../slug/ 不是 {root}/slug/。系列页都住在自己语言那一层
+        # （/slug/ 和 /zh/slug/），下一组永远是**同级目录**，只上一层。
+        # 写成 {root}/ 的话中文页会跳到 ../../good-night/ ——那是英文页，
+        # 读者读着中文突然掉进英文站。
+        nextup_href=f"../{nxt['slug']}/",
+        nextup_label=esc(L["next_series"]),
+        nextup_title=esc(text_of(nxt["cfg"], lang, "title")),
+        # 跟 .work__detail 同一套：每段一个 nowrap 的 <span>，段与段之间留空格。
+        # 直接拼成一个长字符串的话，窄屏上会断在「November –」后面，
+        # 把一个日期范围劈成两行。
+        nextup_meta=" ".join(
+            f"<span>{esc(x)}</span>"
+            for x in (
+                eyebrow_for(nxt["cfg"], lang, nxt["order"]),
+                f"{nxt['count']} {L['photographs']}",
+                format_span(nxt, lang),
+            ) if x
+        ),
         back_href=f"{root}/",
         back_label=esc(L["all_work"]),
         scroll=esc(L["scroll"]),
@@ -743,7 +798,7 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
             format_span(s, lang),
         ) if x
     )
-    eyebrow = text_of(cfg, lang, "eyebrow")
+    eyebrow = eyebrow_for(cfg, lang, s["order"])
     year = str(text_of(cfg, lang, "year"))
 
     return f"""
@@ -838,10 +893,15 @@ def main() -> None:
             cfg = tomllib.load(f)
         built.append(build_series(cfg, args.force))
 
+    # 「下一组」按 order 首尾相接。slug 参与排序只是为了 order 撞车时结果稳定，
+    # 不然两次构建可能给出不同的顺序。
+    chain = sorted(built, key=lambda s: (s["order"], s["slug"]))
+    next_of = {s["slug"]: chain[(i + 1) % len(chain)] for i, s in enumerate(chain)}
+
     # 图片只生成一次，页面按语言各渲染一遍
     for lang in LANGS:
         for s in built:
-            render_series(s, lang, site)
+            render_series(s, lang, site, next_of[s["slug"]])
         write_index(built, site, lang)
 
     copy_static()

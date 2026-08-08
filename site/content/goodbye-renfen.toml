@@ -13,7 +13,6 @@ source = "第一年/再见，人分"
 order = 2              # 目录页上的排列顺序
 cover = "00650c89435290da7420ad155eff930"   # 目录页封面
 
-eyebrow = "Series 02"
 year = "2024"
 place = "Beijing"
 
@@ -64,7 +63,6 @@ colophon = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"
 # ═══════════════════════════════════════════════════════════════════
 [zh]
 title = "再见，人分"
-eyebrow = "第二组"
 place = "北京"
 author = "刘延奥"
 description = "2024 年 5 月，重返初中母校时拍下的九张照片。"

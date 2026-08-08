@@ -11,7 +11,6 @@ source = "第一年/旧时光"
 order = 3                      # 目录页上排第三
 cover = "DSC09243"             # 阳光穿过树、跑道上一地影子的那张
 
-eyebrow = "Series 03"
 year = "2025"
 place = "Beijing"
 
@@ -53,7 +52,6 @@ DSC09275 = "A dim lecture hall at the end of the day, wooden benches in rows, a 
 # ═══════════════════════════════════════════════════════════════════
 [zh]
 title = "旧时光"
-eyebrow = "第三组"
 place = "北京"
 author = "刘延奥"
 description = "2025 年 5 月的一个下午，拍于正在空下来的校园。"

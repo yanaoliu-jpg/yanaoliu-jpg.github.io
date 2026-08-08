@@ -11,7 +11,6 @@ source = "第一年/Xacademy的夏辑"
 order = 5                       # 目录页上排第五
 cover = "20250801-DSC08901"     # 最后一夜，弹吉他的人和一圈举起来的手机
 
-eyebrow = "Series 05"
 year = "2025"
 place = "Shanghai"
 
@@ -65,7 +64,6 @@ colophon = "Sony α7 IV"
 # ═══════════════════════════════════════════════════════════════════
 [zh]
 title = "我总是回到那几天"
-eyebrow = "第五组"
 place = "上海"
 author = "刘延奥"
 description = "2025 年 7 月底到 8 月初，上海的三天，九张照片。"
