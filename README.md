@@ -2,7 +2,7 @@
 
 给美国大学招生官看的网页版作品集。线上地址：**https://yanaoliu-jpg.github.io/**
 
-目前五期：
+目前六期：
 
 | | | |
 |---|---|---|
@@ -11,6 +11,7 @@
 | The Old Days 旧时光 | 2025 年 5 月 | 9 张 |
 | Drunk on the Night Wind 夜风沉醉的旅程 | 2025 年 7 月 | 9 张 |
 | I Keep Going Back 我总是回到那几天 | 2025 年 7–8 月 | 9 张 |
+| Sea and Light 海与光的诗 | 2026 年 3 月 | 9 张 |
 
 - 源码在 `site/`
 - 生成的网站在 `docs/`
@@ -103,6 +104,7 @@ python3 site/tools/check_font.py
 | `the-old-days.toml` | The Old Days / 旧时光 |
 | `night-wind.toml` | Drunk on the Night Wind / 夜风沉醉的旅程 |
 | `keep-going-back.toml` | I Keep Going Back / 我总是回到那几天 |
+| `sea-and-light.toml` | Sea and Light / 海与光的诗 |
 
 下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
 

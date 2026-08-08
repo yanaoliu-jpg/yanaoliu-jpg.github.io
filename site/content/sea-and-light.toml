@@ -1,0 +1,88 @@
+# ═══════════════════════════════════════════════════════════════════
+#  海与光的诗 —— 这个文件就是网页上所有的文字。
+#  改完存盘，跑：  python3 build.py
+#  改了中文还要跑：python3 tools/subset_font.py 然后再 build 一次
+# ═══════════════════════════════════════════════════════════════════
+
+slug = "sea-and-light"          # 网址：.../sea-and-light/ ，定了别再改
+title = "Sea and Light"
+source = "第一年/海与光的诗"
+
+order = 6                       # 目录页上排第六
+cover = "DSC005751"             # 黑暗里那整面亮着的水族箱玻璃，前面一个剪影
+
+year = "2026"
+place = "Zhuhai"
+
+author = "Yanao (Leo) Liu"
+
+description = "Nine photographs made over two days in Zhuhai, March 2026."
+
+# EXIF 这次是完整的（机身 Sony ILCE-7M4、镜头 Sigma 24-70mm F2.8 DG DN Art、
+# 光圈快门 ISO 全在），2026-03-22 16:09 → 03-23 12:13。
+# 所以不写 date，页面按拍摄时间排序、逐张标日期时刻和参数。
+
+# ─────────────────────────────────────────────────────────────────
+#  你原文里的「忧郁的风情，就连天气也是」对得上前七张（阴天、暗调），
+#  但最后一张是蓝天白云，而且是九张里唯一一个张开双臂的动作。
+#  没有抹掉这个落差，反而拿它收尾：忧郁走到最后放了晴。
+#
+#  多写了一段是照片自己说出来的，不在你原文里：
+#  九张里没有一个人是朝着镜头的，全是背影和剪影，而且每个人都在看着什么。
+#  这条线跟第五组接得上，而且更纯粹。
+#
+#  HOSA 按你定的提了一句，只作为去珠海的缘由，不展开。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+In March 2026 I went to Zhuhai with my team for the China round of a HOSA thirty-second public service advertising competition. The city is built along the coast, one bridge from Macau, and something melancholy runs through all of it. The weather was in on it too — overcast nearly the whole time we were there.
+
+The first afternoon we went to Chimelong, the resort Zhuhai is known for. Between the drops on the roller coasters I kept stopping to photograph. Someone sitting under the aquarium tunnel with their head down while the big fish went over. A shaft of daylight falling through a hole in a dark ceiling, one person standing under it looking up. A lit wall of water with kelp growing in it, and a silhouette in front of it. After dark the drones went up and made a jellyfish out of light, and the fireworks came up red underneath.
+
+The next morning we walked out into the city instead. A white arch framing someone who stood facing an empty road under a flyover. A small red-roofed tower at the edge of the sea, and a person in a straw hat sitting in front of it, looking out.
+
+I only noticed this afterwards: not one person in these nine photographs is facing me. They are all backs and silhouettes, and every one of them is looking at something — the fish, the light, the drones, the sea. I was standing behind them, photographing what they were looking at. In the last frame the sky had finally cleared, and someone stood in front of a huge yellow sculpture with both arms out. Still with their back to me.
+
+Those few days do not feel entirely real to me now. The photographs are the part I am sure of.
+"""
+
+colophon = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"
+
+
+# ─────────────────────────────────────────────────────────────────
+#  替代文字（alt text）：图片没加载出来、或读屏软件读页面时用
+#  文件名和画面的对应关系是逐张看过原图确认的，不是按顺序猜的
+# ─────────────────────────────────────────────────────────────────
+[alt]
+DSC005321 = "Inside an aquarium tunnel: a person in a blue cap sits on the ledge with their head lowered while large fish drift past behind the curved glass."
+DSC005381 = "A dark chamber lit only by a round opening in the carved stone ceiling; one figure stands in silhouette below it, looking up."
+DSC005601 = "A huge whale shark sculpture rising out of sculpted waves above a theme park walkway, with palm trees, blue parasols and visitors below."
+DSC005751 = "A wide aquarium window glowing in a dark room, tall kelp and fish inside it, a single figure standing in silhouette against the glass."
+DSC007321 = "A night sky where drone lights form a jellyfish above searchlight beams and palm trees; in the foreground a person watches from behind."
+DSC007471 = "A night sky split in two: a blue constellation of drone lights above, red fireworks and smoke rising through palm fronds below."
+DSC008611 = "Seen through a white arch: a person with an orange tote stands among shrubs facing an empty road beneath a pale concrete flyover."
+DSC009441 = "A small white tower with a red roof at the edge of a hazy sea; a person in a straw hat sits on a stone bench looking out, flowers blurred in the foreground."
+DSC009841 = "Under a blue sky with clouds, a person stands with both arms outstretched, back to the camera, facing a large yellow animal sculpture."
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/sea-and-light/）
+#  直接用中文写的，不是从英文回译
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "海与光的诗"
+place = "珠海"
+author = "刘延奥"
+description = "2026 年 3 月，珠海的两天，九张照片。"
+colophon = "索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"
+
+statement = """
+2026 年三月，我和团队组员一起去珠海，参加 HOSA 三十秒公益广告比赛的中国站。这座城市建在海边，离澳门只隔着一座桥，处处透着一股忧郁的风情——就连天气也是，我们在的那几天几乎都是阴的。
+
+第一天下午我们去了长隆。长隆是珠海的特色，自然要去。在过山车的跌宕起伏之余，我总忍不住停下来拍。有人坐在水族馆的隧道底下低着头，大鱼从头顶游过去。黑黢黢的屋子里，天顶漏下一束光，一个人站在光底下仰着头。一整面亮着的水族箱玻璃，里面长着海藻，玻璃前面立着一个剪影。天黑以后无人机升上夜空，拼出一只水母，红色的烟火在底下炸开。
+
+第二天上午我们没再进园，而是走进了城里。一道白色的拱门框住一个人，面对着高架桥下那条空路。海边一座红顶的小白塔，一个戴草帽的人坐在塔前，望着海。
+
+事后我才发现，这九张照片里没有一个人是朝着我的。全是背影和剪影，而每一个人都在看着什么——看鱼、看光、看无人机、看海。我站在他们身后，拍他们正在看的东西。最后一张，天终于放晴了，有人在一尊巨大的黄色雕塑前张开双臂——还是背对着我。
+
+那几天到现在都有点不真实。我能确定的，只有这些照片。
+"""
