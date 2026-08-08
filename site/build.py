@@ -120,6 +120,14 @@ MAX_VH = 72
 MAX_VW = 92
 MAX_PX = 1400
 
+# 目录页封面的版面，同样必须跟 style.css 对上（见 .works / .work）：
+#   INDEX_COVER_H  ↔  .works 的 --cover-h        并排时每张封面的高度
+#   INDEX_STACK_PX ↔  @media (max-width: 900px)  换成竖向堆叠的断点
+#   INDEX_STACK_VH ↔  堆叠时 .work 的 52vh
+INDEX_COVER_H = "clamp(300px, 24vw + 54px, 400px)"
+INDEX_STACK_PX = 900
+INDEX_STACK_VH = 52
+
 
 # ---------------------------------------------------------------------------
 # 小工具
@@ -709,7 +717,20 @@ def copy_static() -> None:
 def work_card(s: dict, lang: str, prefix: str) -> str:
     """目录页上的一个作品条目。"""
     cfg, cover, L = s["cfg"], s["cover"], LANGS[lang]
-    sizes = f"min(100%, {52 * cover.aspect:.0f}vh)"
+    # 封面的 sizes：必须跟 style.css 里 .work 的宽度算法逐字对上，
+    # 浏览器全靠它决定下哪一档分辨率（见文件顶部 MAX_VH 那段的同款警告）。
+    #
+    # ⚠️ 原来写的是 min(100%, …vh)。`100%` 在 sizes 里不是合法值——
+    #    整条属性会被丢掉、回退成 100vw，于是 1440×900 @2x 上一张只显示
+    #    266px 宽的封面下了 3200px 的图。sizes 里只能用长度，不能用百分比。
+    #
+    #   > 900px  并排：宽度 = 宽高比 × --cover-h（clamp(300px, 24vw + 54px, 400px)）
+    #   ≤ 900px  堆叠：宽度 = min(容器宽, 52vh × 宽高比)，容器宽 = 100vw 减左右留白
+    sizes = (
+        f"(max-width: {INDEX_STACK_PX}px)"
+        f" min(100vw - 3rem, {INDEX_STACK_VH * cover.aspect:.0f}vh),"
+        f" calc({cover.aspect:.4f} * {INDEX_COVER_H})"
+    )
     # 每段各自成块，段与段之间留一个空格。
     # 那个空格不是排版失误，是**唯一的断行机会**——每个 span 都是 nowrap，
     # 中间不留空白的话整行没法折断，窄栏里会直接撑破容器。

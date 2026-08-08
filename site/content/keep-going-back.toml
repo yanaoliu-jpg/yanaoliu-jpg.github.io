@@ -1,0 +1,82 @@
+# ═══════════════════════════════════════════════════════════════════
+#  我总是回到那几天 —— 这个文件就是网页上所有的文字。
+#  改完存盘，跑：  python3 build.py
+#  改了中文还要跑：python3 tools/subset_font.py 然后再 build 一次
+# ═══════════════════════════════════════════════════════════════════
+
+slug = "keep-going-back"        # 网址：.../keep-going-back/ ，定了别再改
+title = "I Keep Going Back"
+source = "第一年/Xacademy的夏辑"
+
+order = 5                       # 目录页上排第五
+cover = "20250801-DSC08901"     # 最后一夜，弹吉他的人和一圈举起来的手机
+
+eyebrow = "Series 05"
+year = "2025"
+place = "Shanghai"
+
+author = "Yanao (Leo) Liu"
+
+description = "Nine photographs from three days in Shanghai, July–August 2025."
+
+# EXIF 里日期时间是真的（2025-07-30 20:54 → 2025-08-01 21:53），
+# 所以不写 date，页面按拍摄时间排序并逐张标注时刻。
+# 但光圈/快门/ISO 被 Lightroom 导出时抹掉了 —— 跟第四组一样，
+# 那一行只会显示日期和时刻，不显示参数。这是原图就没有，不是脚本漏读。
+
+# ─────────────────────────────────────────────────────────────────
+#  你原文里「升学机构推荐的夏校」这句没写进去 —— 见 CLAUDE.md。
+#  你写的「远离城市喧嚣」只覆盖前四张：8/1 那四张就在市区。
+#  所以照第四组的办法，把这个落差写进自述本身，不假装。
+#  最后一段是照片自己说出来的：九张里没有一个人看着镜头。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+In late July 2025 I went to Shanghai for a summer program. We stayed at an international school a long way out from the center of the city — far enough that the noise stopped, and close enough to the coast that at night the wind still came in off the water. Three days, our schedule full the whole time, and almost none of what we were officially there for is in these pictures.
+
+The first evening I found a hall with thousands of small glass spheres hanging from the ceiling and four people sitting on the floor underneath them, talking. The next afternoon the campus was empty: a road running straight out between two rows of trees, a track with one runner on the far side of it. Then it rained, and I photographed the city through a window I could not properly see through.
+
+On the last day we went into town, to a film museum. Someone stood a long time in front of a lit wall of old movie posters. Someone leaned in over a row of old movie cameras and stacked reels of film. Someone in a backwards cap reached out to spin a zoetrope and watch the little red and blue figures start to run.
+
+I only noticed this afterwards: not one person in these nine photographs is looking at the camera. They are all looking at something else, and I am behind a window, or behind the glass of a case, or on the other side of a running track. On the last night someone sat down on the floor with a guitar and about twenty of us gathered around, nearly all of them holding up a phone. I was at the back holding a camera instead. That is the one I keep going back to.
+"""
+
+colophon = "Sony α7 IV"
+
+
+# ─────────────────────────────────────────────────────────────────
+#  替代文字（alt text）：图片没加载出来、或读屏软件读页面时用
+#  文件名以数字开头、中间有连字符，TOML 里必须加引号
+# ─────────────────────────────────────────────────────────────────
+[alt]
+"20250730-DSC01947" = "A large hall with thousands of small glass spheres hung from the ceiling; four students sit talking on the carpet below, a red projection glowing on the far wall."
+"20250731-DSC02147" = "An empty campus road running straight to the horizon between two rows of tall trees under a pale overcast sky; two figures walk along the far pavement."
+"20250731-DSC02181" = "An empty running track and playing field in front of a covered grandstand, with a single runner in white crossing the far side."
+"20250731-DSC02200" = "A city at dusk seen through a rain-blurred window: a long building with its windows lit, a white tented roof below, distant lights beyond."
+"20250801-DSC08635" = "A person stands in a dark museum gallery looking down at a display case, a lit wall of old film posters behind them."
+"20250801-DSC08660" = "Seen through reflecting glass: a row of old movie cameras on tripods and stacks of film canisters, with a person leaning in to look."
+"20250801-DSC08717" = "A visitor in a backwards cap with a camera on their shoulder reaches out to spin a zoetrope printed with rings of red and blue running figures."
+"20250801-DSC08888" = "A view through a window over treetops to a round building with a wide flared roof and a white curved structure beyond, in hazy afternoon light."
+"20250801-DSC08901" = "A dim room at night where someone sits on the floor playing a guitar to a screen of song lyrics, surrounded by about twenty people, most holding up their phones."
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/keep-going-back/）
+#  直接用中文写的，不是从英文回译
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "我总是回到那几天"
+eyebrow = "第五组"
+place = "上海"
+author = "刘延奥"
+description = "2025 年 7 月底到 8 月初，上海的三天，九张照片。"
+colophon = "索尼 α7 IV"
+
+statement = """
+2025 年的暑假对我来说是一段难忘又记忆犹新的回忆。七月底我去上海参加了一个夏校，住处是离市中心很远的一所国际学校——那里远离了城市的喧嚣，又保留着临海城市那种深沉舒服的海风。三天里活动排得很满，可那些活动我几乎一张都没拍。
+
+到的那天晚上，我在一个大厅里看见天花板上垂下成千上万颗小玻璃球，四个人就坐在下面的地毯上聊天。第二天下午整个校园是空的：一条笔直穿过两排树的马路，一片操场上只有一个人在对面跑。后来下起雨，我隔着一扇看不清的窗，拍了外面的城市。
+
+最后一天我们进了城，去了电影博物馆。有人在整面亮着的老电影海报墙前站了很久；有人俯身去看那一排老式摄影机和成堆的胶片罐；有人反戴着帽子，伸手转动那个西洋镜，看转盘上一圈红蓝小人跑起来。
+
+事后我才发现：这九张里没有一个人是看着镜头的。他们都在看别的东西，而我总在窗外、在展柜玻璃的另一边、在跑道的对面。那天夜里，有人抱着吉他坐到地上，二十来个人围过来，几乎都举着手机；我在最后面，举的是相机。这一张，是我到今天还会回去的那一张。
+"""
