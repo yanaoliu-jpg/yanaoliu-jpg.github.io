@@ -623,6 +623,22 @@ def format_span(s: dict, lang: str) -> str:
     return f"{lo.strftime('%B')} – {hi.strftime('%B %Y')}"
 
 
+def year_span(series: list[dict], lang: str) -> str:
+    """所有作品横跨的年份，写成「2023–2026」/「2023 至 2026」。
+
+    首页那句 meta description（搜索结果和分享链接里露出的那一行）原来是手写年份的，
+    两次加新作品之后都忘了改，挂着「between 2023 and 2024」而实际已经到 2025、2026。
+    现在 toml 里写 {years}，由这里填，不可能再过期。
+    """
+    years = [p.shot_at.year for s in series for p in s["photos"] if p.shot_at]
+    if not years:
+        return ""
+    lo, hi = min(years), max(years)
+    if lo == hi:
+        return str(lo)
+    return f"{lo} 至 {hi}" if lang == "zh" else f"{lo}–{hi}"
+
+
 def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
     """把一个系列渲染成某一种语言的页面。图片是共用的，只有文字和路径不同。
 
@@ -856,7 +872,9 @@ def write_index(series: list[dict], site: dict, lang: str) -> None:
         (TEMPLATES / "base.html").read_text(encoding="utf-8"),
         html_lang=L["html_lang"],
         title=esc(name),
-        description=esc(text_of(site, lang, "description")),
+        description=esc(
+            text_of(site, lang, "description").replace("{years}", year_span(series, lang))
+        ),
         root=root,
         alternates=alternate_links(),
         body=body,

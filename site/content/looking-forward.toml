@@ -1,0 +1,87 @@
+# ═══════════════════════════════════════════════════════════════════
+#  留给日后 / Looking Forward —— 这个文件就是网页上所有的文字。
+#  改完存盘，跑：  python3 build.py
+#  改了中文还要跑：python3 tools/subset_font.py 然后再 build 一次
+# ═══════════════════════════════════════════════════════════════════
+
+slug = "looking-forward"        # 网址：.../looking-forward/ ，定了别再改
+title = "Looking Forward"
+source = "第一年/Looking Forward"
+
+# ⚠️ 这组拍于 2026-03-13/14，比「海与光的诗」（03-22/23）早九天。
+#    所以它排第六，sea-and-light.toml 的 order 顺延成了 7。
+#    系列页每张照片都标着具体日期，顺序倒过来读者翻两页就会看到时间往回走。
+order = 6
+cover = "DSC00195"              # 泰国餐厅的绿霓虹，门前一个戴头盔骑车的小孩
+
+year = "2026"
+place = "Tung Chung, Hong Kong"
+
+author = "Yanao (Leo) Liu"
+
+description = "Nine photographs made in Tung Chung, Hong Kong, over two days in March 2026."
+
+# EXIF 完整（Sony ILCE-7M4 + Sigma 24-70mm F2.8 DG DN Art，光圈快门 ISO 全在），
+# 2026-03-13 18:07 → 03-14 15:08。不写 date，逐张标日期时刻和参数。
+
+# ─────────────────────────────────────────────────────────────────
+#  你原文写「上下班期间天桥和商场都人来人往」，但九张里最多的一张
+#  也只有四个人，其余全是一两个。傍晚的东涌确实人来人往——
+#  可你镜头挑中的，全是人流里落单的那一个。
+#  没有抹平这个落差，第三段就是围着它写的。
+#
+#  中文是先按你的原稿润色出来的，英文由中文转过来（不是反过来）。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+In March 2026 I went to Hong Kong on my own to sit the SAT.
+
+March in Hong Kong has not turned hot yet. There was still some winter left in the wind, and the sun was warm without any heat in it. I stayed with a colleague of my mother's, in Tung Chung — an enormous residential estate where footbridges run from one tower to the next and on into the malls. At either end of the working day those bridges and malls are full of people.
+
+What I came back with is almost always whoever was alone in it. A child crossing an empty plaza. Two girls walking home from school. Someone carrying a plastic bag up a flight of steps. A small child in a helmet cycling past a lit Thai restaurant. Near dark, one more person cutting across the brick paving with their shopping, a delivery truck just stopped behind them.
+
+When the light went I photographed the room I was staying in — unlit, the curtains half drawn, hills outside the window. The next afternoon: a row of empty benches with the azaleas out. And then the airport, a line of aircraft behind the glass with one of them already taxiing away.
+
+I am keeping these so that later I can come back to those two days.
+"""
+
+colophon = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"
+
+
+# ─────────────────────────────────────────────────────────────────
+#  替代文字（alt text）
+#  文件名和画面的对应关系是逐张看过原图确认的，不是按顺序猜的
+# ─────────────────────────────────────────────────────────────────
+[alt]
+DSC00125 = "A high-rise residential estate at dusk: white apartment towers above a curved canopy over a mall entrance, with one small figure crossing the empty brick plaza below."
+DSC00132 = "Under a concrete podium at dusk, two schoolgirls in uniform walk away with their backpacks while two adults stand further off beside a white railing and footbridge."
+DSC00156 = "Beneath a steel footbridge a person carrying a plastic bag climbs a flight of steps, bilingual parking signs standing at the roadside."
+DSC00195 = "A lit Thai restaurant front at dusk with green neon lettering; a small child in a white helmet rides a bicycle alone across the paving outside."
+DSC00219 = "Looking down on a mall forecourt at dusk: a delivery truck at the kerb, warm light spilling from the glass frontage, one person walking away across the brick."
+DSC00230 = "An estate courtyard at dusk: rows of apartment towers behind a white colonnade and footbridge, a landscaped garden and an empty circular plaza below."
+DSC00249 = "An unlit room at dusk, a bed and sofa in near darkness, two windows with half-drawn curtains looking out to dark hills."
+DSC00264 = "A row of empty benches on a paved terrace in spring, azaleas in flower beside them and bare branches coming into leaf overhead."
+DSC00299 = "An airport apron seen through glass: aircraft parked along the terminal under a hazy sky, the control tower beyond, one plane taxiing out."
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/looking-forward/）
+#  这一版是原稿，英文从它转过去的
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "留给日后"
+place = "香港 · 东涌"
+author = "刘延奥"
+description = "2026 年 3 月，香港东涌的两天，九张照片。"
+colophon = "索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"
+
+statement = """
+2026 年三月，我一个人去香港考 SAT。
+
+三月的香港还没热起来。风里留着一点冬天的凛冽，太阳是暖的，却不烈。我借住在妈妈同事家，在东涌——一个巨大的居住社区，天桥把一栋栋楼和商场一条条连起来。上下班的时候，那些天桥和商场都是人来人往的。
+
+可我拍下来的，几乎全是人流里落单的那一个。一个孩子独自穿过空掉的广场。两个放学的女生并肩走远。一个人提着塑料袋上台阶。一个小孩戴着头盔，骑车经过一家亮着灯的泰国餐厅。天快黑时，又一个人拎着东西横穿砖地，身后是刚停下的货车。
+
+天刚黑下来的时候，我拍了住的那间屋子。没开灯，窗帘半掩，窗外是山。第二天下午，一排空着的长椅，杜鹃开得正好。再往后就是机场——玻璃外面停着一排飞机，其中一架正滑出去。
+
+这些照片我留着，是为了日后还能回到这几天。
+"""

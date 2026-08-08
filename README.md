@@ -2,7 +2,7 @@
 
 给美国大学招生官看的网页版作品集。线上地址：**https://yanaoliu-jpg.github.io/**
 
-目前六期：
+目前七期：
 
 | | | |
 |---|---|---|
@@ -11,6 +11,7 @@
 | The Old Days 旧时光 | 2025 年 5 月 | 9 张 |
 | Drunk on the Night Wind 夜风沉醉的旅程 | 2025 年 7 月 | 9 张 |
 | I Keep Going Back 我总是回到那几天 | 2025 年 7–8 月 | 9 张 |
+| Looking Forward 留给日后 | 2026 年 3 月 | 9 张 |
 | Sea and Light 海与光的诗 | 2026 年 3 月 | 9 张 |
 
 - 源码在 `site/`
@@ -104,6 +105,7 @@ python3 site/tools/check_font.py
 | `the-old-days.toml` | The Old Days / 旧时光 |
 | `night-wind.toml` | Drunk on the Night Wind / 夜风沉醉的旅程 |
 | `keep-going-back.toml` | I Keep Going Back / 我总是回到那几天 |
+| `looking-forward.toml` | Looking Forward / 留给日后 |
 | `sea-and-light.toml` | Sea and Light / 海与光的诗 |
 
 下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
@@ -125,7 +127,7 @@ cp site/content/good-night.toml site/content/新系列名.toml
 slug   = "new-series"        # 网址会是 .../new-series/，定了别再改
 title  = "New Series"
 source = "第一年/某个文件夹"    # 指向 素材/ 下面的文件夹
-order  = 3                   # 目录页上排第几
+order  = 3                   # 目录页上排第几（**按拍摄时间**，不是按加入顺序）
 cover  = "DSC01234"          # 目录页封面（文件名，不含扩展名）
 ```
 

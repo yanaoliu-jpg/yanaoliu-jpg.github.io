@@ -8,7 +8,10 @@ slug = "sea-and-light"          # 网址：.../sea-and-light/ ，定了别再改
 title = "Sea and Light"
 source = "第一年/海与光的诗"
 
-order = 6                       # 目录页上排第六
+# ⚠️ 原来是 6。「留给日后」拍于 03-13/14，比这组（03-22/23）早九天，
+#    按时间该排在前面，所以这组顺延成 7。
+#    网址 /sea-and-light/ 没变，变的只有页面上「Series 06 → Series 07」那行字。
+order = 7                       # 目录页上排第七
 cover = "DSC005751"             # 黑暗里那整面亮着的水族箱玻璃，前面一个剪影
 
 year = "2026"
