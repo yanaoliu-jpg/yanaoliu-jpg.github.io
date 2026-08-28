@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" class="no-js">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.remove('no-js')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>停止滑动，面对生活 — 刘延奥</title>
+<meta name="description" content="一支三十秒的公益短片，讲算法与注意力。2026 年。">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0e11">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="停止滑动，面对生活 — 刘延奥">
+<meta property="og:description" content="一支三十秒的公益短片，讲算法与注意力。2026 年。">
+
+<link rel="alternate" hreflang="en" href="https://yanaoliu-jpg.github.io/stop-scrolling/">
+<link rel="alternate" hreflang="zh-Hans" href="https://yanaoliu-jpg.github.io/zh/stop-scrolling/">
+<link rel="alternate" hreflang="x-default" href="https://yanaoliu-jpg.github.io/stop-scrolling/">
+
+<link rel="icon" href="../../static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../static/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../../static/apple-touch-icon.png">
+
+<link rel="preload" href="../../static/fonts/newsreader-latin.woff2" as="font"
+      type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../static/style.css">
+</head>
+<body>
+<a class="skip" href="#film">跳到影片</a>
+
+<a class="backlink" href="../../"><span aria-hidden="true">←</span> 全部作品</a>
+<a class="langswitch" href="../../stop-scrolling/" title="Read in English">EN</a>
+
+<main class="page">
+
+  <header class="masthead">
+    <div class="masthead__card">
+      <p class="masthead__eyebrow">影片 <span aria-hidden="true">·</span> 2026</p>
+      <h1 class="masthead__title">停止滑动，面对生活</h1>
+      <p class="masthead__meta"><span>32 秒</span> <span>国家级卓越奖</span> <span>公益广告</span> <span>2026 HOSA 生物与健康未来领袖挑战</span> <span>2026 年 3 月</span></p>
+    </div>
+
+    <div class="statement">
+      <p>三十秒，讲算法怎么一点点吃掉一个人的注意力，以及他怎么从里面走出来。</p>
+          <p>开头是屏幕上跳出来的数据：连看三小时屏幕，工作效率下降 40%，前额叶皮层活动下降 37%。然后是那个人——桌前低着头，饭桌上朋友围了一圈，他还在刷。场景流转，你却停滞不前。红色的字飘过他的试卷：焦虑、抑郁、视力下降、成绩下降。接着他放下手机，拿起笔。打破循环。最后一个镜头，一桌人举起了杯子。</p>
+          <p>只有三十秒，所以每一刀都得有用。团队把节奏来回磨了很多遍——手机要停多久才让人开始不舒服，字什么时候进来，音乐在哪一拍转。掌镜的是我。</p>
+          <p>片子完成于 2026 年三月，那一年拿了 HOSA 的国家级卓越奖。</p>
+    </div>
+
+    <p class="masthead__scroll" aria-hidden="true">向下</p>
+  </header>
+
+  <!--
+    controls + poster + preload="metadata" —— 一行 JavaScript 都不需要。
+    preload="metadata" 保证打开页面只下几十 KB 元数据和一张封面帧，
+    点了播放才去取正片。不自动播放、不循环、不静音偷跑。
+  -->
+  <section class="film" id="film" style="--ar: 1.7778">
+    <video class="film__video" controls playsinline preload="metadata"
+           poster="../../img/stop-scrolling/stop-scrolling-poster-2400.jpg">
+        <source src="../../video/stop-scrolling/stop-scrolling.webm" type="video/webm; codecs=av01.0.05M.08">
+        <source src="../../video/stop-scrolling/stop-scrolling.mp4" type="video/mp4">
+      <p class="film__fallback">
+        你的浏览器放不了这个视频。 <a href="../../video/stop-scrolling/stop-scrolling.mp4">下载影片（MP4）</a>
+      </p>
+    </video>
+  </section>
+
+  <nav class="nextup" aria-label="下一组">
+    <a class="nextup__link" href="../good-night/">
+      <span class="nextup__label">下一组</span>
+      <span class="nextup__title">晚安</span>
+      <span class="nextup__meta"><span>第一组</span> <span>9 张</span> <span>2023 年 11–12 月</span></span>
+    </a>
+  </nav>
+
+  <footer class="colophon">
+    <p class="colophon__gear">导演 Alioth · 摄影 刘延奥</p>
+    <p class="colophon__name">刘延奥</p>
+  </footer>
+
+</main>
+
+<script src="../../static/gallery.js" defer></script>
+</body>
+</html>

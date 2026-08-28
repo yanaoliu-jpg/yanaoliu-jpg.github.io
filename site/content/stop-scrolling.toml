@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════════
+#  停止滑动，面对生活 / Stop Scrolling, Stay Alive
+#  这是站上第一个**影片**条目（kind = "film"），不是照片系列。
+#  改完存盘，跑：  python3 build.py
+#  改了中文还要跑：python3 tools/subset_font.py 然后再 build 一次
+# ═══════════════════════════════════════════════════════════════════
+
+kind = "film"                   # ← 这一行决定 build.py 走影片那条路
+
+slug = "stop-scrolling"         # 网址：.../stop-scrolling/ ，定了别再改
+title = "Stop Scrolling, Stay Alive"
+source = "视频"                  # 素材/视频/
+video = "第五版_副本.mov"          # 要转码的源文件（HEVC，浏览器放不了，必须转）
+
+# order = 0：排在七组照片**之前**。它不占系列编号——
+# 七组照片仍然是 Series 01–07，这一条写「Film / 影片」（见下面的 eyebrow 由
+# build.py 的 eyebrow_for 自动给出，不用手写）。
+order = 0
+
+poster_at = 8                   # 第 8 秒那一帧：空房间里对着手机的人，画面无字
+poster_alt = "A still from the film: a student sits alone at a desk in a bare room, looking down at a phone, an hourglass beside them."
+
+date = "2026-03"                # 片子完成于 2026 年 3 月，只标到月份
+year = "2026"
+
+author = "Yanao (Leo) Liu"
+
+description = "A thirty-second public service film on algorithmic feeds and attention, 2026."
+
+# 奖项按他给的原话写，不自己翻译加工。
+# ⚠️ 「生物与健康未来领袖挑战」的官方英文名他没有，所以英文这行只写 HOSA 2026——
+#    信息不缺，也不会写错。以后拿到官方英文名再补。
+award = "National Outstanding Honor · Public Service Announcement · HOSA 2026"
+
+# ─────────────────────────────────────────────────────────────────
+#  自述：中文是原稿（按他给的素材润色），英文从中文转过来。
+#
+#  他原话里的「精益求精」「力求生动呈现」这类作文腔去掉了——
+#  招生官读的是你做了什么，不是你多努力。
+#  片子里的具体手法（数据字幕、红字词云、Break the loop 的转折）写进来，
+#  比形容词有用得多。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+Thirty seconds on what an algorithmic feed does to a teenager, and on getting out of it.
+
+It opens with numbers on screen: three hours of screen time, work efficiency down forty percent, prefrontal cortex activity down thirty-seven. Then the boy at the desk, the boy at dinner with his friends around him and his face in his phone — scenes pass, stay stuck. Red words drift across his exam papers: anxiety, depression, myopia, grades dropping. Then he puts the phone down and picks up a pen. Break the loop. The last shot is a table of people raising their glasses.
+
+We had thirty seconds, so every cut had to carry something. The team went over the pacing again and again — how long to hold on the phone before it starts to feel wrong, where the type comes in, when the music turns. I shot it.
+
+It was made in March 2026 and took a National Outstanding Honor at HOSA that year.
+"""
+
+colophon = "Directed by Alioth · Cinematography by Yanao (Leo) Liu"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/stop-scrolling/）
+#  这一版是原稿，英文从它转过去的
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "停止滑动，面对生活"
+author = "刘延奥"
+description = "一支三十秒的公益短片，讲算法与注意力。2026 年。"
+award = "国家级卓越奖 · 公益广告 · 2026 HOSA 生物与健康未来领袖挑战"
+colophon = "导演 Alioth · 摄影 刘延奥"
+
+statement = """
+三十秒，讲算法怎么一点点吃掉一个人的注意力，以及他怎么从里面走出来。
+
+开头是屏幕上跳出来的数据：连看三小时屏幕，工作效率下降 40%，前额叶皮层活动下降 37%。然后是那个人——桌前低着头，饭桌上朋友围了一圈，他还在刷。场景流转，你却停滞不前。红色的字飘过他的试卷：焦虑、抑郁、视力下降、成绩下降。接着他放下手机，拿起笔。打破循环。最后一个镜头，一桌人举起了杯子。
+
+只有三十秒，所以每一刀都得有用。团队把节奏来回磨了很多遍——手机要停多久才让人开始不舒服，字什么时候进来，音乐在哪一拍转。掌镜的是我。
+
+片子完成于 2026 年三月，那一年拿了 HOSA 的国家级卓越奖。
+"""

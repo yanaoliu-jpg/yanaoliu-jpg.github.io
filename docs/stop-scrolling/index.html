@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.remove('no-js')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stop Scrolling, Stay Alive — Yanao (Leo) Liu</title>
+<meta name="description" content="A thirty-second public service film on algorithmic feeds and attention, 2026.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0e11">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Stop Scrolling, Stay Alive — Yanao (Leo) Liu">
+<meta property="og:description" content="A thirty-second public service film on algorithmic feeds and attention, 2026.">
+
+<link rel="alternate" hreflang="en" href="https://yanaoliu-jpg.github.io/stop-scrolling/">
+<link rel="alternate" hreflang="zh-Hans" href="https://yanaoliu-jpg.github.io/zh/stop-scrolling/">
+<link rel="alternate" hreflang="x-default" href="https://yanaoliu-jpg.github.io/stop-scrolling/">
+
+<link rel="icon" href="../static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../static/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../static/apple-touch-icon.png">
+
+<link rel="preload" href="../static/fonts/newsreader-latin.woff2" as="font"
+      type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+<a class="skip" href="#film">Skip to the film</a>
+
+<a class="backlink" href="../"><span aria-hidden="true">←</span> All work</a>
+<a class="langswitch" href="../zh/stop-scrolling/" title="Read in Chinese">中文</a>
+
+<main class="page">
+
+  <header class="masthead">
+    <div class="masthead__card">
+      <p class="masthead__eyebrow">Film <span aria-hidden="true">·</span> 2026</p>
+      <h1 class="masthead__title">Stop Scrolling, Stay Alive</h1>
+      <p class="masthead__meta"><span>32 seconds</span> <span>National Outstanding Honor</span> <span>Public Service Announcement</span> <span>HOSA 2026</span> <span>March 2026</span></p>
+    </div>
+
+    <div class="statement">
+      <p>Thirty seconds on what an algorithmic feed does to a teenager, and on getting out of it.</p>
+          <p>It opens with numbers on screen: three hours of screen time, work efficiency down forty percent, prefrontal cortex activity down thirty-seven. Then the boy at the desk, the boy at dinner with his friends around him and his face in his phone — scenes pass, stay stuck. Red words drift across his exam papers: anxiety, depression, myopia, grades dropping. Then he puts the phone down and picks up a pen. Break the loop. The last shot is a table of people raising their glasses.</p>
+          <p>We had thirty seconds, so every cut had to carry something. The team went over the pacing again and again — how long to hold on the phone before it starts to feel wrong, where the type comes in, when the music turns. I shot it.</p>
+          <p>It was made in March 2026 and took a National Outstanding Honor at HOSA that year.</p>
+    </div>
+
+    <p class="masthead__scroll" aria-hidden="true">Scroll</p>
+  </header>
+
+  <!--
+    controls + poster + preload="metadata" —— 一行 JavaScript 都不需要。
+    preload="metadata" 保证打开页面只下几十 KB 元数据和一张封面帧，
+    点了播放才去取正片。不自动播放、不循环、不静音偷跑。
+  -->
+  <section class="film" id="film" style="--ar: 1.7778">
+    <video class="film__video" controls playsinline preload="metadata"
+           poster="../img/stop-scrolling/stop-scrolling-poster-2400.jpg">
+        <source src="../video/stop-scrolling/stop-scrolling.webm" type="video/webm; codecs=av01.0.05M.08">
+        <source src="../video/stop-scrolling/stop-scrolling.mp4" type="video/mp4">
+      <p class="film__fallback">
+        Your browser cannot play this video. <a href="../video/stop-scrolling/stop-scrolling.mp4">Download the film (MP4)</a>
+      </p>
+    </video>
+  </section>
+
+  <nav class="nextup" aria-label="Next series">
+    <a class="nextup__link" href="../good-night/">
+      <span class="nextup__label">Next series</span>
+      <span class="nextup__title">Good Night</span>
+      <span class="nextup__meta"><span>Series 01</span> <span>9 photographs</span> <span>November – December 2023</span></span>
+    </a>
+  </nav>
+
+  <footer class="colophon">
+    <p class="colophon__gear">Directed by Alioth · Cinematography by Yanao (Leo) Liu</p>
+    <p class="colophon__name">Yanao (Leo) Liu</p>
+  </footer>
+
+</main>
+
+<script src="../static/gallery.js" defer></script>
+</body>
+</html>

@@ -443,6 +443,44 @@ img { display: block; max-width: 100%; height: auto; }
   min-width: 0;
 }
 
+/*
+  影片独占一行：它是**头题**，不是第八组照片。
+
+  做法是 flex-basis: 100% 强行占满一行，后面的照片自然换到下一行；
+  真正的可见宽度由 .work__link 的 max-width 收回来（跟其他封面同一条公式）。
+  不用 max-width 直接卡在 <li> 上，是因为 flex 的换行判断会先被 max-width
+  夹住，那样就断不了行了。
+  下面再多留一截空白，让它读起来是「头题 + 正文」而不是「第一张照片」。
+*/
+.work--film {
+  flex: 0 0 100%;
+  max-width: none;
+  margin-bottom: clamp(2rem, 5vh, 4rem);
+}
+.work--film .work__link { max-width: calc(var(--ar) * var(--cover-h)); }
+
+/* 封面正中一个 ▶：不用读文字也知道这是一段影片，不是照片 */
+.work--film .work__frame::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(2.8rem, 4.5vw, 4rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(13, 14, 17, 0.42)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6.5v11l9-5.5z' fill='%23fff'/%3E%3C/svg%3E")
+    center / 38% no-repeat;
+  transition: background-color 0.25s;
+}
+@media (hover: hover) {
+  .work--film .work__link:hover .work__frame::after {
+    background-color: rgba(13, 14, 17, 0.68);
+  }
+}
+
 /* 窄屏放不下并排，改成竖向堆叠，回到原来那套左对齐清单 */
 @media (max-width: 900px) {
   .works {
@@ -454,6 +492,9 @@ img { display: block; max-width: 100%; height: auto; }
     width: min(100%, calc(52vh * var(--ar)));
     margin-bottom: clamp(4rem, 11vh, 8rem);
   }
+  /* 堆叠时没有"行"可言，影片那条也跟其他条目一样占满宽度 */
+  .work--film { flex: none; margin-bottom: clamp(4rem, 11vh, 8rem); }
+  .work--film .work__link { max-width: none; }
   .work:last-child { margin-bottom: 0; }
   /* 堆叠时每条独占整行，标题放大回去，也不需要预留行数 */
   .work__title { font-size: clamp(1.8rem, 6vw, 2.6rem); min-height: 0; }
@@ -564,6 +605,37 @@ img { display: block; max-width: 100%; height: auto; }
   transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .js-reveal .work.is-in { opacity: 1; transform: none; }
+
+/* ── 影片 ────────────────────────────────────────────────────── */
+
+/*
+  跟照片同一条规矩：**限制高度，宽度自己长出来**。
+  用的就是 .plate 那条公式（--plate-vh: 72），所以从系列页点过来，
+  影片和照片在屏幕上占的分量一样，不会突然大一块或小一块。
+  --ar 由 build.py 从视频的真实宽高写在 .film 上。
+*/
+.film {
+  margin: clamp(5rem, 12vh, 9rem) 0 0;
+  padding: 0 var(--gutter);
+}
+
+.film__video {
+  display: block;
+  width: min(92vw, 1400px, calc(var(--plate-vh) * 1vh * var(--ar)));
+  height: auto;
+  aspect-ratio: var(--ar);
+  margin: 0 auto;
+  /* 海报图加载出来之前是一块纯黑，比默认的浅灰安静得多 */
+  background: #000;
+}
+
+/* 三种格式都放不了时才会露出来的兜底文字 */
+.film__fallback {
+  margin: 0;
+  padding: 2rem;
+  color: var(--ink-mute);
+}
+.film__fallback a { color: var(--ink); }
 
 /* ── 看完一组之后：下一组 ────────────────────────────────────── */
 

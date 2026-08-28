@@ -2,7 +2,7 @@
 
 给美国大学招生官看的网页版作品集。线上地址：**https://yanaoliu-jpg.github.io/**
 
-目前七期：
+目前七组照片 + 一部影片：
 
 | | | |
 |---|---|---|
@@ -13,6 +13,7 @@
 | I Keep Going Back 我总是回到那几天 | 2025 年 7–8 月 | 9 张 |
 | Looking Forward 留给日后 | 2026 年 3 月 | 9 张 |
 | Sea and Light 海与光的诗 | 2026 年 3 月 | 9 张 |
+| **Stop Scrolling, Stay Alive** 停止滑动，面对生活 | 2026 年 3 月 | 影片 32 秒 |
 
 - 源码在 `site/`
 - 生成的网站在 `docs/`
@@ -25,6 +26,16 @@
 ```bash
 brew install imagemagick webp
 ```
+
+放**影片**才需要这个（只放照片不用装）：
+
+```bash
+brew install ffmpeg
+```
+
+> ⚠️ 装完 ffmpeg 如果 `build.py` 开始刷屏「AVIF 比 WebP 还大」，
+> 跑一次 `brew reinstall libheif` 就好——ffmpeg 带进来的 x265 会让 libheif 加载失败，
+> ImageMagick 的 AVIF 就悄悄变得又大又糊。详见 CLAUDE.md 第七节。
 
 生成中文字体子集还需要（只在你电脑上用，访客不需要）：
 
@@ -107,6 +118,7 @@ python3 site/tools/check_font.py
 | `keep-going-back.toml` | I Keep Going Back / 我总是回到那几天 |
 | `looking-forward.toml` | Looking Forward / 留给日后 |
 | `sea-and-light.toml` | Sea and Light / 海与光的诗 |
+| `stop-scrolling.toml` | Stop Scrolling, Stay Alive / 停止滑动，面对生活（影片） |
 
 下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
 

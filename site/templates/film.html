@@ -1,0 +1,50 @@
+<a class="skip" href="#film">{{ skip }}</a>
+
+<a class="backlink" href="{{ back_href }}"><span aria-hidden="true">←</span> {{ back_label }}</a>
+<a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
+
+<main class="page">
+
+  <header class="masthead">
+    <div class="masthead__card">
+      <p class="masthead__eyebrow">{{ eyebrow }} <span aria-hidden="true">·</span> {{ year }}</p>
+      <h1 class="masthead__title">{{ title }}</h1>
+      <p class="masthead__meta">{{ meta }}</p>
+    </div>
+
+    <div class="statement">
+      {{ statement }}
+    </div>
+
+    <p class="masthead__scroll" aria-hidden="true">{{ scroll }}</p>
+  </header>
+
+  <!--
+    controls + poster + preload="metadata" —— 一行 JavaScript 都不需要。
+    preload="metadata" 保证打开页面只下几十 KB 元数据和一张封面帧，
+    点了播放才去取正片。不自动播放、不循环、不静音偷跑。
+  -->
+  <section class="film" id="film" style="--ar: {{ aspect }}">
+    <video class="film__video" controls playsinline preload="metadata"
+           poster="{{ poster }}">
+{{ sources }}
+      <p class="film__fallback">
+        {{ no_video }} <a href="{{ video_href }}">{{ download_video }}</a>
+      </p>
+    </video>
+  </section>
+
+  <nav class="nextup" aria-label="{{ nextup_label }}">
+    <a class="nextup__link" href="{{ nextup_href }}">
+      <span class="nextup__label">{{ nextup_label }}</span>
+      <span class="nextup__title">{{ nextup_title }}</span>
+      <span class="nextup__meta">{{ nextup_meta }}</span>
+    </a>
+  </nav>
+
+  <footer class="colophon">
+    <p class="colophon__gear">{{ colophon }}</p>
+    <p class="colophon__name">{{ author }}</p>
+  </footer>
+
+</main>
