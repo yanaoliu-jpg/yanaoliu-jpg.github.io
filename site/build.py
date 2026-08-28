@@ -89,6 +89,7 @@ LANGS = {
         "series_word": "Series",
         "film_word": "Film",
         "film_count": "film",
+        "films_count": "films",
         "seconds": "seconds",
         "no_video": "Your browser cannot play this video.",
         "download_video": "Download the film (MP4)",
@@ -116,6 +117,7 @@ LANGS = {
         "series_word": "第{n}组",
         "film_word": "影片",
         "film_count": "部影片",
+        "films_count": "部影片",
         "seconds": "秒",
         "no_video": "你的浏览器放不了这个视频。",
         "download_video": "下载影片（MP4）",
@@ -673,21 +675,27 @@ def fmt_duration(seconds: float, lang: str) -> str:
     return f"{s // 60}:{s % 60:02d}"
 
 
-def encode_video(src: Path, out_dir: Path, slug: str, force: bool) -> int:
+def encode_video(src: Path, out_dir: Path, slug: str, cfg: dict, force: bool) -> int:
     """转出 webm(AV1) 和 mp4(H.264)。
 
     比源文件新就跳过——一条 30 秒的片子转一次要一分多钟，
     每次构建都从头来会让 build.py 变得没法用（跟图片那套 is_fresh 同一个道理）。
+
+    档位可以按片子在 toml 里覆盖（height / av1_crf / h264_crf）。
+    30 秒的叙事短片值得 1080p；5 分钟的访谈片全是人在说话，720p 完全够，
+    而且体积差得很远——实测同一部片子 1080p 要 248 MB、720p 只要 85 MB。
     """
     out_dir.mkdir(parents=True, exist_ok=True)
-    scale = f"scale=-2:{VIDEO_HEIGHT}"
+    scale = f"scale=-2:{cfg.get('height', VIDEO_HEIGHT)}"
     jobs = [
         (out_dir / f"{slug}.webm", [
-            "-c:v", "libsvtav1", "-crf", str(VIDEO_AV1_CRF), "-preset", "6",
+            "-c:v", "libsvtav1", "-crf", str(cfg.get("av1_crf", VIDEO_AV1_CRF)),
+            "-preset", "6",
             "-pix_fmt", "yuv420p", "-c:a", "libopus", "-b:a", "96k"]),
         # +faststart 把索引挪到文件开头，浏览器不用下完整个文件就能起播
         (out_dir / f"{slug}.mp4", [
-            "-c:v", "libx264", "-crf", str(VIDEO_H264_CRF), "-preset", "slow",
+            "-c:v", "libx264", "-crf", str(cfg.get("h264_crf", VIDEO_H264_CRF)),
+            "-preset", "slow",
             "-profile:v", "high", "-pix_fmt", "yuv420p",
             "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart"]),
     ]
@@ -716,9 +724,9 @@ def build_film(cfg: dict, force: bool) -> dict:
     w, h = (int(x) for x in probe(src, "stream=width,height",
                                  ["-select_streams", "v:0"]).split())
     duration = float(probe(src, "format=duration"))
-    print(f"  源 {w}×{h} / {duration:.1f} 秒 → 网页 {VIDEO_HEIGHT}p")
+    print(f"  源 {w}×{h} / {duration:.1f} 秒 → 网页 {cfg.get('height', VIDEO_HEIGHT)}p")
 
-    total_bytes = encode_video(src, DIST / "video" / slug, slug, force)
+    total_bytes = encode_video(src, DIST / "video" / slug, slug, cfg, force)
 
     # 封面帧走**图片流水线**，跟另外七个封面用同一套 AVIF/WebP/JPEG 四档，
     # 首页那张卡不需要任何特殊照顾。
@@ -1143,7 +1151,8 @@ def write_index(series: list[dict], site: dict, lang: str) -> None:
         f"<span>{esc(x)}</span>" for x in (
             f"{len(photo_sets)} {L['series_count']}",
             f"{sum(s['count'] for s in photo_sets)} {L['photographs']}",
-            f"{len(films)} {L['film_count']}" if films else "",
+            # 英文要区分单复数：1 film / 2 films。中文两者相同。
+            f"{len(films)} {L['films_count' if len(films) > 1 else 'film_count']}" if films else "",
         ) if x
     )
 

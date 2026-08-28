@@ -457,6 +457,8 @@ img { display: block; max-width: 100%; height: auto; }
   max-width: none;
   margin-bottom: clamp(2rem, 5vh, 4rem);
 }
+/* 排在照片后面的影片：空白要加在**上面**，不然它会贴着最后一排照片 */
+.work--film:not(:first-child) { margin-top: clamp(2rem, 5vh, 4rem); }
 .work--film .work__link { max-width: calc(var(--ar) * var(--cover-h)); }
 
 /* 封面正中一个 ▶：不用读文字也知道这是一段影片，不是照片 */

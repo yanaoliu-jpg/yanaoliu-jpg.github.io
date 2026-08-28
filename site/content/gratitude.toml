@@ -1,0 +1,83 @@
+# ═══════════════════════════════════════════════════════════════════
+#  感恩悄然发生 / Gratitude, Quietly —— 站上第二部影片
+#  改完存盘，跑：  python3 build.py
+#  改了中文还要跑：python3 tools/subset_font.py 然后再 build 一次
+# ═══════════════════════════════════════════════════════════════════
+
+kind = "film"
+
+slug = "gratitude"              # 网址：.../gratitude/ ，定了别再改
+title = "Gratitude, Quietly"
+source = "视频"
+video = "12月31日_副本.mov"
+
+# order = 8：排在七组照片**之后**。
+# 「停止滑动」是 30 秒、双语字幕、拿过国家级奖，留在最前面当头题；
+# 这一部是 5 分 21 秒的纯中文访谈片，英文站的访客基本不会看完，
+# 放在最后既不埋没它、也不把照片往下挤。
+order = 8
+
+# ⚠️ 这一部按 720p 转，跟「停止滑动」的 1080p 不同 —— 全片是人在说话，
+#    720p 完全够。实测：1080p 要 248 MB，720p 只要 85 MB。
+height = 720
+av1_crf = 36
+h264_crf = 26
+
+poster_at = 24                  # 第 24 秒：学生举话筒问食堂师傅，画面无字
+poster_alt = "A still from the film: a student in a blue school tracksuit holds a microphone out to a canteen cook in a white hat and apron, in an empty dining hall."
+
+date = "2025-11"                # 感恩节前后拍的（文件 12-31 导出，那是剪完的日子）
+year = "2025"
+
+author = "Yanao (Leo) Liu"
+
+description = "A five-minute film in which students interview the people who run their school, November 2025."
+
+# ─────────────────────────────────────────────────────────────────
+#  自述：中文是原稿（按他给的素材润色），英文从中文转过来。
+#
+#  他原文里「一束光」「耕耘」「细碎却实实在在的温暖，拼凑成了」这类
+#  作文腔去掉了，换成片子里的人**真正说出口的话**——
+#  「阿姨辛苦了，我听见这句话心里就挺开心的」比任何形容词都有力。
+#
+#  ⚠️ 片子是纯中文对话、只有中文字幕。英文自述最后一句点明这一点，
+#     并把内容讲够，让不懂中文的招生官读完也知道这片子做了什么。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+What gratitude actually means is buried somewhere in an ordinary day.
+
+It is not the ritual you perform once a year. Breakfast from the kitchen staff, the guard at the gate, the cleaners in the corridors, the teachers preparing lessons — small, entirely concrete things that add up to the steadiest part of a school day. Most of us walk past all of it without looking up.
+
+So over Thanksgiving we went and asked the people in each of those jobs what their day is actually like.
+
+The kitchen manager said he clocks in first thing, then goes through room by room checking whether the hygiene passes. The cleaner said her day is simply cleaning — and then added that when a student says "you've worked hard today," it stays with her for the rest of it. The guard at the gate said he can only clock off once nearly everyone has gone home. The teachers talked about what passes between them and their students.
+
+Five minutes, a team of eight, and me on camera.
+
+The film is in Mandarin with Chinese subtitles.
+"""
+
+colophon = "Camera: Yanao (Leo) Liu · Made by a team of eight students"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/gratitude/）
+#  这一版是原稿，英文从它转过去的
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "感恩悄然发生"
+author = "刘延奥"
+description = "一部五分钟的短片，学生去问了把学校撑起来的那些人。2025 年 11 月。"
+colophon = "录制 刘延奥 · 八人学生团队共同完成"
+
+statement = """
+感恩的意义，藏在日常里。
+
+它不只是节日那天的一套仪式。食堂师傅的早餐、门口保安的守护、保洁阿姨的清扫、老师们的备课——这些细碎、却实实在在的东西，拼起了校园里最让人安心的那部分日常。而我们平时几乎不会抬头看它们一眼。
+
+所以借着感恩节，我们去问了学校里各个岗位上的人：你每天到底在做什么。
+
+后厨的管理员说，早上到了先打卡，再一间间看卫生合不合格。保洁阿姨说，工作日常就是打扫；说完又补了一句——"阿姨辛苦了"，我听见这句话心里就挺开心的。门口的保安说，得等人走得差不多了才能下岗。老师说的是他们和学生之间的一些事。
+
+五分钟，八个人的团队，我负责录制。
+"""

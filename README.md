@@ -2,7 +2,7 @@
 
 给美国大学招生官看的网页版作品集。线上地址：**https://yanaoliu-jpg.github.io/**
 
-目前七组照片 + 一部影片：
+目前七组照片 + 两部影片：
 
 | | | |
 |---|---|---|
@@ -14,6 +14,7 @@
 | Looking Forward 留给日后 | 2026 年 3 月 | 9 张 |
 | Sea and Light 海与光的诗 | 2026 年 3 月 | 9 张 |
 | **Stop Scrolling, Stay Alive** 停止滑动，面对生活 | 2026 年 3 月 | 影片 32 秒 |
+| **Gratitude, Quietly** 感恩悄然发生 | 2025 年 11 月 | 影片 5 分 21 秒 |
 
 - 源码在 `site/`
 - 生成的网站在 `docs/`
@@ -119,6 +120,7 @@ python3 site/tools/check_font.py
 | `looking-forward.toml` | Looking Forward / 留给日后 |
 | `sea-and-light.toml` | Sea and Light / 海与光的诗 |
 | `stop-scrolling.toml` | Stop Scrolling, Stay Alive / 停止滑动，面对生活（影片） |
+| `gratitude.toml` | Gratitude, Quietly / 感恩悄然发生（影片） |
 
 下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
 
