@@ -63,9 +63,14 @@ AVIF_QUALITY = 72
 WEBP_QUALITY = 85
 JPEG_QUALITY = 86
 
-# JPEG 只是给既不支持 AVIF 也不支持 WebP 的浏览器兜底——那是 2020 年以前的老家伙，
-# 不会跑在 4K 屏上。所以最大的那档不出 JPEG，能省掉近三分之一的仓库体积。
-JPEG_MAX_WIDTH = 2400
+# JPEG 只是给既不支持 AVIF 也不支持 WebP 的浏览器兜底——那是 Safari 13 以下、
+# IE 这种 2020 年以前的老家伙，不会跑在视网膜屏上。
+#
+# 2026-08 从 2400 降到 1600：JPEG 原本占了照片体积的 46%（73.8 MiB），
+# 光 2400px 那一档就 45.2 MiB。老浏览器拿 1600px 完全够用（它们的屏幕本来
+# 也没那么大），而现代浏览器走的是 AVIF/WebP，那两种格式仍然出到 2400px。
+# 换来的是每加一组照片少 5 MiB。
+JPEG_MAX_WIDTH = 1600
 
 # 小尺寸缩图后锐度会掉，轻微补一点；大尺寸不补，因为这批片子噪点多，
 # 锐化会把噪点一起放大，还会让文件明显变大。
@@ -467,10 +472,24 @@ def build_images(photos: list[Photo], slug: str, force: bool) -> int:
                 encode_all(stages[w], out_dir / f"{photo.stem}-{w}", w)
             photo.lqip = make_lqip(stages[widths[0]])
 
+        # 这张图上一轮被判定「不用 AVIF」（见下面量体积那段）：记号在、文件已删。
+        # ⚠️ 必须在这里就认出来，否则下面 weight["avif"] 会去 stat 不存在的文件而崩掉。
+        #    记号和文件要同时符合才算数——只有记号却有文件（比如 git 恢复过 docs/），
+        #    说明记号过期了，照常重新量。
+        marker = no_avif_marker(out_dir, photo.stem)
+        avif_widths = [w for w in widths if "avif" in formats_for(w)]
+        skipped_avif = marker.exists() and not all(
+            (out_dir / f"{photo.stem}-{w}.avif").exists() for w in avif_widths
+        )
+
         photo.variants = {}
         weight = {}
         for ext in ("avif", "webp", "jpg"):
             useful = [w for w in widths if ext in formats_for(w)]
+            if ext == "avif" and skipped_avif:
+                photo.variants[ext] = []
+                weight[ext] = 0
+                continue
             # 存成相对 dist/ 根目录的路径。页面在哪一层由 prefix 决定——
             # 英文系列页在 /slug/，中文系列页在 /zh/slug/，深度不同。
             photo.variants[ext] = [
@@ -490,8 +509,14 @@ def build_images(photos: list[Photo], slug: str, force: bool) -> int:
         # 必须**整张图一起丢**，不能只丢某一档——<picture> 是先按 type 选中
         # 一个 <source>，再在它的 srcset 里挑尺寸；只丢大档的话，视网膜屏会
         # 选中 AVIF 那条、却只找得到小尺寸，反而更糊。
-        marker = no_avif_marker(out_dir, photo.stem)
-        if weight["avif"] >= weight["webp"] > 0:
+        #
+        # ⚠️ **千万别同时跑两个 build.py。** 两个进程写同一批文件时，
+        #    这里会量到写了一半的大小，于是好端端的照片被误判成「AVIF 更大」，
+        #    AVIF 全被删掉、留下一堆假记号。2026-08 踩过一次，11 张中招。
+        #    症状就是这行提示在正常的照片上刷屏。修法：删掉所有 .noavif 再重建。
+        if skipped_avif:
+            pass                                    # 上一轮已判定，文件也不在，跳过
+        elif weight["avif"] >= weight["webp"] > 0:
             print(f"      ↳ AVIF 比 WebP 还大（{weight['avif']/1024:.0f} vs "
                   f"{weight['webp']/1024:.0f} KB），这张不用 AVIF")
             for w, _ in photo.variants["avif"]:
@@ -994,7 +1019,12 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
         statement=paragraphs(text_of(cfg, lang, "statement")),
         meta=meta,
         aspect=f"{s['aspect']:.4f}",
-        poster=f"{prefix}{cover.variants['jpg'][-1][1]}",
+        # poster 属性只能给一个 URL，没有 srcset 可用，所以要挑得准。
+        # 用 WebP 的最大档：JPEG 从 2026-08 起封顶 1600px（见 JPEG_MAX_WIDTH），
+        # 而播放器在 1440×900 @2x 上要 2300px 才够清楚。
+        # WebP 2400px 只有 42 KB，比同尺寸 JPEG 的 146 KB 还小得多。
+        # 放不了 WebP 的浏览器只是不显示封面帧（黑底），视频照样能播。
+        poster=f"{prefix}{cover.variants['webp'][-1][1]}",
         sources=sources,
         no_video=esc(L["no_video"]),
         download_video=esc(L["download_video"]),

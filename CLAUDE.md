@@ -1,7 +1,7 @@
 # 项目交接说明
 
 > 这个文件是给**下一次会话**看的（新开的 Claude Code 会自动读它）。
-> 面向使用者的操作手册在 [README.md](README.md)，两者不重复。
+> 面向使用者的操作手册在 [README.md](README.md)，容量和长期方案在 [容量规划.md](容量规划.md)，三者不重复。
 > 这里记的是**为什么这么做**，以及**哪些地方一改就出事**。
 
 ---
@@ -355,6 +355,64 @@ magick /tmp/s.png -strip -quality 72 /tmp/s.avif && ls -l /tmp/s.avif
 坏的时候还会把整站好好的 AVIF 全删掉。`docs/` 全是产物，
 真搞乱了就 `git checkout -- docs/` 恢复，再跑一次增量构建。
 
+### ⚠️ GitHub 的**单文件 100 MiB 硬限制**，才是真正的墙
+
+推「都值得被听见」时 GitHub 回了三行 warning。前两行说文件超过 50 MB
+「建议值」——那个无所谓。但它背后有一条**硬规则：单个文件超过 100 MiB 直接拒收**。
+
+```
+remote: warning: File docs/video/make-a-wish/make-a-wish.mp4 is 94.58 MB;
+        this is larger than GitHub's recommended maximum file size of 50.00 MB
+```
+
+那个 mp4 是 **94.58 MiB**，离 100 MiB 只剩 **5.4 MiB**。
+按 720p / crf26 这套参数换算，**mp4 约 9.3 MiB 每分钟**——
+
+> **同样参数下，单部影片的上限是 10 分 45 秒左右。**
+> 「都值得被听见」是 10 分 11 秒，已经贴着天花板。
+
+再有更长的片子，**先算 mp4 会多大再动手**，别转完了才发现推不上去：
+
+```bash
+# 转之前先估：时长(秒) × 0.155 ≈ mp4 的 MiB 数（720p crf26）
+```
+
+超了的处理顺序：**先调 h264_crf（26 → 29 约省三成）**，再考虑降到 540p，
+最后才是外部托管。webm 那边宽松得多（8.2 MiB/分钟），不是瓶颈。
+
+### ⚠️ 绝对不要同时跑两个 `build.py`
+
+2026-08 踩过一次，代价是半小时的误判。两个进程写同一批图片文件时，
+`build_images` 里那段「量一量谁大就不要谁」会量到**写了一半的大小**，
+于是好端端的照片被误判成「AVIF 比 WebP 还大」，AVIF 被删掉、留下一堆假 `.noavif` 记号。
+
+**症状**：这行提示在正常照片上刷屏，接着下一次构建直接崩：
+
+```
+FileNotFoundError: docs/img/night-wind/DSC00680-900.avif
+```
+
+（记号让 `is_fresh` 跳过 AVIF 检查，后面却仍去 stat 已删的 AVIF 文件。
+这个 bug 已经修了，但假记号本身还是要清。）
+
+**修法**：
+
+```bash
+find docs/img -name '*.noavif' -delete
+git checkout -- docs/img/        # 已提交的图片是已知良好的，别接受重编的结果
+python3 site/build.py
+```
+
+**判断 AVIF 到底有没有坏**，用同尺寸对同尺寸比，别拿 1600 的数字去比 2400：
+
+```bash
+git show HEAD:docs/img/good-night/DSC05547-2400.avif | wc -c   # 已提交
+ls -l docs/img/good-night/DSC05547-2400.avif                   # 现在
+```
+
+一样大就是好的。我在这里连着判断错两次——第一次以为是 AVIF 又坏了（其实是并发），
+第二次拿错了尺寸的数字做对比。
+
 ### 脚本是安全失败的
 
 `subset_font.py` 下载失败时先退出，**不会覆盖已有字体文件**。报错了先跑 `check_font.py`，够用就照常推送。
@@ -401,6 +459,9 @@ async function go(pg,u){for(let i=0;i<5;i++){try{return await pg.goto(u,{waitUnt
 有封面帧、两条 source 的顺序是 webm→mp4 且都能 HEAD 到 200、播放器占高跟照片一样是 72%、
 关掉 JS 播放器仍在且可见。
 
+**改了影片的 `height` / `av1_crf` / `h264_crf` 不会自动重转**——`is_fresh` 只比对源文件的
+时间戳。必须先 `rm docs/video/<slug>/<slug>.mp4` 再构建，否则改了等于没改。
+
 上一次跑下来是 **585 项全过**（7 组照片 + 3 部影片：6 个屏幕尺寸 × 中英双版 + 22 个页面
 + 22 条语言切换路径 + 20 条「下一组／下一部」链路 + 影片播放器若干）。
 其中每个页面还多查一项：**不能再引用 3200px 的图片档**（那一档已删）。
@@ -445,9 +506,9 @@ async function go(pg,u){for(let i=0;i<5;i++){try{return await pg.goto(u,{waitUnt
 - **别超过 10–12 组。** 素材里还有 60 多组，但招生官在一份作品集上只停留几分钟，10 组已经 4.6 屏。第 11 组开始每加一组都在稀释前面的。挑的标准还是那条线索。
 - **影片现在是最大的一块**：三部占 284 MB，比全部照片（160 MB）还多。
   实测规律：**720p 每分钟约 17.5 MB**（32 秒→21 MB，5 分 21 秒→85 MB，10 分 11 秒→178 MB）。
-  `docs/` 是 GitHub Pages 发布的站点，**硬上限 1 GB**，现在 444 MB。
-  **再加一部十分钟的片子之前先算**：还剩约 580 MB，也就是三部长片，或者
-  一部长片 + 十六组照片。
+  `docs/` 是 GitHub Pages 发布的站点，**硬上限 1 GB**，现在 444 MB，还剩约 580 MB。
+  **但真正的墙不是这个，是 GitHub 的单文件 100 MiB 硬限制**（见第七节）——
+  同样参数下一部片子最长只能到 10 分 45 秒，现在这部已经 10 分 11 秒。
   真要放很多长片，再考虑传 YouTube/Vimeo 嵌进来——但那会引入外部 JS 和隐私追踪，
   跟"关掉 JS 也要能看"冲突，所以能自己托管就自己托管。
 - **纯中文的片子放最后。** 「感恩悄然发生」是纯中文对话 + 中文字幕，
