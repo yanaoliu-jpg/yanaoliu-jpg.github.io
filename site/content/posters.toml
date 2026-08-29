@@ -1,0 +1,691 @@
+# ═══════════════════════════════════════════════════════════════════
+#  海报对照表 —— 由 tools/fetch_posters.py --resolve 生成
+#
+#  ⚠️ 这是生成的文件，但**必须人工核对过**才能 --download。
+#     片名搜错了海报就错了，而 62 张小图里混进一张同名重拍的，
+#     事后谁都不会发现。matched 跟 title 对不上的要重点看。
+#
+#  改了某条的 tmdb 之后，重跑 --download 会自动重下那一张。
+# ═══════════════════════════════════════════════════════════════════
+
+[[poster]]
+slug         = "the-prestige"
+title        = "The Prestige"
+year         = 2006
+tmdb         = 1124
+poster_path  = "/Ag2B2KHKQPukjH7WutmgnnSNurZ.jpg"
+matched      = "The Prestige"   # TMDB 上的原始片名，用来核对
+matched_year = 2006
+director     = "Christopher Nolan"
+country      = "GB/US"
+
+[[poster]]
+slug         = "dead-poets-society"
+title        = "Dead Poets Society"
+year         = 1989
+tmdb         = 207
+poster_path  = "/tNvKkSnnn4Z6RCBThyK1gfCSSvv.jpg"
+matched      = "Dead Poets Society"   # TMDB 上的原始片名，用来核对
+matched_year = 1989
+director     = "Peter Weir"
+country      = "US"
+
+[[poster]]
+slug         = "catch-me-if-you-can"
+title        = "Catch Me If You Can"
+year         = 2002
+tmdb         = 640
+poster_path  = "/ctjEj2xM32OvBXCq8zAdK3ZrsAj.jpg"
+matched      = "Catch Me If You Can"   # TMDB 上的原始片名，用来核对
+matched_year = 2002
+director     = "Steven Spielberg"
+country      = "US"
+
+[[poster]]
+slug         = "love-letter"
+title        = "Love Letter"
+year         = 1995
+tmdb         = 47002
+poster_path  = "/9iAgQSkt9z34DTYQfpG0M69SyiL.jpg"
+matched      = "ラブレター"   # TMDB 上的原始片名，用来核对
+matched_year = 1995
+director     = "Shunji Iwai"
+country      = "JP"
+
+[[poster]]
+slug         = "to-live"
+title        = "To Live"
+year         = 1994
+tmdb         = 31439
+poster_path  = "/bv0qREWTw8TPAtgt22ELp1UlKVl.jpg"
+matched      = "活着"   # TMDB 上的原始片名，用来核对
+matched_year = 1994
+director     = "Zhang Yimou"
+country      = "CN"
+
+[[poster]]
+slug         = "the-grand-budapest-hotel"
+title        = "The Grand Budapest Hotel"
+year         = 2014
+tmdb         = 120467
+poster_path  = "/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg"
+matched      = "The Grand Budapest Hotel"   # TMDB 上的原始片名，用来核对
+matched_year = 2014
+director     = "Wes Anderson"
+country      = "US"
+
+[[poster]]
+slug         = "harry-potter-and-the-prisoner-of-azkaban"
+title        = "Harry Potter and the Prisoner of Azkaban"
+year         = 2004
+tmdb         = 673
+poster_path  = "/aWxwnYoe8p2d2fcxOqtvAtJ72Rw.jpg"
+matched      = "Harry Potter and the Prisoner of Azkaban"   # TMDB 上的原始片名，用来核对
+matched_year = 2004
+director     = "Alfonso Cuarón"
+country      = "GB"
+
+[[poster]]
+slug         = "la-la-land"
+title        = "La La Land"
+year         = 2016
+tmdb         = 313369
+poster_path  = "/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg"
+matched      = "La La Land"   # TMDB 上的原始片名，用来核对
+matched_year = 2016
+director     = "Damien Chazelle"
+country      = "US"
+
+[[poster]]
+slug         = "the-pianist"
+title        = "The Pianist"
+year         = 2002
+tmdb         = 423
+poster_path  = "/2hFvxCCWrTmCYwfy7yum0GKRi3Y.jpg"
+matched      = "The Pianist"   # TMDB 上的原始片名，用来核对
+matched_year = 2002
+director     = "Roman Polanski"
+country      = "GB/FR/DE"
+
+[[poster]]
+slug         = "a-chinese-odyssey-part-one-pandora-s-box"
+title        = "A Chinese Odyssey Part One: Pandora's Box"
+year         = 1995
+tmdb         = 13345
+poster_path  = "/wIDDJ3FXPmVnNpxVoZOvjjcKVqj.jpg"
+matched      = "西遊記第壹佰零壹回之月光寶盒"   # TMDB 上的原始片名，用来核对
+matched_year = 1995
+director     = "Jeffrey Lau Chun-Wai"
+country      = "HK"
+
+[[poster]]
+slug         = "scent-of-a-woman"
+title        = "Scent of a Woman"
+year         = 1992
+tmdb         = 9475
+poster_path  = "/4adI7IaveWb7EidYXfLb3MK3CgO.jpg"
+matched      = "Scent of a Woman"   # TMDB 上的原始片名，用来核对
+matched_year = 1992
+director     = "Martin Brest"
+country      = "US"
+
+[[poster]]
+slug         = "green-book"
+title        = "Green Book"
+year         = 2018
+tmdb         = 490132
+poster_path  = "/7BsvSuDQuoqhWmU2fL7W2GOcZHU.jpg"
+matched      = "Green Book"   # TMDB 上的原始片名，用来核对
+matched_year = 2018
+director     = "Peter Farrelly"
+country      = "US"
+
+[[poster]]
+slug         = "roman-holiday"
+title        = "Roman Holiday"
+year         = 1953
+tmdb         = 804
+poster_path  = "/8lI9dmz1RH20FAqltkGelY1v4BE.jpg"
+matched      = "Roman Holiday"   # TMDB 上的原始片名，用来核对
+matched_year = 1953
+director     = "William Wyler"
+country      = "US"
+
+[[poster]]
+slug         = "havoc-in-heaven"
+title        = "Havoc in Heaven"
+year         = 1961
+tmdb         = 47759
+poster_path  = "/vBHI9QjQyCyJP7EtqoGweahTU8S.jpg"
+matched      = "大闹天宫"   # TMDB 上的原始片名，用来核对
+matched_year = 1961
+director     = "Wan Laiming"
+country      = "CN"
+
+[[poster]]
+slug         = "cinema-paradiso"
+title        = "Cinema Paradiso"
+year         = 1988
+tmdb         = 11216
+poster_path  = "/9JhfVOveaY00o8njQu2Xrp4YWud.jpg"
+matched      = "Nuovo Cinema Paradiso"   # TMDB 上的原始片名，用来核对
+matched_year = 1988
+director     = "Giuseppe Tornatore"
+country      = "IT"
+
+[[poster]]
+slug         = "the-matrix"
+title        = "The Matrix"
+year         = 1999
+tmdb         = 603
+poster_path  = "/dXNAPwY7VrqMAo51EKhhCJfaGb5.jpg"
+matched      = "The Matrix"   # TMDB 上的原始片名，用来核对
+matched_year = 1999
+director     = "Lana Wachowski/Lilly Wachowski"
+country      = "US"
+
+[[poster]]
+slug         = "the-lion-king"
+title        = "The Lion King"
+year         = 1994
+tmdb         = 8587
+poster_path  = "/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg"
+matched      = "The Lion King"   # TMDB 上的原始片名，用来核对
+matched_year = 1994
+director     = "Roger Allers/Rob Minkoff"
+country      = "US"
+
+[[poster]]
+slug         = "the-attorney"
+title        = "The Attorney"
+year         = 2013
+tmdb         = 242452
+poster_path  = "/dNCJgCCC97ABZ6yplyosNHI4Pjr.jpg"
+matched      = "변호인"   # TMDB 上的原始片名，用来核对
+matched_year = 2013
+director     = "Yang Woo-seok"
+country      = "KR"
+
+[[poster]]
+slug         = "eat-drink-man-woman"
+title        = "Eat Drink Man Woman"
+year         = 1994
+tmdb         = 10451
+poster_path  = "/olhIWtIBFg6VWK59DEd4lAvgVgz.jpg"
+matched      = "飲食男女"   # TMDB 上的原始片名，用来核对
+matched_year = 1994
+director     = "Ang Lee"
+country      = "TW"
+
+[[poster]]
+slug         = "fight-club"
+title        = "Fight Club"
+year         = 1999
+tmdb         = 550
+poster_path  = "/jSziioSwPVrOy9Yow3XhWIBDjq1.jpg"
+matched      = "Fight Club"   # TMDB 上的原始片名，用来核对
+matched_year = 1999
+director     = "David Fincher"
+country      = "US"
+
+[[poster]]
+slug         = "the-curious-case-of-benjamin-button"
+title        = "The Curious Case of Benjamin Button"
+year         = 2008
+tmdb         = 4922
+poster_path  = "/26wEWZYt6yJkwRVkjcbwJEFh9IS.jpg"
+matched      = "The Curious Case of Benjamin Button"   # TMDB 上的原始片名，用来核对
+matched_year = 2008
+director     = "David Fincher"
+country      = "US"
+
+[[poster]]
+slug         = "a-beautiful-mind"
+title        = "A Beautiful Mind"
+year         = 2001
+tmdb         = 453
+poster_path  = "/rEIg5yJdNOt9fmX4P8gU9LeNoTQ.jpg"
+matched      = "A Beautiful Mind"   # TMDB 上的原始片名，用来核对
+matched_year = 2001
+director     = "Ron Howard"
+country      = "US"
+
+[[poster]]
+slug         = "the-boy-in-the-striped-pyjamas"
+title        = "The Boy in the Striped Pyjamas"
+year         = 2008
+tmdb         = 14574
+poster_path  = "/2C8QCXdMlojTxZjfBlINr4FWcb6.jpg"
+matched      = "The Boy in the Striped Pyjamas"   # TMDB 上的原始片名，用来核对
+matched_year = 2008
+director     = "Mark Herman"
+country      = "GB"
+
+[[poster]]
+slug         = "the-lives-of-others"
+title        = "The Lives of Others"
+year         = 2006
+tmdb         = 582
+poster_path  = "/cVUDMnskSc01rdbyH0tLATTJUdP.jpg"
+matched      = "Das Leben der Anderen"   # TMDB 上的原始片名，用来核对
+matched_year = 2006
+director     = "Florian Henckel von Donnersmarck"
+country      = "DE"
+
+[[poster]]
+slug         = "tenet"
+title        = "Tenet"
+year         = 2020
+tmdb         = 577922
+poster_path  = "/aCIFMriQh8rvhxpN1IWGgvH0Tlg.jpg"
+matched      = "Tenet"   # TMDB 上的原始片名，用来核对
+matched_year = 2020
+director     = "Christopher Nolan"
+country      = "US/GB"
+
+[[poster]]
+slug         = "malena"
+title        = "Malèna"
+year         = 2000
+tmdb         = 10867
+poster_path  = "/3OyQTl0IGkbnjDxd3MhztfPE34g.jpg"
+matched      = "Malèna"   # TMDB 上的原始片名，用来核对
+matched_year = 2000
+director     = "Giuseppe Tornatore"
+country      = "IT"
+
+[[poster]]
+slug         = "the-sound-of-music"
+title        = "The Sound of Music"
+year         = 1965
+tmdb         = 15121
+poster_path  = "/c6CrUZypAsBCaRWX0M3RVRDbhNS.jpg"
+matched      = "The Sound of Music"   # TMDB 上的原始片名，用来核对
+matched_year = 1965
+director     = "Robert Wise"
+country      = "US"
+
+[[poster]]
+slug         = "the-invisible-guest"
+title        = "The Invisible Guest"
+year         = 2016
+tmdb         = 411088
+poster_path  = "/fptnZJbLzKUHeNlYrAynbyoL5YJ.jpg"
+matched      = "Contratiempo"   # TMDB 上的原始片名，用来核对
+matched_year = 2017
+director     = "Oriol Paulo"
+country      = "ES"
+
+[[poster]]
+slug         = "avatar"
+title        = "Avatar"
+year         = 2009
+tmdb         = 19995
+poster_path  = "/gKY6q7SjCkAU6FqvqWybDYgUKIF.jpg"
+matched      = "Avatar"   # TMDB 上的原始片名，用来核对
+matched_year = 2009
+director     = "James Cameron"
+country      = "US"
+
+[[poster]]
+slug         = "saving-private-ryan"
+title        = "Saving Private Ryan"
+year         = 1998
+tmdb         = 857
+poster_path  = "/uqx37cS8cpHg8U35f9U5IBlrCV3.jpg"
+matched      = "Saving Private Ryan"   # TMDB 上的原始片名，用来核对
+matched_year = 1998
+director     = "Steven Spielberg"
+country      = "US"
+
+[[poster]]
+slug         = "one-flew-over-the-cuckoo-s-nest"
+title        = "One Flew Over the Cuckoo's Nest"
+year         = 1975
+tmdb         = 510
+poster_path  = "/kjWsMh72V6d8KRLV4EOoSJLT1H7.jpg"
+matched      = "One Flew Over the Cuckoo's Nest"   # TMDB 上的原始片名，用来核对
+matched_year = 1975
+director     = "Miloš Forman"
+country      = "US"
+
+[[poster]]
+slug         = "children-of-heaven"
+title        = "Children of Heaven"
+year         = 1997
+tmdb         = 21334
+poster_path  = "/jWqh1CJWAEcxckMRrf6ARhIEh0R.jpg"
+matched      = "بچه‌های آسمان"   # TMDB 上的原始片名，用来核对
+matched_year = 1997
+director     = "Majid Majidi"
+country      = "IR"
+
+[[poster]]
+slug         = "the-silence-of-the-lambs"
+title        = "The Silence of the Lambs"
+year         = 1991
+tmdb         = 274
+poster_path  = "/uS9m8OBk1A8eM9I042bx8XXpqAq.jpg"
+matched      = "The Silence of the Lambs"   # TMDB 上的原始片名，用来核对
+matched_year = 1991
+director     = "Jonathan Demme"
+country      = "US"
+
+[[poster]]
+slug         = "blade-runner-2049"
+title        = "Blade Runner 2049"
+year         = 2017
+tmdb         = 335984
+poster_path  = "/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg"
+matched      = "Blade Runner 2049"   # TMDB 上的原始片名，用来核对
+matched_year = 2017
+director     = "Denis Villeneuve"
+country      = "US"
+
+[[poster]]
+slug         = "kung-fu-hustle"
+title        = "Kung Fu Hustle"
+year         = 2004
+tmdb         = 9470
+poster_path  = "/exbyTbrvRUDKN2mcNEuVor4VFQW.jpg"
+matched      = "功夫"   # TMDB 上的原始片名，用来核对
+matched_year = 2004
+director     = "Stephen Chow"
+country      = "HK"
+
+[[poster]]
+slug         = "shutter-island"
+title        = "Shutter Island"
+year         = 2010
+tmdb         = 11324
+poster_path  = "/nrmXQ0zcZUL8jFLrakWc90IR8z9.jpg"
+matched      = "Shutter Island"   # TMDB 上的原始片名，用来核对
+matched_year = 2010
+director     = "Martin Scorsese"
+country      = "US"
+
+[[poster]]
+slug         = "the-butterfly-effect"
+title        = "The Butterfly Effect"
+year         = 2004
+tmdb         = 1954
+poster_path  = "/ea5iv7TWMh18fOKoRGgmtcg85Gx.jpg"
+matched      = "The Butterfly Effect"   # TMDB 上的原始片名，用来核对
+matched_year = 2004
+director     = "J. Mackye Gruber/Eric Bress"
+country      = "US"
+
+[[poster]]
+slug         = "good-will-hunting"
+title        = "Good Will Hunting"
+year         = 1997
+tmdb         = 489
+poster_path  = "/z2FnLKpFi1HPO7BEJxdkv6hpJSU.jpg"
+matched      = "Good Will Hunting"   # TMDB 上的原始片名，用来核对
+matched_year = 1997
+director     = "Gus Van Sant"
+country      = "US"
+
+[[poster]]
+slug         = "detachment"
+title        = "Detachment"
+year         = 2011
+tmdb         = 74308
+poster_path  = "/bC5H2dabnHrQJD1KmQUSUUeuCXU.jpg"
+matched      = "Detachment"   # TMDB 上的原始片名，用来核对
+matched_year = 2011
+director     = "Tony Kaye"
+country      = "US"
+
+[[poster]]
+slug         = "pulp-fiction"
+title        = "Pulp Fiction"
+year         = 1994
+tmdb         = 680
+poster_path  = "/vQWk5YBFWF4bZaofAbv0tShwBvQ.jpg"
+matched      = "Pulp Fiction"   # TMDB 上的原始片名，用来核对
+matched_year = 1994
+director     = "Quentin Tarantino"
+country      = "US"
+
+[[poster]]
+slug         = "modern-times"
+title        = "Modern Times"
+year         = 1936
+tmdb         = 3082
+poster_path  = "/AthaPakkuCLROdKxtRbKWclkDBK.jpg"
+matched      = "Modern Times"   # TMDB 上的原始片名，用来核对
+matched_year = 1936
+director     = "Charlie Chaplin"
+country      = "US"
+
+[[poster]]
+slug         = "the-cove"
+title        = "The Cove"
+year         = 2009
+tmdb         = 23128
+poster_path  = "/miodcVtQv2YxpKjjHJWcV0EDfSP.jpg"
+matched      = "The Cove"   # TMDB 上的原始片名，用来核对
+matched_year = 2009
+director     = "Louie Psihoyos"
+country      = "US"
+
+[[poster]]
+slug         = "king-of-comedy"
+title        = "King of Comedy"
+year         = 1999
+tmdb         = 53168
+poster_path  = "/dmJWvKNgeCrIwJH6AapdSMiZHop.jpg"
+matched      = "喜劇之王"   # TMDB 上的原始片名，用来核对
+matched_year = 1999
+director     = "Stephen Chow/Lee Lik-Chi"
+country      = "HK"
+
+[[poster]]
+slug         = "once-upon-a-time-in-america"
+title        = "Once Upon a Time in America"
+year         = 1984
+tmdb         = 311
+poster_path  = "/i0enkzsL5dPeneWnjl1fCWm6L7k.jpg"
+matched      = "Once Upon a Time in America"   # TMDB 上的原始片名，用来核对
+matched_year = 1984
+director     = "Sergio Leone"
+country      = "US"
+
+[[poster]]
+slug         = "identity"
+title        = "Identity"
+year         = 2003
+tmdb         = 2832
+poster_path  = "/sYgimsiBywqVwJI8H4sETke8m7v.jpg"
+matched      = "Identity"   # TMDB 上的原始片名，用来核对
+matched_year = 2003
+director     = "James Mangold"
+country      = "US"
+
+[[poster]]
+slug         = "memories-of-murder"
+title        = "Memories of Murder"
+year         = 2003
+tmdb         = 11423
+poster_path  = "/jcgUjx1QcupGzjntTVlnQ15lHqy.jpg"
+matched      = "살인의 추억"   # TMDB 上的原始片名，用来核对
+matched_year = 2003
+director     = "Bong Joon Ho"
+country      = "KR"
+
+[[poster]]
+slug         = "paprika"
+title        = "Paprika"
+year         = 2006
+tmdb         = 4977
+poster_path  = "/nHJljo2Pi7XimYEgV9hvRchQWmg.jpg"
+matched      = "パプリカ"   # TMDB 上的原始片名，用来核对
+matched_year = 2006
+director     = "Satoshi Kon"
+country      = "JP"
+
+[[poster]]
+slug         = "flirting-scholar"
+title        = "Flirting Scholar"
+year         = 1993
+tmdb         = 37703
+poster_path  = "/sK5k5gyE18yEHCw9AqeTEfqYqtw.jpg"
+matched      = "唐伯虎點秋香"   # TMDB 上的原始片名，用来核对
+matched_year = 1993
+director     = "Lee Lik-Chi"
+country      = "CN/HK"
+
+[[poster]]
+slug         = "brokeback-mountain"
+title        = "Brokeback Mountain"
+year         = 2005
+tmdb         = 142
+poster_path  = "/aByfQOQBNa4CMFwIgq3QrqY2ZHh.jpg"
+matched      = "Brokeback Mountain"   # TMDB 上的原始片名，用来核对
+matched_year = 2005
+director     = "Ang Lee"
+country      = "US"
+
+[[poster]]
+slug         = "parasite"
+title        = "Parasite"
+year         = 2019
+tmdb         = 496243
+poster_path  = "/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg"
+matched      = "기생충"   # TMDB 上的原始片名，用来核对
+matched_year = 2019
+director     = "Bong Joon Ho"
+country      = "KR"
+
+[[poster]]
+slug         = "before-sunset"
+title        = "Before Sunset"
+year         = 2004
+tmdb         = 80
+poster_path  = "/4sW5XH9ZfYXpvFzev00S1IGAEbg.jpg"
+matched      = "Before Sunset"   # TMDB 上的原始片名，用来核对
+matched_year = 2004
+director     = "Richard Linklater"
+country      = "US"
+
+[[poster]]
+slug         = "princess-mononoke"
+title        = "Princess Mononoke"
+year         = 1997
+tmdb         = 128
+poster_path  = "/cMYCDADoLKLbB83g4WnJegaZimC.jpg"
+matched      = "もののけ姫"   # TMDB 上的原始片名，用来核对
+matched_year = 1997
+director     = "Hayao Miyazaki"
+country      = "JP"
+
+[[poster]]
+slug         = "edward-scissorhands"
+title        = "Edward Scissorhands"
+year         = 1990
+tmdb         = 162
+poster_path  = "/e0FqKFvGPdQNWG8tF9cZBtev9Em.jpg"
+matched      = "Edward Scissorhands"   # TMDB 上的原始片名，用来核对
+matched_year = 1990
+director     = "Tim Burton"
+country      = "US"
+
+[[poster]]
+slug         = "inside-out"
+title        = "Inside Out"
+year         = 2015
+tmdb         = 150540
+poster_path  = "/2H1TmgdfNtsKlU9jKdeNyYL5y8T.jpg"
+matched      = "Inside Out"   # TMDB 上的原始片名，用来核对
+matched_year = 2015
+director     = "Pete Docter"
+country      = "US"
+
+[[poster]]
+slug         = "whiplash"
+title        = "Whiplash"
+year         = 2014
+tmdb         = 244786
+poster_path  = "/7fn624j5lj3xTme2SgiLCeuedmO.jpg"
+matched      = "Whiplash"   # TMDB 上的原始片名，用来核对
+matched_year = 2014
+director     = "Damien Chazelle"
+country      = "US"
+
+[[poster]]
+slug         = "singin-in-the-rain"
+title        = "Singin' in the Rain"
+year         = 1952
+tmdb         = 872
+poster_path  = "/w03EiJVHP8Un77boQeE7hg9DVdU.jpg"
+matched      = "Singin' in the Rain"   # TMDB 上的原始片名，用来核对
+matched_year = 1952
+director     = "Stanley Donen/Gene Kelly"
+country      = "US"
+
+[[poster]]
+slug         = "metropolis"
+title        = "Metropolis"
+year         = 1927
+tmdb         = 19
+poster_path  = "/kr9wXRN23zLuWJIelahas1mtnYj.jpg"
+matched      = "Metropolis"   # TMDB 上的原始片名，用来核对
+matched_year = 1927
+director     = "Fritz Lang"
+country      = "DE"
+
+[[poster]]
+slug         = "grizzly-man"
+title        = "Grizzly Man"
+year         = 2005
+tmdb         = 501
+poster_path  = "/zuZWpcuye25rpsiZ4XzsAvmLDHG.jpg"
+matched      = "Grizzly Man"   # TMDB 上的原始片名，用来核对
+matched_year = 2005
+director     = "Werner Herzog"
+country      = "US"
+
+[[poster]]
+slug         = "blade-runner"
+title        = "Blade Runner"
+year         = 1982
+tmdb         = 78
+poster_path  = "/63N9uy8nd9j7Eog2axPQ8lbr3Wj.jpg"
+matched      = "Blade Runner"   # TMDB 上的原始片名，用来核对
+matched_year = 1982
+director     = "Ridley Scott"
+country      = "US"
+
+[[poster]]
+slug         = "how-to-train-your-dragon"
+title        = "How to Train Your Dragon"
+year         = 2010
+tmdb         = 10191
+poster_path  = "/ygGmAO60t8GyqUo9xYeYxSZAR3b.jpg"
+matched      = "How to Train Your Dragon"   # TMDB 上的原始片名，用来核对
+matched_year = 2010
+director     = "Chris Sanders/Dean DeBlois"
+country      = "US"
+
+[[poster]]
+slug         = "a-man-called-ove"
+title        = "A Man Called Ove"
+year         = 2015
+tmdb         = 348678
+poster_path  = "/a41uvFqze4PI7N3E9jPNwN9ypV.jpg"
+matched      = "En man som heter Ove"   # TMDB 上的原始片名，用来核对
+matched_year = 2015
+director     = "Hannes Holm"
+country      = "SE/DK/NO"
+
+[[poster]]
+slug         = "in-the-mood-for-love"
+title        = "In the Mood for Love"
+year         = 2000
+tmdb         = 843
+poster_path  = "/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg"
+matched      = "花樣年華"   # TMDB 上的原始片名，用来核对
+matched_year = 2000
+director     = "Wong Kar-Wai"
+country      = "HK"

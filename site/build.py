@@ -27,6 +27,7 @@ import shutil
 import subprocess
 import sys
 import tomllib
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -213,7 +214,22 @@ def fmt_shutter(value) -> str | None:
 
 
 def slugify(text: str) -> str:
-    s = re.sub(r"[^\w\-]+", "-", text.strip().lower(), flags=re.UNICODE)
+    """把标题变成网址里那一段。
+
+    先把重音拆开再丢掉，让 Malèna → malena、Amélie → amelie。
+    不这么做的话 `\\w` 在 UNICODE 下会把 è 当成合法字符留在网址里，
+    于是 /mal%C3%A8na/ ——能用，但没人愿意手打，分享出去也难看。
+
+    ⚠️ CJK 是故意留着的：这里只脱重音符号，不做音译。
+       中文标题如果没在 toml 里写 slug，落到这儿会得到一个中文网址——
+       那说明该去 toml 里补一个 slug，不是这个函数的问题。
+
+    ⚠️ 影评的锚点和海报文件名都靠它。site/tools/ 下的两个脚本
+       **直接 import 这个函数**，不要在别处再写一份——写两份必然漂移。
+    """
+    text = unicodedata.normalize("NFKD", text.strip().lower())
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    s = re.sub(r"[^\w\-]+", "-", text, flags=re.UNICODE)
     return re.sub(r"-{2,}", "-", s).strip("-")
 
 
