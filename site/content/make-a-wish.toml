@@ -1,0 +1,81 @@
+# ═══════════════════════════════════════════════════════════════════
+#  都值得被听见 / Make a Wish —— 站上第三部影片
+#  改完存盘，跑：  python3 build.py
+#  改了中文还要跑：python3 tools/subset_font.py 然后再 build 一次
+# ═══════════════════════════════════════════════════════════════════
+
+kind = "film"
+
+slug = "make-a-wish"            # 网址：.../make-a-wish/ ，定了别再改
+title = "Make a Wish"
+source = "视频"
+video = "7月8日(1)_副本.mov"
+
+# order = 9：排在最后。两部长片按时间排在尾部（感恩 2025.11 在前，这部 2026.07 在后），
+# 30 秒的「停止滑动」仍然留在最前面当头题。照片是中间的主体。
+order = 9
+
+# 720p，跟「感恩悄然发生」同参数。十分钟的片子这已经是 233 MB——
+# 为了给它腾地方，同一次提交里把图片的 3200px 档去掉了（省 110 MB），
+# 见 build.py 的 WIDTHS 注释。
+height = 720
+av1_crf = 36
+h264_crf = 26
+
+# 第 537 秒：长椅上的双人镜头，阳光和绿植，**没有字幕**。
+# 这部片子几乎全程压着中文字幕，我写脚本扫了 47 帧的底部亮度才找出这一帧。
+poster_at = 537
+poster_alt = "A still from the film: two people sit talking on a stone bench under a tree in a residential courtyard, one in a school shirt, the other in a pink work jacket."
+
+date = "2026-07"
+year = "2026"
+
+author = "Yanao (Leo) Liu"
+
+description = "A ten-minute film about asking someone what she wants, July 2026."
+
+# ─────────────────────────────────────────────────────────────────
+#  自述按他的要求，从**片子自己的文字卡**里提取（开场／中段／结尾三张），
+#  中间补上阿姨在采访里实际说的话——比转述有力得多。
+#
+#  ⚠️ 又是一部纯中文对话、只有中文字幕的片子。英文自述最后一句点明，
+#     并且把"礼物"那条线讲清楚，让不懂中文的人读完也知道发生了什么。
+# ─────────────────────────────────────────────────────────────────
+statement = """
+Everyone is carrying a wish somewhere — however small, however ordinary, it still deserves to be heard.
+
+On an afternoon in July we sat on a bench in a residential courtyard and talked for a long time with a woman who cleans other people's homes for a living. One job is three hours; some days she does several. Her eyes get so tired she can hardly keep them open. The walk home is the most relaxed part of her day. When there is time, she cooks something she actually likes.
+
+Listening to her, we realised she spends almost all of her hours looking after other people's lives, and is almost never asked what she wants.
+
+"Make a wish" is usually a weightless thing to say to someone. This time we wanted it to land. After the interview we quietly put a present together, and took her wish one step further.
+
+Her wish was a small one — small enough that nobody normally thinks to ask. But being heard properly, and answered properly, may have mattered more than the present did.
+
+The film is in Mandarin with Chinese subtitles.
+"""
+
+colophon = "Camera: Yanao (Leo) Liu · Interview by a classmate"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  中文版（/zh/make-a-wish/）
+#  这一版是原稿——直接取自片子里的三张文字卡，英文从它转过去
+# ═══════════════════════════════════════════════════════════════════
+[zh]
+title = "都值得被听见"
+author = "刘延奥"
+description = "一部十分钟的短片，关于问一个人：你想要什么。2026 年 7 月。"
+colophon = "录制 刘延奥 · 采访由一位同学完成"
+
+statement = """
+每个人心里，或许都藏着一个愿望——不管它多小、多普通，都值得被听见。
+
+七月的一个下午，我们在小区的长椅上，和一位做家政的阿姨聊了很久。她说一单三小时，一天要跑好几家；说眼睛累得睁不开；说回家路上是一天里最放松的时候；说有空的话，就给自己做一点爱吃的。
+
+聊完我们发现，她把大部分时间都花在了照顾别人的生活上，却很少有机会好好想一想，自己想要什么。
+
+Make a wish，对很多人来说可能只是一句轻飘飘的祝福。但这一次我们想让它落地——采访结束后，我们悄悄准备了一份礼物，替她把这个愿望往前推了一步。
+
+她的愿望或许很小，小到平时很少有人问起。但被认真听见、被认真回应，这件事本身，也许比礼物更重要。
+"""

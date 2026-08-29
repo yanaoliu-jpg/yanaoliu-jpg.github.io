@@ -2,7 +2,7 @@
 
 给美国大学招生官看的网页版作品集。线上地址：**https://yanaoliu-jpg.github.io/**
 
-目前七组照片 + 两部影片：
+目前七组照片 + 三部影片：
 
 | | | |
 |---|---|---|
@@ -15,6 +15,7 @@
 | Sea and Light 海与光的诗 | 2026 年 3 月 | 9 张 |
 | **Stop Scrolling, Stay Alive** 停止滑动，面对生活 | 2026 年 3 月 | 影片 32 秒 |
 | **Gratitude, Quietly** 感恩悄然发生 | 2025 年 11 月 | 影片 5 分 21 秒 |
+| **Make a Wish** 都值得被听见 | 2026 年 7 月 | 影片 10 分 11 秒 |
 
 - 源码在 `site/`
 - 生成的网站在 `docs/`
@@ -121,6 +122,7 @@ python3 site/tools/check_font.py
 | `sea-and-light.toml` | Sea and Light / 海与光的诗 |
 | `stop-scrolling.toml` | Stop Scrolling, Stay Alive / 停止滑动，面对生活（影片） |
 | `gratitude.toml` | Gratitude, Quietly / 感恩悄然发生（影片） |
+| `make-a-wish.toml` | Make a Wish / 都值得被听见（影片） |
 
 下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
 
@@ -196,7 +198,7 @@ python3 site/build.py && git add -A && git commit -m "更新作品集" && git pu
 仍然和页面有边界。
 
 **图片压到什么程度？**
-每张出 4 个尺寸（900/1600/2400/3200px）× 最多 3 种格式（AVIF/WebP/JPEG），
+每张出 3 个尺寸（900/1600/2400px）× 3 种格式（AVIF/WebP/JPEG），
 浏览器按屏幕和网速自己挑。主力是 AVIF，实测暗部误差优于 JPEG q90，
 体积只有它的四成。跟原图 100% 放大对比过，看不出差别。
 
@@ -210,6 +212,8 @@ python3 site/build.py && git add -A && git commit -m "更新作品集" && git pu
 不是藏在图片文件里的。
 
 **以后作品多了，仓库会不会太大？**
-一期 9 张约 27 MB。GitHub 单个仓库建议不超过 1 GB，也就是大约 35 期。
-真到那一天有两个办法：在 `site/build.py` 里把 `WIDTHS` 去掉 3200 那档（省一半），
-或者干脆精选 10–15 期——招生官不会看 68 期，精选比全堆上去有效得多。
+`docs/` 就是 GitHub Pages 发布的站点，**硬上限 1 GB**，现在 444 MB。
+一期照片约 23 MB，**影片每分钟约 17.5 MB**——三部影片已经占了 284 MB，比照片还多。
+省空间的那张牌（去掉 3200px 档）2026 年 8 月已经打掉了。
+还剩约 580 MB，也就是三部长片，或者一部长片 + 十六组照片。
+再往后只能精选——招生官不会看 68 期，精选比全堆上去有效得多。
