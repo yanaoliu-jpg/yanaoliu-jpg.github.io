@@ -16,6 +16,9 @@
 | **Stop Scrolling, Stay Alive** 停止滑动，面对生活 | 2026 年 3 月 | 影片 32 秒 |
 | **Gratitude, Quietly** 感恩悄然发生 | 2025 年 11 月 | 影片 5 分 21 秒 |
 | **Make a Wish** 都值得被听见 | 2026 年 7 月 | 影片 10 分 11 秒 |
+| **Film Notes** 影评 | 2024 年至今 | 62 篇 |
+
+网站分三大类：**照片 / 影片 / 影评**，首页顶部有导航。
 
 - 源码在 `site/`
 - 生成的网站在 `docs/`
@@ -124,8 +127,11 @@ python3 site/tools/check_font.py
 | `stop-scrolling.toml` | Stop Scrolling, Stay Alive / 停止滑动，面对生活（影片） |
 | `gratitude.toml` | Gratitude, Quietly / 感恩悄然发生（影片） |
 | `make-a-wish.toml` | Make a Wish / 都值得被听见（影片） |
+| `film-notes.toml` | 62 篇影评，一条一个 `[[entry]]` |
+| `_posters.toml` | 海报对照表，**生成的**，别手改（除非要钉死某一部） |
 
-下划线开头的文件不会被当成作品系列。改完存盘，重新跑 `python3 site/build.py` 就生效。
+下划线开头的文件不会被当成作品系列。**这不是可选的**——`_posters.toml` 少了下划线，
+`build.py` 会拿它当一个作品，然后报错。改完存盘，重新跑 `python3 site/build.py` 就生效。
 
 **没填完的地方写成【这样】，网页上会显示成橙色虚线框**——故意做得刺眼，
 就是为了不可能在没写完的情况下不小心发出去。
@@ -213,14 +219,17 @@ python3 site/build.py && git add -A && git commit -m "更新作品集" && git pu
 不是藏在图片文件里的。
 
 **以后作品多了，仓库会不会太大？**
-`docs/` 就是 GitHub Pages 发布的站点，**硬上限 1 GB**，现在 444 MB。
-一期照片约 23 MB，**影片每分钟约 17.5 MB**——三部影片已经占了 284 MB，比照片还多。
-省空间的那张牌（去掉 3200px 档）2026 年 8 月已经打掉了。
-还剩约 580 MB。
+`docs/` 就是 GitHub Pages 发布的站点，**硬上限 1 GB**，现在 380 MB，还剩约 644 MB。
+影片 258 MB、照片 114 MB、62 张影评海报只占 5.9 MB。
+一期照片约 16 MB，**影片每分钟约 15 MB**——影片是最大的一块。
 
-**但真正卡住你的不是这个，是 GitHub 的单文件 100 MiB 硬限制**：
-「都值得被听见」的 mp4 已经 94.58 MiB，再长约 35 秒就推不上去了。
-按现在的参数，**单部影片最长约 10 分 45 秒**。超了先把 `h264_crf` 从 26 调到 29
-（约省三成），再考虑降到 540p。
+**但真正卡住你的不是总量，是 GitHub 的单文件 100 MiB 硬限制。**
+现在离硬限最近的是 `make-a-wish.webm`（83.7 MiB，84%），不是 mp4。
+详细的账和解决方案在 [容量规划.md](容量规划.md)。
 
 再往后只能精选——招生官不会看 68 期，精选比全堆上去有效得多。
+
+**加影评要 TMDB 的 key 吗？**
+只有拉海报那一步要。免费，到 <https://www.themoviedb.org/settings/api> 申请，
+然后 `export TMDB_API_KEY='...'`。**别写进仓库里的任何文件**——仓库是 Public 的。
+构建本身不联网。

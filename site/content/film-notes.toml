@@ -38,7 +38,7 @@ statement = """
 [[entry]]
 year  = 2006
 title = "The Prestige"
-text  = "【English translation pending】"
+text  = "The mystery is measured exactly right — you only understand once it is over. The thriller in it fills the film with science fiction and a sense of the occult."
   [entry.zh]
   title = "致命魔术"
   text  = "悬疑的成分恰到好处，让人看完后才能顿悟，惊悚的成分让这部剧充满了科幻和神秘感"
@@ -47,7 +47,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1989
 title = "Dead Poets Society"
-text  = "【English translation pending】"
+text  = "The Captain is a ferryman, opening the door to a new world for you. A parent's constraints are the devil, pulling you back out of the light and into the dark."
   [entry.zh]
   title = "死亡诗社"
   text  = "船长就像是摆渡人一样帮你打开新世界的大门，父母的约束就像魔鬼把你从光明中拉回黑暗"
@@ -56,7 +56,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2002
 title = "Catch Me If You Can"
-text  = "【English translation pending】"
+text  = "A con man's brilliant life."
   [entry.zh]
   title = "猫鼠游戏"
   text  = "骗子的精彩一生"
@@ -65,7 +65,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1995
 title = "Love Letter"
-text  = "【English translation pending】"
+text  = "Falling, slowly and from inside a memory, for the person who once loved you."
   [entry.zh]
   title = "情书"
   text  = "在回忆中渐渐喜欢上了那个曾经喜欢你的人"
@@ -74,7 +74,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1994
 title = "To Live"
-text  = "【English translation pending】"
+text  = "A modern history of China. Set against a great age, the people of a small one look so slight."
   [entry.zh]
   title = "活着"
   text  = "一部中国的近代史，小时代的人在大时代的背景下显得那么微不足道"
@@ -83,7 +83,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2014
 title = "The Grand Budapest Hotel"
-text  = "【English translation pending】"
+text  = "A world like a fairy tale; colours like something said in sleep."
   [entry.zh]
   title = "布达佩斯大饭店"
   text  = "童话般的世界，梦话般的色彩"
@@ -92,7 +92,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2004
 title = "Harry Potter and the Prisoner of Azkaban"
-text  = "【English translation pending】"
+text  = "The turn from fairy tale toward darkness. The unbroken take through Hogwarts flows beautifully."
   [entry.zh]
   title = "哈利·波特和阿兹卡班的囚徒"
   text  = "由童话转向黑暗的过渡，霍格沃茨魔法学院的一镜到底很流畅。"
@@ -101,7 +101,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2016
 title = "La La Land"
-text  = "【English translation pending】"
+text  = "A film that holds music, story and editing all at once. What stayed with me most is the opening, cut like a music video: introducing the two leads separately, each through their own point of view, felt new to me. \"City of Stars\" runs through the whole picture and stays with you afterwards. The seasons cut the film into five parts, each with its own palette, mood and meaning. Music is the subject, and around it the film argues about dreams, love and work. The story peaks in the honeymoon of summer. Again and again it sets dance to music to show how good love can be, and the dreamlike run back through time at the end is devastating. Narrative, cross-cut, parallel and musical montage are all used to hold the rhythm — the mix at the opening party especially. It made me feel that a good film rests not on effects but on shots and technique. It earns its place: the craft of folding this many elements into one film is in a class of its own."
   [entry.zh]
   title = "爱乐之城"
   text  = "一部兼具音乐、剧情、剪辑手法的影片。最让我印象深刻的是影片MV式的开头。开篇分别与男女主视角交代生活背景的形式耳目一新。贯穿全片的《City Of Stars》令人回味。以四季的形式将影片切割为5个部分，每部分有独立的影调、情绪、和意义，各具特色。本片以音乐为主题，围绕梦想，爱情与事业展开讨论。故事的发展在夏季的蜜月中达到高潮。影片多次以音乐配舞蹈的形式展现爱情的美好。结尾梦境般的时光回溯催人泪下。全篇多用叙事蒙太奇、交叉蒙太奇、平行蒙太奇和音乐蒙太奇的剪辑手法将影片的节奏把控的很好，特别是开头晚会上的混剪，让我感觉好影片靠的不是特效，而是镜头和手法。不愧是好莱坞大片，能把多种元素融入影片的技术是独一档的！"
@@ -110,7 +110,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2002
 title = "The Pianist"
-text  = "【English translation pending】"
+text  = "Crueller than losing your family is losing the place you came from."
   [entry.zh]
   title = "钢琴家"
   text  = "比失去家人更残酷的是失去家园"
@@ -119,7 +119,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1995
 title = "A Chinese Odyssey Part One: Pandora's Box"
-text  = "【English translation pending】"
+text  = "A very good period martial-arts film. There is a great deal of moving camera in it, and the blocking of the dialogue scenes is worth studying. Stephen Chow's built-in comic presence, and the ending where Pandora's Box carries him through time, are the high points — and his partnership with Ng Man-tat adds much of the comedy."
   [entry.zh]
   title = "大话西游之月光宝盒"
   text  = "很不错的一部古装武打片，里面有大量的运动镜头和对话戏的调度值得学习，周星驰自带喜感的角色形象和结尾用月光宝盒穿梭时空的情节是本片的亮点，不得不提周星驰与吴孟达的拍档给本片增添了许多喜剧色彩"
@@ -128,7 +128,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1992
 title = "Scent of a Woman"
-text  = "【English translation pending】"
+text  = "Everyone has a reason to exist, principles of their own, and some hope worth living for."
   [entry.zh]
   title = "闻香识女人"
   text  = "每个人都有存在的意义，有自己的原则，有活下去的希望"
@@ -137,7 +137,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2018
 title = "Green Book"
-text  = "【English translation pending】"
+text  = "Life's green book is to do every single thing as well as you can, whatever comes of it."
   [entry.zh]
   title = "绿皮书"
   text  = "人生的绿皮书就是尽力做好每一件事，不论结果如何"
@@ -146,7 +146,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1953
 title = "Roman Holiday"
-text  = "【English translation pending】"
+text  = "The truth of living is freedom, and romance."
   [entry.zh]
   title = "罗马假日"
   text  = "生活的真谛是自由与浪漫"
@@ -155,7 +155,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1961
 title = "Havoc in Heaven"
-text  = "【English translation pending】"
+text  = "It made me miss kindergarten, when nothing weighed on me."
   [entry.zh]
   title = "大闹天宫"
   text  = "怀念幼儿园无忧无虑的时光"
@@ -164,7 +164,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1988
 title = "Cinema Paradiso"
-text  = "【English translation pending】"
+text  = "Those kisses, those tears — time has washed them until they are utterly clear."
   [entry.zh]
   title = "天堂电影院"
   text  = "那些吻戏，那些泪水，都被时间冲刷得无比清晰"
@@ -173,7 +173,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1999
 title = "The Matrix"
-text  = "【English translation pending】"
+text  = "A visual feast."
   [entry.zh]
   title = "黑客帝国"
   text  = "一场视觉盛宴"
@@ -182,7 +182,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1994
 title = "The Lion King"
-text  = "【English translation pending】"
+text  = "\"Remember — do not forget who you are.\""
   [entry.zh]
   title = "狮子王"
   text  = "“请记住，不要忘了你自己。”"
@@ -191,7 +191,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2013
 title = "The Attorney"
-text  = "【English translation pending】"
+text  = "\"The egg is alive. The rock is dead.\""
   [entry.zh]
   title = "辩护人"
   text  = "“鸡蛋是活的，石头是死的。”"
@@ -200,7 +200,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1994
 title = "Eat Drink Man Woman"
-text  = "【English translation pending】"
+text  = "Every family has its own scripture, and it is hard to recite."
   [entry.zh]
   title = "饮食男女"
   text  = "家家有本难念的经"
@@ -209,7 +209,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1999
 title = "Fight Club"
-text  = "【English translation pending】"
+text  = "The film takes a very unusual point of view. The story moves from different temperaments to different personalities to different lives altogether. The lead's mind seems disordered and unreal from beginning to end — only at the moment the bomb starts counting down does he see his real self, and the real world."
   [entry.zh]
   title = "搏击俱乐部"
   text  = "本篇采用了很独特的视角。故事的发展从不同性格到不同人格再到不同的人生……主人公似乎从始至终思维都是混乱的、不真实的，直到炸弹倒计时的那一刻，他才认清了真实的自我、真实的世界……"
@@ -218,7 +218,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2008
 title = "The Curious Case of Benjamin Button"
-text  = "【English translation pending】"
+text  = "Some things do not change, however long time washes over them."
   [entry.zh]
   title = "本杰明·巴顿奇事"
   text  = "有些事是永恒不变的，即使经过时间的冲刷"
@@ -227,7 +227,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2001
 title = "A Beautiful Mind"
-text  = "【English translation pending】"
+text  = "The story is coherent, fluid and tight, with nothing wasted. The film leans heavily on long lenses and crane moves to isolate its subject and his qualities, which suits what it set out to do. The score keeps you tense throughout."
   [entry.zh]
   title = "美丽心灵"
   text  = "故事很连贯、流畅、紧凑，毫不拖泥带水，影片大量使用长焦和摇臂，突出人物主体和特点，也符合本片拍摄目的。音乐让人紧张感十足。"
@@ -236,7 +236,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2008
 title = "The Boy in the Striped Pyjamas"
-text  = "【English translation pending】"
+text  = "The dialogue scenes are lean, and the camera keeps changing through them. When Bruno crosses the woods on his expedition, the moving camera follows him from several angles and at several focal lengths — you feel you are there with him."
   [entry.zh]
   title = "穿条纹睡衣的男孩"
   text  = "对话戏很精炼，在对话时的镜头很多变，布鲁诺穿越森林进行探险时的运动镜头从多个角度和不同焦段进行跟拍，让人身临其境"
@@ -245,7 +245,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2006
 title = "The Lives of Others"
-text  = "【English translation pending】"
+text  = "The narrative turns, and turns again, and the ending knows exactly what to dwell on and what to pass over. There is not much technique on display, but the tension in the arrests and the searches is done extremely well."
   [entry.zh]
   title = "窃听风暴"
   text  = "叙事一波三折，结尾详略得当！手法上不是很多，但是抓捕和搜查时的紧张感体现的非常好"
@@ -254,16 +254,16 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2020
 title = "Tenet"
-text  = "【English translation pending】"
+text  = "The technique is rarely seen, and you cannot follow the plot in a single viewing. Nolan's scores go without saying — vast and epic as ever. The way the dialogue scenes are shot is worth studying."
   [entry.zh]
   title = "信条"
-  text  = "拍摄手法很少见，故事情节不是一边就能看得懂的，诺兰电影的配乐没得说，依旧宏大史诗。对话戏拍摄值得研究"
+  text  = "拍摄手法很少见，故事情节不是一遍就能看得懂的，诺兰电影的配乐没得说，依旧宏大史诗。对话戏拍摄值得研究"
 
 # ── 26 ── 西西里的美丽传说 ─────────────────────────────────
 [[entry]]
 year  = 2000
 title = "Malèna"
-text  = "【English translation pending】"
+text  = "The film uses a great many low, ground-level angles, and lets the environment carry the character. The moving shots taken head-on to the lead are very good, and the staging works superbly with the processions through the town."
   [entry.zh]
   title = "西西里的美丽传说"
   text  = "影片有很多贴地视角和环境描写衬托人物，正对主角拍摄的运动画面很好，场面调度和巡演的配合很出色。"
@@ -272,7 +272,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1965
 title = "The Sound of Music"
-text  = "【English translation pending】"
+text  = "I love that the camera comes down out of the sky at the start and cranes back up into it at the end. Inside the church, the architecture and the costumes are classical and devotional, which gives the image a mystery. The night lighting is superb: the environment is built exactly right, and it carries a stillness with it. The low-light photography is a real success."
   [entry.zh]
   title = "音乐之声"
   text  = "喜欢开头摄像机从空中降下来和结尾摄像机又摇回空中的设计，教堂内的建筑和服装都很古典和宗教，使画面具有一种神秘感。夜晚的打光非常棒，环境营造的很到位，也渲染了静谧的气氛。对于暗光的拍摄非常成功。"
@@ -281,7 +281,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2016
 title = "The Invisible Guest"
-text  = "【English translation pending】"
+text  = "I learned how to imply things with the camera, cutting between long, medium and close positions. Changing how much the frame takes in during a conversation can mark a shift in feeling or attitude, and can mark how much a particular line matters."
   [entry.zh]
   title = "看不见的客人"
   text  = "学到了用镜头暗示，机位由远中近的切换。人物对话时的镜头视野范围的变化可以突出情绪和态度的变化，也可以突出某段话的重要程度。"
@@ -290,7 +290,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2009
 title = "Avatar"
-text  = "【English translation pending】"
+text  = "After The Matrix, another epic that remade what a film could look like. The plot is well built, and the way the ending lifts its theme took me by surprise. Its argument is that we should protect the environment and treasure life on this planet, and that our fates are bound together. Beyond that, the shooting feels technological and stays coherent, especially the first-person tension of arriving on Pandora. The camera circles its subjects again and again to open up a location without letting the image go dull, and pulling the camera back to reveal a character's surroundings looks wonderful to me. I did feel the film runs a little long, and the motion capture was not yet mature — though already very good. The fights are exciting, but not quite to my taste."
   [entry.zh]
   title = "阿凡达"
   text  = "继《黑客帝国》之后，又一部伟大的视觉革新的史诗，剧情设计的很好结尾升华主题很惊喜，这部片的立意是告诫人类要保护环境，珍爱地球生命共，也提倡促进人类命运共同体。除此之外，在拍摄手法上，镜头充满科技感也很连贯，尤其是用第一人称代入进入潘多拉星球的紧张感，此外影片多次环绕运镜达到展现场景的作用，也不会让画面变得那么乏味。还有就是镜头后退展现人物背景我觉得很帅。我感觉这部影片稍长，动作捕捉技术还没那么成熟，但已经很好，还有就是打斗戏很刺激但不是很合我胃口。"
@@ -299,7 +299,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1998
 title = "Saving Private Ryan"
-text  = "【English translation pending】"
+text  = "One of a kind among war films, and history will not produce another like it. Story, narration, sets and props are beyond reproach. There are a great many long lenses and a lot of structural composition. It favours over-the-shoulder shots from above and from below, with the camera at about thirty degrees to the actor, and the focal lengths look to be around 60–70mm. It often begins on a close-up and pulls back to reveal the whole scene — the use of the wide view has clearly been thought about carefully. The handheld work adds a particular kind of shake that matches the tension the film wants the audience to feel, and the camera repeatedly follows from behind a soldier and then moves round in front of him, which pulls you in. The long takes that open the film are executed at a very high level and drop the audience into the situation at once."
   [entry.zh]
   title = "拯救大兵瑞恩"
   text  = "战争片里的独一无二，历史上也绝不会再拍出这样的战争片了，剧情、叙事、场景和道具都无可挑剔。影片有大量长焦镜头，也有很多结构性构图。多使用过肩俯拍和仰拍，摄像机与人物的夹角呈30度，拍摄所使用的焦段大概是60-70mm，经常用以特写镜头出发，后拉展现全景的拍摄手法，对于全景的运用是经过仔细琢磨的。此外手持拍摄加入了特定的晃动，符合影片所要给观众呈现的紧张感，摄影机有大量背后跟拍挪至身前的手法，增加代入感。开篇大量长镜头完成度很高，也使观众被迅速带入情境中。"
@@ -308,7 +308,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1975
 title = "One Flew Over the Cuckoo's Nest"
-text  = "【English translation pending】"
+text  = "I did not really follow it the first time. Only after reading what others wrote did I understand that the shot on McMurphy's forehead near the end implies surgery — his memory erased, his nature already gone. When the Chief smothers him, he is in fact freeing him from the world outside and giving him a physical freedom. The doctors reminding them daily to take their medication and holding group sessions looks like help, but is really a way of confining their minds. McMurphy's arrival breaks that silent system: he starts teaching the \"patients\" basketball, building a casino, even making demands of the nurse. As for why the nurse stops him being discharged — perhaps it is her anger at a singular person breaking the rules. In short, the ward stands for the system, and the nurse for the people inside it. On camera language: several of the card-playing shots use the onlookers as foreground, which conveys how alive the room is. In a corridor with real depth you can shoot from fixed positions at either end, and when people are passing through, different focal lengths can carry that too. Some interiors are established on a long lens, which lets you leave out the secondary detail and keeps the image from going flat even when nothing is moving and there is little colour."
   [entry.zh]
   title = "飞越疯人院"
   text  = "第一遍没看太懂，看了评论才知道影片最后给到麦克脑门的镜头是暗示脑部做过手术是代表麦克的记忆被抹去，已经失去了他的本性。酋长将麦克捂死实则是帮麦克摆脱现实社会带他实现物理上的自由。 医生每天提醒他们吃药和开小组讨论会看似是在帮助他们，实则是在禁锢他们的思想。麦克的到来打破了这种缄默的制度，他开始教\"患者\"们打篮球 建造赌场，甚至对护士提要求。至于护士为什么阻止麦克出院可能是因为她对独特个体打破规矩的愤怒。总之疯人院暗示了体制，护士暗示体制内的人。镜头语言方面，有几个打牌的镜头用围观的人当前景，能体现场面热闹，此外在有纵深的楼道内拍摄时可以在前后采用固定机位拍摄，特别是在有人来往时也可以用不同焦段体现。此外有些室内场景用长焦镜头交代，这样能省略次要，也能让画面即使没有动的物体或缺少色彩时也不乏味"
@@ -317,7 +317,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1997
 title = "Children of Heaven"
-text  = "【English translation pending】"
+text  = "A short story, but a full one — moving, and with a child's clarity. At the end the goldfish swim up around Ali's feet, as if his sister has forgiven him at last. The running is shot first-person on a slightly wide lens; the head-on shots retreat before him on a long lens; the side views are slow motion, tracking across. The neighbourhood the boy lives in suits a long lens, which brings out its depth. I love the camera when the coach times Ali: it tracks sideways, fast, keeping pace with him, and stops only when the coach comes into frame holding the watch."
   [entry.zh]
   title = "小鞋子"
   text  = "故事很短，但是内容很丰富。很感人、童真的一部影片。最后金鱼游到阿里的腿边，仿佛是妹妹最终原谅了哥哥。跑步时的第一人称用稍广的焦段，正面后退的运动镜头用长焦拍摄，侧面用升格横移，影片里男主所在的生活环境很适合长焦，可以拍出纵深感。很喜欢影片中教练给阿里测试时的运镜，镜头跟随阿里跑步的动作快速横移直到出现教练拿着表计时的画面时停下。"
@@ -326,7 +326,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1991
 title = "The Silence of the Lambs"
-text  = "【English translation pending】"
+text  = "I did not understand it the first time. Under two hours, the cutting rhythm feels a little compressed. The conversations between Clarice and Lecter are a model of how to study a film shot by shot. Lecter is built from every direction and through many other characters, and the way the ending hints at the theme is the finishing stroke. The low melody of the score and the leaping violin lay another layer of suspense over the whole thing. When the film takes a character's subjective view it combines a head-on close-up with a first-person wide angle, to show the change in feeling and what is going on inside them. The flashbacks outside the main plot are cut cleanly too, always moving from a shot facing the character straight into first person, which speeds the rhythm up cheaply and well. The scene where Clarice searches the old garage — the set, the props, the lighting, the sound, the score — puts you inside her feelings immediately. Enclosed spaces are introduced with a circling camera and long-lens pans. Several arrangements of colour and cold light leave you oppressed and tense. The overall palette leans vivid while the exteriors are graded cool, and a push-in signals a subjective view and the information that matters. The actors' movements and micro-expressions are at a very high level."
   [entry.zh]
   title = "沉默的羔羊"
   text  = "第一遍没看懂。不到两个小时的影片让剪辑节奏略显紧凑。克拉丽斯与汉尼拔的几场对话戏堪称拉片典范。对汉尼拔人物形象的塑造是全方位且多主体的。结尾对电影主题的暗示是点睛之笔。配乐低沉的旋律和音符跳动的小提琴为这部史诗更加渲染了一层悬疑的氛围。影片在拍摄人物主观视角时用正面特写和第一人称广角的组合展现人物情绪变化和心理活动。对于主线剧情之外的闪回情节也剪辑的干脆利落，都是以人物正打直接过度到第一人称，讨巧的加快了节奏。克拉丽斯探查旧车库的场景、道具、布光、声音和配乐将观众迅速代入人物情绪中。对封闭空间环境的介绍用环绕运镜加长焦摇移的拍摄手法展现。几次色彩和冷光的布设让人感到压抑、紧张 。影片色调整体偏鲜艳，对于室外环境的调色偏冷，推进运镜预示人物主观视角和关键信息。演员们的动作和微表情都展现了高水准"
@@ -335,7 +335,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2017
 title = "Blade Runner 2049"
-text  = "【English translation pending】"
+text  = "I have not seen the first one, so parts of this were lost on me. This must be Villeneuve's finest work as a master of light. Sets, lighting, effects and music are all taken as far as they will go. The exteriors mostly come with rain and heavy fog, which brings out the end-of-the-world feeling of that future. The interiors are lit with great precision: wide-angle shots from above, combined with moving light and shadow and a desert-toned grade, give a sense of mystery and of ritual. Enormous computing power renders the crowded city and the neon night markets of the future as pure science fiction. There is not much dialogue, and the shooting stays mostly with the lead, which expresses directly how cold and empty the world is. What moved me most is Villeneuve's shallow focus: it shows the subject's movement and expression while also implying and pushing the story forward. It was the first time I felt the appeal of what lies outside the focal plane, and the first time I recognised this way of watching — a kind of third-person looking-in."
   [entry.zh]
   title = "银翼杀手2049"
   text  = "没看过第一部，这一部有部分没看懂。这应该是用光大师维伦纽瓦最封神的一部。场景、灯光、特效和音乐都做的淋漓尽致。室外场景多伴随雨天、大雾天气，突出未来世界的末日感。室内场景的灯光布置的很精细，广角端的俯拍搭配移动的光影以及沙漠色系的调色给人一种神秘感、仪式感。强大的电脑算力把未来世界下拥挤的城市、霓虹的夜市渲染的科幻感十足。本片的对白不多，拍摄也主要围绕主角进行，直接表现了影片中冷清的气氛。最打动我的是维伦纽瓦的浅焦拍摄手法，既能展现主 体的动作表情，又能暗示和推进故事情节，也让我第一次感受到了焦点外的魅力，认识了这种类似第三人称窥视的表现手法。"
@@ -344,7 +344,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2004
 title = "Kung Fu Hustle"
-text  = "【English translation pending】"
+text  = "The best martial-arts film I have seen. Its photography, editing, technique, music and intent completely make up for the slightly absurd characters the genre hands it; its depth has gone past what a traditional wuxia film is. The high points for me are the technique and the cutting rhythm. Even though the film uses the crane a great deal, every shot carries a full load of information — nothing is surplus. The fast cutting leaves the audience with almost too much to take in, and even someone like me, who is not interested in action, gets carried along. Although it is an action film its audience is very wide, with threads of every kind woven into the main line. From the long take at the opening to the montage of time at the end, Chow's talent as a director is everywhere. For me the finishing stroke is the montage of imagery when Sing transforms — a cocoon becoming a butterfly — which shows the exact moment a character grows. The film is careful with its near-zero-angle wide shots from above, which introduce the space and give the frame tension at once, and I cannot help admiring the staging: nothing in it feels out of place. The lift at the very end brings tears."
   [entry.zh]
   title = "功夫"
   text  = "迄今为止看过的最好的武打片！影片的摄影、剪辑、手法、音乐和立意完美填补了武打片略显荒唐的人物角色和特性，其深度已经超越了传统武侠类型电影的范畴。我觉得影片的亮点在于拍摄手法和剪辑节奏。尽管影片多处运用了摇臂，但每个镜头所交代的信息很饱满，一点都不多余。《功夫》较快的剪辑节奏让观众有点目不暇接感觉，连我这种对动作戏不感兴趣的人也能被感染到。影片虽然类型是动作片，但受众却很广泛，主线中穿插着各种元素的支线。影片从开头的长镜头到结尾的时间蒙太奇，处处展现着周星驰作为导演的才华。我认为影片的点睛之笔是阿星蜕变时化茧成蝶的意向蒙太奇，能直接体现出人物角色成长的瞬间。影片对于广角近乎零角度的俯拍镜头很讲究，介绍环境的同时呈现了画面张力，还有不得不佩服影片的场面调度，毫无违和感。整部影片结尾的升华催人泪下"
@@ -353,7 +353,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2010
 title = "Shutter Island"
-text  = "【English translation pending】"
+text  = "A suspense film that works your head. It is a little puzzling the first time through. The story is very finely built, with almost no holes. Delusion is a subject that suits film, but few handle it well. Measured against A Beautiful Mind, Shutter Island turns more times and ends with more depth; it also carries some horror, and its casting lifts its standing further. On technique: the heavy rain at the opening and the shots inside the boat already set the film's suspense. Once they reach the island, real work goes into rendering the place — the wire fence in the foreground and the moving car, approaching the buildings fast in first person, the iron gates opening one after another along the way, the guards standing watch — all of it builds tension. The film has a lot of plot but the rhythm never drags: there is a great deal of jump-cutting, and several continuous actions matched with sound effects, a technique that pushes the story faster. Shot-reverse-shot shows a thing or a person appearing suddenly in front of someone, and the feeling that follows. Shooting a conversation from below brings out the latent conflict between people."
   [entry.zh]
   title = "禁闭岛"
   text  = "一部烧脑的悬疑片。第一遍看会稍微有点令人费解，影片的故事构架做的很细致，几乎没有漏洞。妄想症这类题材很适合拍成电影，但能拍好的并不多。对标《美丽心灵》，《禁闭岛》的剧情更一波三折，结局也更有深度，但《禁闭岛》还有些恐怖色彩，对演员的选择也抬高了这部影片的历史地位。从拍摄手法来说，开篇浓重的阴雨天气和船舱里的镜头就已经奠定了影片悬疑的基调，当男主一行人来到到岛上后，对岛上环境的刻画下足了功夫，比如前景的铁丝网和行驶的汽车，用第一人称快速接近建筑，沿路还有不断打开的铁门以及站岗的守望，都渲染了紧张的气氛。影片情节虽多，但节奏丝毫不拖泥带水，很多跳切的剪辑，几个连贯的动作配上音效，这种手法可以加快情节推进。另外，影片中出现正反打展现人物面前突然出现的事物和人物情绪。对话戏仰拍更能突出人物间潜在冲突"
@@ -362,7 +362,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2004
 title = "The Butterfly Effect"
-text  = "【English translation pending】"
+text  = "If you have ever felt you should not have been born, watch this film. A fine piece of storytelling with reasoning and suspense mixed in, and some horror as well. The lead lives out a different life in each parallel universe, and the palette changes with them: in the second ending, living with Kayleigh, the image is vivid and bright and highly saturated; in prison the grade goes cold and dim. Every memory sequence drops you into first person and holds your breath. Worth noting is the way the film connects its main line to another event or action happening at the same moment in the same space, moving to the new subject by camera movement or by following. The handling of the transitions is very natural. This is a film that cares about narrative logic above all."
   [entry.zh]
   title = "蝴蝶效应"
   text  = "如果你觉得你不该被生下，你可以看看这部电影！一部精彩的剧情夹杂推理和悬疑甚至有些恐怖色彩的影片。本片男主在不同平行宇宙中有不同人生轨迹，影片色调也随之而变。如第二个结局男主与凯丽生活在一起，影调呈现鲜艳亮丽，高饱和度。再如男主在监狱时色调冷淡阴暗……影片每个故事的回忆环节都以第一人称代入让人屏息凝神。值得一提的是影片在拍摄手法上用同一时刻同空间内发生的另一件事或一个动作联系上故事主线，可以通过运镜或跟随的方式移动至主体。另外在转场时的处理很自然。可以说这是一部更看重叙事逻辑的电影。"
@@ -371,7 +371,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1997
 title = "Good Will Hunting"
-text  = "【English translation pending】"
+text  = "A film with lines that stay with you, and a great deal beneath them. My reading of the ending is that Will finally understands what Sean has told him, makes peace with himself, and sets out to find what his life means. Sean is Will's hunter of the mind; the professor plays the reconciling part. Will's best friend is the catalyst that makes him think about work at all, and his time with Skylar shows his fragile side. The film opens by building Will and the professor through a few scenes, and although it is not long it draws its characters thoroughly. Its lines are, word for word, worth keeping, and every one offers the audience something. The technique is fairly conventional, but the film does work at the therapy conversations: when Sean and Will embrace, Will is shot from below and Sean roughly at eye level, which shows how much Will leans on him. A wonderful passage is Will's flood of words as he turns down the intelligence agency, where a push-in leads the audience into the monologue."
   [entry.zh]
   title = "心灵捕手"
   text  = "这是一部台词令人印象深刻、内容饱含深意的电影。我对结尾的理解是小韦最终理解了Sean的话并与自己和解，踏上了寻找生命意义的旅程。影片中的Sean是小韦的心灵捕手，而教授则充当调和剂的角色。小韦的好兄弟是促使小韦萌生找工作念头的催化剂，Skylar和小韦的交际则展现了小韦脆弱的一面。影片的开头就用几个场景着重塑造了小韦和教授的人物形象，影片虽不长但对人物性格和形象的刻画十分细致全面，片中的台词可谓字字金句，都能对观众有些启发。影片的拍摄手法比较常规，但对于心理辅导时的对话戏还是做了些文章，例如Sean和小韦拥抱时的画面，正拍小韦时是仰视的角度，对Sean的正打相对平视，可以看出小韦对Sean的依靠，一个比较精彩的转场是小韦在接受中情局的入职邀请时滔滔不绝的陈词用推进运镜的方式引导观众进入独白。"
@@ -380,7 +380,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2011
 title = "Detachment"
-text  = "【English translation pending】"
+text  = "The story is oppressive, especially the chaos of the school at the end — one man reading a poem alone, and the loneliness in that is the whole film in miniature. On first viewing it felt too obscure; the frame of the story seemed to have no logic to it, let alone technique. Too much implication and philosophy is compressed into under two hours, and it comes out rough. From the opening, the lead speaking to camera in dim light and the chalk drawings already put a weight on you; then the pitch-black night, the silent crying alone on the bus, the saturated walls and the flashbacks loaded with grain all deepen it. Still, I very much like the middle section, the time the lead spends with Erica and the bright, lovely music that goes with it — it puts some life and some hope into a dark film. The saturated scenes are in fact expressing the character's own suppression, fear and collapse. The shooting feels low-budget: a lot of zooms, a lot of lost focus, and lighting that is a mess — I cannot tell whether that is deliberate. But the wide-angle head-on shots along the depth of the school corridors do have real atmosphere."
   [entry.zh]
   title = "超脱"
   text  = "影片的剧情太压抑，尤其是结尾混乱不堪的校园，一个人念着诗的孤独和寂寞，是整部影片的缩影。第一遍看感觉这部片太晦涩难懂了，故事框架仿佛也没有什么逻辑，更不要提什么手法之类的。太多暗示和哲理被压缩在这么一部不到2个小时的影片里略显粗糙。影片开头男主在昏暗的灯光下的自述和粉笔画就给人一种压抑的感觉，再往后漆黑的夜、独自坐在公交车上无声的哭泣、高饱和的墙壁和颗粒感拉满的闪回都加重了这一感觉。但我还是很喜欢影片中段男主和美丽卡共度时光的情节和欢快旋律优美的音乐，给这部偏黑暗的影片注入一点活力和积极向上的情绪。高饱和的场景其实提现了人物内心的压抑、恐惧和崩溃。本片拍摄给人一种制作成本不高的感觉，有大量的变焦、失焦、布光也是一塌糊涂，不知道是不是刻意而为。但是广角正拍配合学校楼道的纵深还是很有氛围感的。"
@@ -389,7 +389,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1994
 title = "Pulp Fiction"
-text  = "【English translation pending】"
+text  = "A black comedy about gangsters. The director makes a 150-minute film out of three stories, each connected to the others. The score must be its greatest strength: the theme and the music over the transitions are all funny, and although the melody repeats it still makes you want to dance. Tarantino's characteristic low angle carries both the comedy and a kind of awkwardness in the relationships, and the waist-height view — not something you see often — is used especially well here, showing the swagger and the strut of these gangsters completely. In the corridor the camera combines a fixed position with a pan-follow, which takes you from bystander to participant: a very fine effect. The palette is mostly warm and on the saturated side, which leaves you restless, and seems to hint at how unsettled that era was. The film seems to want to say that this absurd world is full of uncertainty, and that justice looks different to everyone. Pulp Fiction opened a door for me into a new world — novelistic cinema — and it was the first time I appreciated Tarantino's aesthetics of violence."
   [entry.zh]
   title = "低俗小说"
   text  = "一部黑色幽默的黑帮电影。导演用三个故事组成了一部长达150分钟的电影，每段情节又彼此有联系。本片的配乐应该是最大亮点，不论是主题曲还是转场衔接时的配乐都很funny，虽然是重复的旋律但是依然给人一种想跳舞的感觉。昆汀·塔伦蒂诺用他特有的仰拍视角烘托了搞笑的气氛和一种尴尬的关系，腰间视角平时不常见但这部影片运用的特别好，把黑帮的横行霸道和威风凛凛展现的淋漓尽致。楼道里的机位用固定+摇跟的组合，给人一种从旁观者到参与者的感觉，十分微妙。影片的色调以暖色为主，饱和偏高，给人一种躁动不安的情绪，似乎也暗示了那个年代的风云变幻。影片似乎想要表达这个荒谬的世界充满了太多不确定性，人们眼中的正义各不相同。总之，《低俗小说》让我打开了新世界的大门，带我走进了小说式电影的世界，这也是我第一次欣赏昆汀的暴力美学"
@@ -398,7 +398,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1936
 title = "Modern Times"
-text  = "【English translation pending】"
+text  = "An old film from 1936. Black and white and silent, and yet the acting, the dramatic effect, the editing and the use of montage put it on level terms with any colour picture. Five stars, deserved. Chaplin's fine performance and his humour not only bring the plight of America's unemployed during the Depression vividly to life, but also mock, from the side, the holes in capitalism — its disregard for working conditions, its single-minded pursuit of efficiency and output. What refreshed me most is the imagined passage where Chaplin and the girl live together, which shows how much the two of them long for a decent life."
   [entry.zh]
   title = "摩登时代"
   text  = "1936年的老片子，虽然是黑白无声，但是演员演技、戏剧效果、剪辑手法，蒙太奇的运用都让这部片子能和彩色影片相提并论。五星实至名归。本片用卓别林出色的演技搭配其幽默的性格特点，不仅生动的展现了经济危机下的美国失业者的生活窘境，侧面讽刺了资本主义的漏洞，以及不顾工人工作条件，一味追求工作效率、生产量的缺点。影片让人耳目一新的是卓别林和流浪少女一起过日子的那段想象画面，展现了两人对美好生活的渴望和向往。"
@@ -407,7 +407,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2009
 title = "The Cove"
-text  = "【English translation pending】"
+text  = "The first documentary I ever watched, and one whose place in Douban's top 250 carries real weight. It was the first time I learned what happens to dolphins at Taiji, and how severe their situation is becoming. The crew used hidden cameras, aerial shots, night vision and underwater equipment to show the killing, and used interviews and first-person footage to show what bystanders think and know, and the absurd indifference of the Japanese government. The film is structured out of sequence, opening with night-vision shots of the cove and with the point of view of Ric, who founded the organisation, and leading us deep into what is happening at Taiji — very much a record of fact. It made my hair stand on end and left me cold, and made me feel deeply that protecting the ocean is protecting ourselves."
   [entry.zh]
   title = "海豚湾"
   text  = "我看过的第一部纪录片，能进入豆瓣电影top250片单也是意义深重。第一次了解海豚在太地町的遭遇和海豚所面临的日益严峻的生存环境。拍摄团队用隐藏的摄像机的镜头，航拍、夜视仪、水下录像设备等形式展现了海豚遭到捕杀的一系列画面，也通过采访第一人称等形式展现了旁观者对待海豚的态度和认知，以及日本政府对于此事的无能和置之不理的荒诞态度。纪录片用插叙的形式先用几个夜视仪中的海豚湾的镜头和组织创办者里克的视角带领我们深入探索太地町发生的捕杀海豚的事件，很有纪实性。这部影片看得我毛骨悚然，不寒而栗，让我深深的感受到了保护海洋环境就是在保护人类。"
@@ -416,7 +416,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1999
 title = "King of Comedy"
-text  = "【English translation pending】"
+text  = "The second Stephen Chow film I have seen that he both directed and starred in. I think it is better made than Kung Fu Hustle; the extra story lines make it richer. It feels as though it has captured much of what performers actually go through, and how they grow. There is a lot here I can learn from: how the narrative is laid out, how characters are brought on, how you shoot the connection between two people, transitions built around montage, the use of a MacGuffin. And lines worth savouring. In short, Chow's films may be shot a little more simply, but the scripts are solid and the substance is rich — they lose nothing to a Hollywood picture, and that shows how far he will go to get a thing right."
   [entry.zh]
   title = "喜剧之王"
   text  = "看过的第2部星爷自导自演的作品！感觉比《功夫》拍的好，故事线的增加丰富了剧情。感觉这部片子拍出了很多演艺人过往的经历和成长的过程。我觉得这部影片有很多值得我学习和鉴赏的地方，比如交代叙事的方式、人物的出场方式、如何拍摄两个角色间的关联、配合蒙太奇的转场、麦高芬的运用。还有值得仔细品位的台词。总之我觉得星爷的电影虽然可能拍摄的稍微简陋一点，但剧本扎实、内涵丰富，完全不输好莱坞大片，这也体现出星爷精益求精的职业精神。"
@@ -425,7 +425,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1984
 title = "Once Upon a Time in America"
-text  = "【English translation pending】"
+text  = "A film that puts its weight on narrative. It opens out of sequence to introduce its characters and where they now stand, then uses a montage of time and a flashback to carry us back to Noodles' childhood. It weaves narration through itself, switching between memory and the present, and it takes time to keep track of. The film stock also seems inconsistent: in the church the image switches suddenly to something antique, and the raised contrast and darkened exposure take some adjusting to. For 1984 the staging is fluid and considered — the camera's shifts of position and of shot size imply the relationships and the standings between people, build atmosphere, and close the distance to the audience. Staging that smooth was very advanced for its moment. The film also likes to use close-ups to show the fear inside a character, and fixed positions to show the small changes in what they feel. Music runs through the whole thing alongside the narrative, a lilting, winding melody with a quiet sadness in it; when its rhythm goes from gentle to soaring, the feeling has been building to a peak."
   [entry.zh]
   title = "美国往事"
   text  = "《美国往事》是一部强调叙事性的电影。影片开篇用插叙介绍人物出场和现状，又用时间蒙太奇和倒叙的手法带我们拉回到面条的童年。影片用了很多穿插的叙事，在回忆和现实中来回切换，需要花时间辨认。其次，影片拍摄所用的胶片似乎不一致，在教堂的场景中突然切换为一种复古的胶片，对比度的增加和曝光的压暗需要观众适应。1984年的《美国往事》在镜头调度上很流畅和用心，镜头的位移和景别的转换可以起到暗示人物间关系和地位的作用，还能烘托气氛，拉近与观众的距离。这样流畅连贯的调度在当时的电影拍摄十分先进。此外，《美国往事》喜欢用镜头特写展现人物内心的恐惧，也喜欢用固定机位呈现人物情绪细微的变化。音乐伴随整部影片和叙事的推进，悠扬婉转的曲调，带有淡淡的忧伤。音乐节奏由舒缓到高亢也意味着情绪的酝酿达到高潮"
@@ -434,7 +434,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2003
 title = "Identity"
-text  = "【English translation pending】"
+text  = "Among the many films about split personalities, Identity holds its place through its particular way of telling the story and the carefully built suspense and logic. Much of the horror along its main line comes from the locations, and from how the lighting and the sound work together: rain, thunder, lightning, a remote motel, unexpected guests, an accident on the road. The film is not long but draws several of its characters in detail, and its chapters keep their grip. You can see that the murder scenes deliberately imitate the famous sequence in Psycho. When a killing happens it always comes with terrible thunder and a scene in disarray, or an urgent shout; when the search begins, the film follows the characters and uses shot-reverse-shot to bring out their nerves and pull the audience's feelings along. Then, once the feeling has built to the point where your heart is about to come out of your chest, the director uses a slow push on a medium shot and the environment to uncover the truth a step at a time. The film asks a certain amount of its audience. All told, four stars."
   [entry.zh]
   title = "致命ID"
   text  = "在众多精神分裂症电影中，《致命ID》凭借它独特的叙事方式、精心塑造的超强的悬疑型和逻辑性占据一席之地。这部影片中主线所塑造的恐怖效果，很大程度上来自拍摄场景的环境，以及拍摄时灯光和音效的配合。下雨天、打雷、闪电、偏僻的旅馆、不速之客、和意外车祸等要素烘托了紧张、阴森的氛围。影片不长，但对几位角色刻画的比较细致。影片章节扣人心弦。发生凶案的画面拍摄能看得出是在有意模仿影片《惊魂记》中的经典场面。当凶杀案发生时，总会伴随骇人的闪电雷声和杂乱不堪的场景，或是急切的呼喊。而当探查时，又会用对人物的跟拍和正反打的方式突出人物内心的紧张，拉拢观看者情绪，当情绪烘托到一定程度，观众悬着的心都要跳出来时，导演会用缓慢的中景别推镜头和环境渲染一步步揭开真相。影片对观众的理解能力有一定门槛。综合下来给四星"
@@ -443,7 +443,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2003
 title = "Memories of Murder"
-text  = "【English translation pending】"
+text  = "A crime film that works your head. On first viewing it is confusing, but the ending seems clear enough: the young man Park Hyun-kyu is the serial killer, and he has come back to the town to go on. Detective Park's eyes never do see through him, and by the end of the investigation even the most level-headed of them, Detective Seo, has completely lost his temper. Memories of Murder is a model of the crime-suspense film: from raising the case, to analysing it, to the misunderstandings in the middle, to the officers' feelings breaking loose once it has stalled, and the accidents that keep happening. Bong Joon-ho's narration is close to perfect, and he builds his characters through it, which makes them fuller. He likes to tell a story with a fixed camera, and he handles his actors' movement very well, using the camera to show where a person stands, what power they hold and what they feel. The rhythm goes from slow to fast and then passes through music into the final act and the coda, and the use of location adds to the story throughout. From The Crucible and Hope to Memories of Murder, Korean cinema likes to put a train into a film and tie it to the plot — practically a local speciality."
   [entry.zh]
   title = "杀人回忆"
   text  = "一部烧脑的逻辑推理片。第一次看未免有些疑惑，但结局似乎已清晰明了了，小青年朴贤奎就是连环杀人案的凶手，且又回到镇上继续作案。朴探警的眼睛终究没有看穿凶手，案件探查到最后连最理智的徐警官到最后也彻底发飙。《杀人回忆》绝对是犯罪悬疑片的典范，从引出案情，到案件分析、中间出现的误会，到最后案件陷入焦灼后警员们情绪的宣泄和不断发生的意外……导演的叙事堪称完美，对人物的塑造也穿插其中，让人物形象更加立体。奉俊昊导演喜欢用固定镜头讲故事，对人物的调动也把控的很好，他会用镜头的移动展现人物立场，人物势力和情绪，影片对节奏的把控由慢到快再由音乐过度，进入终章和尾声。对场景的运用为剧情添砖加瓦。从《熔炉》《素媛》到《杀人回忆》，韩国电影也喜欢将火车这一交通工具搬进电影并与剧情关联，属于是韩国电影土特产了"
@@ -452,7 +452,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2006
 title = "Paprika"
-text  = "【English translation pending】"
+text  = "I did not understand it the first time; having finished it, all I can do is marvel. It was the first time I had seen science fiction shot as animation. The image does not draw you in the way 3D animation does, but Satoshi Kon's handling of flat images gives up nothing to three-dimensional space. The film brings in dreams — a concept even now we cannot explain — and warns us to use technology sensibly. I did not quite follow how Detective Konakawa reads the film, and I hope a second viewing will fix that. The science fiction in it is not that heavy, and yet through reality and dream the director gives the audience a visual feast. The theme appears at both the start and the end, and its melody sounds fogged and far away, exactly like being inside a dream — it is the finishing stroke. On sound and image: when a character is in danger the film does not cut away but first pushes in or goes to a close-up, bringing out the face. Paprika created a style of its own, giving the audience a dream in a form nobody had used before — by the end even I felt the world in front of me starting to come loose from the real."
   [entry.zh]
   title = "红辣椒"
   text  = "第一遍没看懂，看完只能用惊叹来形容这部电影。能用漫画的方式拍出科幻片还是第一次见。画面虽然没3D动画那样有代入感，但今敏导演对于平面图像的应用一点都不输三维空间。本片的主题用一个当今社会也无法解释的概念“梦”代入，告诫了人们要合理利用科学技术。但本片里男主粉川警部对电影的解读没太看懂，希望能在第二遍观看时弥补。整部影片的科幻色彩并没有那么浓厚，但导演却用现实与梦境给观众呈现了一场视觉盛宴。影片的主题曲在开头和结尾都有出现，音乐的旋律听起来云里雾里，就很符合梦境中的感觉，是《红辣椒》中的点睛之笔。视听层面，当角色面临危险时，不会直接切画面，而是先给角色拉近或特写，突出人物面部表情。总之，《红辣椒》开创了一种风格，用新颖的展现方式给了观众一场“梦”，就连我看完都会觉得眼前的世界开始变得不真实了"
@@ -461,7 +461,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1993
 title = "Flirting Scholar"
-text  = "【English translation pending】"
+text  = "Personally the hardest of these to judge. People say there is always something deeper in Chow's films, but with this one, on a first viewing, I did not find any great truth in it — perhaps because he did not direct it. There is nothing especially new in the content; at most the scene at the end where he wins Qiuxiang is a little fresher. The plot is still worth praising, and I came to like the way Wah On is set up. Beyond that, in the last fight between Wah On and the Scholar of Death, Wah On is brought on first through opera and then handed over to the Tang family spear — that way of introducing a character is striking. I have tried several times to watch this film and could not get through it; perhaps it felt too excruciating, or too crude. Nothing much stayed with me afterwards, only a few of the fights, which were genuinely rousing. I hope my score goes up when I watch it a second time. For now, two stars — the film seems to run almost entirely on performance and on faces."
   [entry.zh]
   title = "唐伯虎点秋香"
   text  = "个人认为最难评的一部影片。都说星爷的电影蕴含深意，但仅这部影片来说，第一遍并没有看出什么深刻的道理，或许不是星爷导演的缘故。《唐伯虎点秋香》在内容上感觉没什么新颖的地方，顶多就是结尾点秋香的情景新鲜一些，整部影片的故事情节还是值得称赞的，华安的设定在看完后觉得还挺好的。除此之外，华安与夺命书生的最后一场打斗戏中华安的出场是先由戏曲引出在过渡到唐家枪，这样的人物出场方式让人眼前一亮。这部影片我几次看都看不下去，可能是觉得演的太尬了或太低俗了。第一遍看完后感觉没有让我留下什么深刻印象，只有几处打斗戏还看得挺热血的。我希望我第二次看这部片子时评分能高一些，先打个2星吧，感觉这部片子基本上全靠演技和颜值撑场唉"
@@ -470,7 +470,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2005
 title = "Brokeback Mountain"
-text  = "【English translation pending】"
+text  = "Ang Lee is good at using the language of the camera, and the logic of a strong script, to show fine-grained feeling and relationships that keep turning; Brokeback Mountain shows it completely. The mountain is where people put their feelings and their quiet. Everyone has a Brokeback Mountain inside them, keeping the noise and the confusion out — somewhere of their own to be."
   [entry.zh]
   title = "断背山"
   text  = "李安善于用镜头语言和强大的剧本逻辑展现细腻的情感和一波三折的关系 这一点在《断背山》中体现的淋漓尽致 断背山是人们寄托情感和宁静的世外桃源 每个人心里都有一座断背山 将喧嚣与迷惘隔开 享受自己的天地"
@@ -479,7 +479,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2019
 title = "Parasite"
-text  = "【English translation pending】"
+text  = "Another masterpiece from Bong Joon-ho: a film that reflects the enormous gap between rich and poor in Korea. It uses metaphor and staging to show, vividly and concretely, the division of wealth and the contradiction between rich and poor that cannot be bridged. In terms of content, the solid script already lays a good foundation, and the director handles the transitions and turns of the plot especially well; the ending flows cleanly too. He uses the rise and fall of the music to carry the rise and fall of feeling, and to show what shifts inside the characters. Slow motion and lateral movement are still his stock in trade and mark his personal style. The lighting is very well handled: warm and cool tones express elation and suppression, and the contrast of light and dark brings out the division of class. All told, Parasite is a film with a style of its own that reflects the unequal structure of contemporary Korean society. From its release in 2019 to when I watched it, it had climbed into the top 150 — and it deserves it."
   [entry.zh]
   title = "寄生虫"
   text  = "奉俊昊导演的又一部神作！一部反应韩国极大的贫富差距的作品 巧妙用隐喻和制袋生动形象的将贫富分化和富人与穷人间不可隔阂的矛盾体现的淋漓尽致 从内容上来说 扎实的剧本就已经奠定了一个好底子 导演在拍摄上对情节的过渡和转折处理的特别好 结尾也很流畅通顺 导演用音乐的起伏舒缓体现情绪的升降 也展现了 人物内心的情绪变换 升格和横向移动依旧是奉俊昊导演的老本行 体现个人风格 此外 灯光处理的非常好 冷暖色调表达了情绪的高涨和压抑 明暗对比突出阶级的分化 总体来说 《寄生虫》是一部反应当代韩国社会结构不均和贫富分化等社会问题的带有风格特色的电影 从2019年上映到我观影时已经冲到top前150是实至名归"
@@ -488,7 +488,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2004
 title = "Before Sunset"
-text  = "【English translation pending】"
+text  = "The second of the talking trilogy. It is shorter than the first, but with Before Sunrise laid down beneath it, this one feels more mature and holds more philosophy. The two of them have not changed; only their age and the years have. They still meet as they did, talking and laughing, easy and unconstrained. They tell each other the nine years of hardship and journey they have each had, and together they feel how the years have worn down the edges of their pursuit of romance. But their warmth toward each other has not changed. As the sea takes in rivers, they are each other's harbour, the port where the ship unloads, the point where two minds cross."
   [entry.zh]
   title = "爱在日落黄昏时"
   text  = "话唠三部曲中的第二部 虽然时长不如第一部长 但有了第一部《爱在黎明破晓前》的铺垫和加持 这一部显得更加成熟 更加富含哲理 男女主没有变 变的只是年龄和岁月 两人依旧交往如初 谈笑风生 轻松无拘无束 她们互相分享着着九年的风雨坎坷 人生旅程 共同感慨岁月磨平了她们对浪漫追求的棱角 但他们对彼此的热情没变 就像海水能容纳河流一样 她们是彼此心灵的港湾 是轮船卸货的港口 是心灵交织的节点"
@@ -497,7 +497,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1997
 title = "Princess Mononoke"
-text  = "【English translation pending】"
+text  = "People must always keep some awe of the natural world. Miyazaki's fairy tales carry deep philosophy in them, and awe of nature has always been a basic condition of our surviving. Through the world of a fairy tale he warns us to hold nature and life in awe, and to protect the home we share — an epic about saving humanity, with a trace of the tragic in it and yet romantic too. San's goodness moved me, and Ashitaka's individual heroism shook me."
   [entry.zh]
   title = "幽灵公主"
   text  = "人类要始终有一颗对大自然的敬畏之心 宫崎骏的童话蕴含着深刻的哲理 对大自然敬畏始终是人类生存的基本原则 宫崎骏用童话的世界告诫了我们要敬畏自然 敬畏生命 保护我们共同的家园 拯救人类的史诗也带有一丝悲壮却又浪漫的剧情 幽灵公主的善良打动了我 阿席达卡的个人英雄主义震撼了我"
@@ -506,7 +506,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1990
 title = "Edward Scissorhands"
-text  = "【English translation pending】"
+text  = "Edward returns to the house on the hill in the end — perhaps he never belonged among people at all. And yet love broke through the boundary between souls. Ever since he came down from the mountain it has snowed, and she can still see herself dancing. Perhaps that snow falls for her. Perhaps it is Edward's tears, missing her."
   [entry.zh]
   title = "剪刀手爱德华"
   text  = "爱德华最终还是回到了山顶 或许它本来就不属于人间 可是爱情打破了灵魂的界限 “从它他下山以后 天空便下起了雪 我还能看到我跳舞的样子” 或许这雪就是为她而下 是爱德华思念她的眼泪"
@@ -515,7 +515,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2015
 title = "Inside Out"
-text  = "【English translation pending】"
+text  = "Although I am no longer a child watching it, I could feel the shadow of childhood clearly. Disney's fairy tales are always beautiful, and their films suit people everywhere. Inside Out uses cartoon animation to tell of the change, the growth and the transformation of a girl's inner world — from everything being fine at the start, to the family moving to San Francisco, where the story turns. A good film does not need a gorgeous surface; it needs a story that can genuinely reach people. If I could turn time back, I would go to the year this film came out, and walk into the cinema holding my mother's hand again."
   [entry.zh]
   title = "头脑特工队"
   text  = "虽然看时已不是童年 但我能真切的感受到童年的影子 迪士尼的童话永远是美好的 他们的电影适合全世界的人看。这部《头脑特工队》用卡通动画的形式讲述主人公的内心世界的变化 成长已经蜕变 从刚开始的一切美好到后来主角一家搬到旧金山 故事的转折点也就此展开 一部好的电影不必在意华丽的外表 而在于真正能够打动人心的情节 如果我想时光倒流 我愿意回到这部电影上映的那一年 重新回到于妈妈手牵手走进电影院的时光"
@@ -524,7 +524,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2014
 title = "Whiplash"
-text  = "【English translation pending】"
+text  = "The first film I watched after a long time away — nearly two years without one before I came back to that world. Short video keeps accelerating, but for anyone who loves film these classics on the Douban list are always worth taking slowly. This one reaches a new height in its use of music: many images have the music of the next scene entering before the cut, and that background sound turns out to be what the lead, or the rehearsal room, is playing in the scene we arrive at. The lighting design brings out the lead's inner world and magnifies what he feels; each time he plays, the focus of the spotlights is like a monologue from inside him. Many of the shots bring out his obsession with drumming, and his mania. Together they turn the film into a real drummer's autobiography."
   [entry.zh]
   title = "爆裂鼓手"
   text  = "在许久回归以后的第一部观影 接近两年没看电影后 再度回归到电影的世界中 虽然短视频的趋势日益加速 但是对于影迷来说这些豆瓣榜单上的经典始终值得我们去细细品鉴 这部电影在声乐上达到了新的高度 很多画面都是在转场前音乐部分线进入 而背景音的部分恰好是下一个场景主角或者排练室正在进行的演奏 这部电影在灯光设计上突出了主角内心世界 放大了情绪变化 每次演奏时聚光灯汇聚下的聚焦都像是主角内心世界独白 包括很多分镜突出主角打鼓的执着 癫狂 这些设计将影片塑造成为一部真正爆裂鼓手的自传"
@@ -533,7 +533,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 1952
 title = "Singin' in the Rain"
-text  = "【English translation pending】"
+text  = "A combination of the silent film and the talkie, and for me that combination is its greatest strength: it brings out the performance of silent cinema — the vivid action and expression — and also the immersion of sound film. Putting film inside film is where this one is inspired. Some things in it are very much its own: the way the lead tells a story, and his partner, who stays the second man throughout while his comic effect cannot be ignored. The declaration scene is romantic, and I think the director's idea there is a good one, making full use of everything a film set can offer."
   [entry.zh]
   title = "雨中曲"
   text  = "一部默片和talk picture的结合 我觉得这部片的最大亮点在于两者的结合 既突出了默片的表演 以及绘声绘色的动作和神态 也突出了有声电影的代入感 把电影拍进电影里 是这部电影传神的地方 还有一些地方很独特比如男主讲故事的方式 和他的搭档 一直作为一个男二但是喜剧效果不可忽视的存在 片中的表白场景很浪漫 我觉得导演这个想法很好 充分利用了电影场特别多地方"
@@ -543,7 +543,7 @@ text  = "【English translation pending】"
 year  = 1927
 title = "Metropolis"
 note_kind = "class"   # 课堂笔记：短句堆叠，原样保留
-text  = "【English translation pending】"
+text  = "A clock with only ten numbers marks capitalism's exploitation of ordinary people. A dystopian work. Shows the difference between social classes and the sharpening of their contradiction. Visual impact: extravagant sets. Dystopian in type, but utopian in its ending. Dystopia: anti-totalitarian, presenting a world of catastrophe, wealth divided severely. Maria the robot breaks anthropocentrism. A representative of the posthuman. Surrealism and the decentring of the human. The process by which the robot Maria evolves does not directly show a fusion of the human and the inorganic, and does not entirely fit the transformation from human to cyborg. Maria as a figure: the Madonna; a figure capable of inciting. The anxiety that modern technology and the urban woman bring to the bourgeoisie. The rise of women's position. The process of modernity. Stereotyped images of women. Instrumentalised. Cyberpunk: high tech, low life. The catacombs: a benighted Middle Ages. The underground city as the buried past, pointing to the shackles of darkness. German Expressionism: building particular sets that fold expressionism into art. Its features: highly symbolic, artistic, surreal, dark in mood; stories full of horror and crime; unusual visual design; instrumentalisation — the workers driven, for instance."
   [entry.zh]
   title = "大都会"
   text  = "只有10个数字的时钟标志资本主义对平民的剥削 反乌托邦类的作品 体现社会阶级的差异和矛盾激化 视觉冲击：浮夸的布景 反乌托邦类型但是结局是乌托邦式的 反乌托邦：反极权主义 呈现灾难的世界 贫富分化严重 玛丽亚（机器人）打破了人类中心主义 后人类的代表 超现实主义和去人类中心化 机器人玛丽亚的演变过程没有直接体现人与无机体的融合 并不完全符合人与赛博格的转变过程 玛丽亚的人物形象: 圣母 具有煽动性的人物 现代性技术和都市女性给资产阶级带来的焦虑 女性地位的提高 现代性的过程 女性的刻板形象 工具化 赛博朋克：高科技低生活 地下墓穴：蒙昧的中世纪 地下城象征被埋葬的过去 指向黑暗的枷锁 德国表现主义：制作特殊的场景将表现主义融入艺术 德国表现主义的特点：高度象征化 艺术性 超现实主义 阴暗的情绪 故事充满恐怖和犯罪 不寻常的视觉设计 具有工具化 比如工人被驱使"
@@ -553,7 +553,27 @@ text  = "【English translation pending】"
 year  = 2005
 title = "Grizzly Man"
 note_kind = "class"   # 课堂笔记：短句堆叠，原样保留
-text  = "【English translation pending】"
+text  = """
+In Grizzly Man the subject stands in an idealist's friendship with the bears. In his own footage he calls out again and again the names he has given them, as though they could understand. He tells the grizzlies he loves them — an intimate form of address that seems to say they are under his protection, though in fact they are not. Inside the reserve he observes them at close range: males fighting over a mate, feeding seen from very close, touching their droppings with his hands. This open but bystander's position shows a concern for the bears beyond what a human should have, because the official safe distance is at least ninety metres and what the camera records is often far less than that. I cannot understand his conversations with the bears, because they are not on one level: human and grizzly share no language at all, let alone names for each animal on screen. If he were simply too lonely he had every reason to go out into the world; that he stayed shows his resolve to protect them. He casts himself as a grizzly and wants to shed his own human attributes, imitating their calls — which shows that his near-madness is in fact a symptom.
+
+His attitude to nature is one of awe, but ignorant awe. First the bears: he loves them, and protects them without hesitating, and being close to them can be read as love of nature. But pitching a tent inside the reserve, however small the impact, is an interference — a human presence in the place they live means disturbing their lives, and indirectly affecting nature, which he plainly has not thought about. That is the ignorance inside his fanatical love.
+
+His fate is wretched: he and his girlfriend were eaten until nothing whole was left. But it was determined, because the grizzlies never held the slightest thought of protecting humans and could not understand what humans wanted to protect them from. Nature does not have us in view. Human thinking is still too idealised, assuming the bears can read our will to protect them, when they care only whether there is food, not who is concerned about their habitat.
+
+I agree with how others judge him. First the Alaskan wardens: they set up the reserve precisely to protect the bears, to provide a space for them to live in. If they think he broke the rules, they are right — who could imagine a person in this world loving grizzlies so much that he saw himself as one of them.
+
+His former girlfriend grieves deeply over his death. She admires him, because his original intention — to protect the bears and to live among them — is worth admiring. I can understand that too, because everyone has a sacred task of their own.
+
+Treadwell's closeness to the animals put distance between him and other people, and perhaps between him and being human. The author does not understand what he did, and thinks it futile, because the bears do not understand human feeling. Treadwell treated the reserve as his own Eden and was hostile toward the human world and toward every other form of protection for the bears; he crossed the line between human and nature.
+
+New German Cinema. Herzog has always held to exploring the relation between nature and people, and to showing how a person faces wildness inside nature. The ballad at the end is in a Western style, with something of nature's sanctity in it.
+
+Some hold that the environment is worth protecting, that its wildness should be protected and not damaged by human civilisation. Others hold that the environment should keep what is original in it. The American rich treat nature as a place of consumption, often arriving with great quantities of supplies and with servants. Herzog's understanding of nature in Grizzly Man carries German philosophy in it.
+
+Treadwell chose the role of director of his own life: he gave up the life he had before, decided to change his name and begin again. In the human world he was a failed actor; in the animal world, a star. The director does not plant Treadwell's end as the film's core; he states it at the very beginning. He does not play the recording to the audience directly, but shows his own response to hearing it and the changes in his face — a reaction to a reaction. Treadwell's former girlfriend does not listen to the recording either; she responds to Herzog's response to it.
+
+American direct cinema has something in common with Bazin's French film theory and with cinéma vérité. Direct cinema attends to the negligible changes in a scene — only the shot, without any sound. Direct cinema has to be understood from an objective position; cinéma vérité needs to show a complete truth, while direct cinema is a truth of the surface.
+"""
   [entry.zh]
   title = "灰熊人"
   text  = """
@@ -599,7 +619,21 @@ treadwell选择一种成为自己人生导演的角色 他放弃了之前的生�
 year  = 1982
 title = "Blade Runner"
 note_kind = "class"   # 课堂笔记：短句堆叠，原样保留
-text  = "【English translation pending】"
+text  = """
+Light and shadow. The lighting is one of the film's greatest strengths. In the images of the future city the light is mostly cold; in the Tyrell building, warm colours dominate the background. In the meeting with the head of the corporation the director uses rim light to make a cold, killing atmosphere, and Rembrandt lighting to bring out the detail of the face. The rippling effect the light makes on the wall stays with you — there must have been a coated filter in front of the lamp to produce that beautiful, mysterious, uncanny air. In Deckard's apartment the lighting is dense, and the light on his face, coming through something like a prison window or a blind, creates a cutting effect that feels sinister and frightening, and speaks to his character. When Deckard investigates J. F. Sebastian's home, the sources are placed in the far ground, which conveys how unsafe the surroundings are and the sense of danger buried all around.
+
+Colour: mostly cold, which conveys the strangeness of the world and its cold, empty air — people are distant from one another, or the place is dangerous.
+
+Setting: mostly night. Rainy nights, the road surface reflecting the neon of the street. Very futuristic, and a real urban aesthetic.
+
+Camera movement: Deckard's pursuit of the dancer is thrilling. In the street chase, the director uses the density of extras walking the street to convey the pursuit as Deckard searches for the fleeing performer in a sea of people.
+
+Catastrophic narrative: the director describes a world in desperate straits, where a very few hold the great majority of resources. The futurity is carried by the replicants and by the cyberpunk look of the streets. Humans have developed tools more efficient than themselves and set them to work. The world is no longer fit to live in, so colonising other planets has become the norm — which says that humans have mined the Earth's resources to exhaustion.
+
+In common with Metropolis: both films are dystopian. Metropolis ends by describing the division between capital and the common class, showing the evil of capitalism and how easily people are incited. Blade Runner presents the Tyrell Corporation controlling genetic construction to manufacture replicants and monopolise the right to develop resources — that is totalitarianism. Blade Runner depicts a world whose resources are exhausted: catastrophic. Also worth noting is that Blade Runner's highly imaginative architecture and vehicles, the spinners for instance, resemble the skyscrapers built in Metropolis.
+
+The Madonna and the cyborg robot in Metropolis have something in common with the replicant Rachael in Blade Runner: both are created by humans through advanced technology, both serve people, both are tools for achieving some purpose. Both films are cyberpunk, and both used the most advanced photographic technology of their time — Metropolis shot with miniatures, Blade Runner rendering and using blue screen to the greatest extent it could. Both imagine the model of the future city and its vehicles fully. The characters in both are highly symbolic. Blade Runner has more of the artistic about it, in image, in lighting and grading, and in effects. Both films contain elements of horror and menace.
+"""
   [entry.zh]
   title = "银翼杀手"
   text  = """
@@ -622,7 +656,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2010
 title = "How to Train Your Dragon"
-text  = "【English translation pending】"
+text  = "Far too moving — several times I wanted to cry and held it in. How to Train Your Dragon is a deeply affecting animated film. Hiccup goes from being told by his father that he has no such son to becoming the Vikings' hero. There are a few places that bring tears. The first is Hiccup taming Toothless: they become friends and soar along a beautiful skyline. The second is when Toothless and Hiccup save the Vikings and Toothless's wing burns in the fight with the great dragon; as Hiccup loses control and falls, Toothless shields him with his body and saves his life. And when Hiccup finally wakes and finds he has lost a leg, thinking his life is over, a brand-new prosthetic built to steer Toothless is set in front of him. The interesting thing is that Toothless and Hiccup are hurt on the same side — the left leg, the left wing — and what they share is that among their own kind they both seem fragile and out of place. But when the two of them work together, their strength cannot be stopped."
   [entry.zh]
   title = "驯龙高手"
   text  = "太催泪了 好几次想哭都忍住了 《how to train your dragon》是一部非常煽情的动画电影 小嗝嗝从父亲口中的（我没有你这个儿子）成为了维京人的英雄 这部影片有几个催泪点 一是小嗝嗝成功驯服toothless 他们成为了好朋友 在美丽的天际线遨游 第二幕是当toothless和小嗝嗝拯救了维京人 而toothless的翅膀却因为与巨龙搏斗的时候烧毁 小嗝嗝失去控制坠落时 toothless用身体护住了小嗝嗝保住了他的生命 而当最后小嗝嗝苏醒时发现自己失去双腿 以为已经结束自己的生命时 一副全新的专门用来操控toothless的假肢摆在眼前 有趣的是 toothless和小嗝嗝都是左腿（左边的翅膀）受伤 而他们的共同点都是在同类中显得脆弱 不合群 但是当他们合作起来的时候 他们的力量是不可阻挡的"
@@ -631,7 +665,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2015
 title = "A Man Called Ove"
-text  = "【English translation pending】"
+text  = "This film really does bring tears. It moves from not understanding Ove at the start — thinking him stubborn, prejudiced against everyone in his neighbourhood, sick of every part of life — to coming slowly to know his wife in the middle section, and then his background and his father, at which point you find Ove is no misanthrope at all: he simply holds to what he believes. His father and he both lost their wives first. His father was a quiet man who knew cars and loved them, and worked at the railway station; Ove grew up under his influence, worked with him there, and loved cars in the same way. But he is sincere, kind, with a sense of justice, and wants to do better. Then an accident took from Ove — who should have had a happy ending — the father he had depended on all his life, and a fire burned down his home. A hurried night on a train is how he met his wife, and her persistence moved him deeply. But another accident took the life of the child who should have been born into that happy family, and his wife was disabled by the crash and ran into difficulties in her work as well."
   [entry.zh]
   title = "一个叫欧维的男人决定去死"
   text  = "这部影片真的是催人泪下 从一开始的对欧维的不理解 觉得他很偏执 对社区里的人很有偏见 对生活的方方面面很厌恶 到中间部分慢慢对他妻子有了一定的了解 对他的身世和父亲渐渐有了了解 才发现欧维并不是厌世嫉俗 他只是坚持自己的信念 他的父亲和他都是妻子先过世 他的父亲沉默寡言 对汽车很是了解也很热爱 工作在火车站 欧维从小深受父亲影响在火车站和父亲一起工作 同样热爱汽车 但是他真诚 善良 有正义感 上进 但是一场意外使本应该是皆大欢喜的欧维失去了此生的依靠父亲 而一场火灾烧毁了他的家 在火车上仓促的过夜却让他认识了他的妻子 他们妻子的坚持不懈的品质深深打动了欧维 但是一次意外却让本应该诞生在这个幸福家庭的孩子失去了生命 而妻子因为车祸而残疾在事业上也遇到了困难。"
@@ -640,7 +674,7 @@ text  = "【English translation pending】"
 [[entry]]
 year  = 2000
 title = "In the Mood for Love"
-text  = "【English translation pending】"
+text  = "Once again I marvel at Wong Kar-wai's gift — telling a story this superb inside a space this narrow, through every last detail. First, the sets give a cramped space a real refinement, and the conversations between Tony Leung and Maggie Cheung are carried by the movement of the camera. Maggie Cheung does not, in the end, leave her husband, and when Tony Leung goes back to find her and fails, he chooses to tell the secret to a ruined wall — and in the end that hollow puts out a green shoot. Nobody else knows this story; it is buried forever in the Hong Kong of the 1960s. Every meeting between the two of them happens in pouring rain and on staircases, which seems to foretell the turns and the mistiming of this love."
   [entry.zh]
   title = "花样年华"
   text  = "再一次感叹王家卫的才华，将一个精彩绝伦的故事在这样一个狭小的空间里，用每一个细节去体现出来。这部片的布景把一个狭小的空间做出了高级感，梁朝伟和张曼玉之间的对话则以运镜的形式表达。张曼玉最终没有离开她的丈夫，而梁朝伟在回去找她未果后，选择把秘密讲给那段残垣断壁——最终那个「树洞」开出了绿芽。这段故事没有别人知道，就这样永远埋没在了上世纪六十年代的香港。梁朝伟和张曼玉的几次相遇都发生在暴雨天和阶梯上，似乎也预示着这段感情的波折和错位。"

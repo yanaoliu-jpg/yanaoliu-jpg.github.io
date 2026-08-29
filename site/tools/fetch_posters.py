@@ -28,7 +28,9 @@ from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent
 NOTES = SITE / "content" / "film-notes.toml"
-LOCK = SITE / "content" / "posters.toml"
+# ⚠️ 必须以下划线开头。content/ 里不以下划线开头的 .toml 都会被 build.py
+#    当成一个作品系列，然后炸在 KeyError: 'title'。
+LOCK = SITE / "content" / "_posters.toml"
 DEST = SITE.parent / "素材" / "海报"
 
 API = "https://api.themoviedb.org/3"

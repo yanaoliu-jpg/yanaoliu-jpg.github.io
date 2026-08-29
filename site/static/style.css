@@ -608,6 +608,246 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .js-reveal .work.is-in { opacity: 1; transform: none; }
 
+/* ── 三大类别：导航和区标题 ──────────────────────────────────── */
+
+/*
+  Photographs · Films · Film Notes。
+
+  这条导航接手了原来「停止滑动」当头题的活：招生官第一秒就知道
+  这里有三类东西，而且比一张影片封面说得更直接。
+  见 影评栏目设计.md 第三节。
+*/
+.catnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem clamp(1.2rem, 3vw, 2.4rem);
+  margin: 2.4rem 0 0;
+}
+
+.catnav__item {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-decoration: none;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid transparent;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+/* 中文不做 uppercase（对汉字没有意义），字距也收窄一点 */
+:lang(zh-Hans) .catnav__item { text-transform: none; letter-spacing: 0.08em; }
+
+.catnav__item[aria-current='page'] {
+  color: var(--ink-dim);
+  border-bottom-color: #3a3e47;
+}
+@media (hover: hover) {
+  a.catnav__item:hover { color: var(--ink); border-bottom-color: #3a3e47; }
+}
+
+.cat__title {
+  max-width: 1500px;
+  margin: clamp(4.5rem, 11vh, 7.5rem) auto 0;
+  padding: 0 clamp(1.5rem, 3.5vw, 6rem);
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+:lang(zh-Hans) .cat__title { text-transform: none; letter-spacing: 0.1em; }
+
+.cat__title a { color: inherit; text-decoration: none; }
+@media (hover: hover) {
+  .cat__title a:hover { color: var(--ink-dim); }
+}
+
+/* 区标题紧跟着自己的那一组，所以把 .works 顶部那段外边距收掉 */
+.cat__title + .works,
+.cat__title + .posterwall { margin-top: clamp(1.6rem, 3.5vh, 2.6rem); }
+
+/* ── 影评：首页那面海报墙 ────────────────────────────────────── */
+
+/*
+  62 张小海报密排。这面墙**本身就是信息**——「这人看了很多片子」
+  一眼就看到了，不需要读任何文字。
+
+  做成小图而不是大封面是有意的：整站每一张图都是他自己拍的，
+  那是这个网站最强的地方。62 张好莱坞官方海报做成大卡片，
+  招生官的眼睛会被《低俗小说》的海报抓走，而不是他的照片。
+
+  ⚠️ --poster-w 必须跟 build.py 的 POSTER_WALL_PX 对上。
+     对不上不会变形（CSS 说了算），但 sizes 会跟着错，浏览器就挑错档。
+*/
+.posterwall {
+  --poster-w: 96px;
+  max-width: 1500px;
+  margin: clamp(4rem, 10vh, 7rem) auto 0;
+  padding: 0 clamp(1.5rem, 3.5vw, 6rem);
+  list-style: none;
+  display: grid;
+  /*
+    列宽**定死**成 --poster-w，不用 minmax(…, 1fr)。
+
+    ⚠️ 这不是随便选的。用 1fr 的话列宽会在 96px 到 191px 之间浮动
+       （auto-fill 在加下一列之前会把剩余空间全摊给现有列），而
+       build.py 写进 sizes 的是一个定值 96px。两者对不上的后果是
+       3 倍屏的手机上列宽 104px、需要 312px 的图，却只拿到 200px 那档——
+       明显发软。定死列宽之后 sizes 在每个屏幕宽度上都精确。
+
+    代价是每行右边可能剩一截空白，居中之后分到两边。
+    那是墙的边缘，不是没对齐 —— 跟首页作品墙同一个道理。
+  */
+  grid-template-columns: repeat(auto-fill, var(--poster-w));
+  justify-content: center;
+  gap: clamp(0.6rem, 1.2vw, 1rem);
+}
+
+.posterwall__item { margin: 0; }
+
+.posterwall__item a {
+  display: block;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--bg-lift);
+  /* 海报本身是彩色印刷品，直接铺在深色页上会比照片更跳。
+     压一点亮度和饱和度，让它退回到"索引"的位置上去。 */
+  filter: saturate(0.82) brightness(0.86);
+  transition: filter 0.35s ease, transform 0.35s ease;
+}
+
+.posterwall__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+/* 没有海报的条目：退化成一个文字块，仍然可点、仍然有落点 */
+.posterwall__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 2 / 3;
+  padding: 0.6rem;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--ink-faint);
+  border: 1px dashed #2a2e36;
+}
+
+@media (hover: hover) {
+  .posterwall__item a:hover {
+    filter: none;
+    transform: translateY(-3px);
+  }
+}
+
+/* ── 影评页 ──────────────────────────────────────────────────── */
+
+.notes {
+  max-width: 46rem;
+  margin: clamp(5rem, 12vh, 9rem) auto 0;
+  padding: 0 var(--gutter);
+  list-style: none;
+}
+
+.note {
+  display: grid;
+  grid-template-columns: var(--poster-col) 1fr;
+  gap: clamp(1.2rem, 3vw, 2rem);
+  align-items: start;
+  margin: 0 0 clamp(3.5rem, 8vh, 5.5rem);
+  --poster-col: 120px;   /* ⚠️ 跟 build.py 的 POSTER_ENTRY_PX 对上 */
+}
+.note:last-child { margin-bottom: 0; }
+
+.note__poster {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--bg-lift);
+  filter: saturate(0.82) brightness(0.86);
+}
+
+/* 没有海报时正文占满整行，不留一个空洞 */
+.note:not(:has(.note__poster)) { grid-template-columns: 1fr; }
+
+.note__title {
+  margin: 0 0 0.9rem;
+  font-family: var(--serif);
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.note__year {
+  color: var(--ink-faint);
+  font-size: 0.72em;
+  white-space: nowrap;
+}
+
+/*
+  《大都会》《灰熊人》《银翼杀手》这三条是课堂笔记 —— 短句堆叠、
+  几乎没有标点。标出来是诚实：它们跟另外 59 条不是一类东西，
+  而"这人在正经上电影课"本身就是信息。
+*/
+.note__tag {
+  display: inline-block;
+  margin-left: 0.7rem;
+  padding: 0.15em 0.55em;
+  font-size: 0.52em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  vertical-align: 0.35em;
+  color: var(--ink-faint);
+  border: 1px solid #2a2e36;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+:lang(zh-Hans) .note__tag { text-transform: none; letter-spacing: 0.06em; }
+
+.note__body p {
+  margin: 0 0 1.1em;
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--ink-dim);
+}
+.note__body p:last-child { margin-bottom: 0; }
+
+/*
+  短评（50 字 / 30 词以内）单独一种排法：大一号，像格言那样排。
+  《狮子王》"请记住，不要忘了你自己"、《辩护人》"鸡蛋是活的，石头是死的"——
+  这些当短句是好的，用长文那套版式排出来才显得像没写完。
+*/
+.note--short .note__body p {
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.note--class .note__body p { color: var(--ink-mute); }
+
+@media (max-width: 620px) {
+  /* 窄屏：海报缩到能认出片子就行，正文要拿到宽度 */
+  .note { --poster-col: 74px; gap: 1rem; }
+}
+
+.js-reveal .note {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.js-reveal .note.is-in { opacity: 1; transform: none; }
+
 /* ── 影片 ────────────────────────────────────────────────────── */
 
 /*
@@ -827,9 +1067,13 @@ body.is-locked { overflow: hidden; }
 /* ── 无障碍与降级 ────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .js-reveal .plate { opacity: 1; transform: none; transition: none; }
+  .js-reveal .plate,
+  .js-reveal .work,
+  .js-reveal .note { opacity: 1; transform: none; transition: none; }
   .js-reveal .plate__frame img,
+  .js-reveal .work__frame img,
   .viewer__stage img { transition: none; opacity: 1; }
+  .posterwall__item a { transition: none; }
   * { scroll-behavior: auto !important; }
 }
 

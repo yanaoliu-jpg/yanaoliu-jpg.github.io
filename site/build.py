@@ -103,6 +103,17 @@ LANGS = {
         "film_word": "Film",
         "film_count": "film",
         "films_count": "films",
+        "cat_photos": "Photographs",
+        "cat_films": "Films",
+        "cat_notes": "Film Notes",
+        "notes_eyebrow": "Notes",
+        # ⚠️ 不能写 "films"。首页那行是「7 series · 63 photographs · 3 films · N ___」，
+        #    写 films 就成了「3 films · 62 films」，读者会以为站上有 65 部片子。
+        "notes_count": "notes",
+        "class_notes": "Class notes",
+        "skip_notes": "Skip to the notes",
+        "poster_alt": "Poster for {title}",
+        "poster_credit": "Poster images from TMDB",
         "seconds": "seconds",
         "no_video": "Your browser cannot play this video.",
         "download_video": "Download the film (MP4)",
@@ -131,6 +142,16 @@ LANGS = {
         "film_word": "影片",
         "film_count": "部影片",
         "films_count": "部影片",
+        "cat_photos": "照片",
+        "cat_films": "影片",
+        "cat_notes": "影评",
+        "notes_eyebrow": "影评",
+        # 同上：跟前面的「3 部影片」并排，写「62 部」会读成 62 部片子
+        "notes_count": "篇影评",
+        "class_notes": "课堂笔记",
+        "skip_notes": "跳到影评",
+        "poster_alt": "《{title}》的海报",
+        "poster_credit": "海报图片来自 TMDB",
         "seconds": "秒",
         "no_video": "你的浏览器放不了这个视频。",
         "download_video": "下载影片（MP4）",
@@ -174,6 +195,30 @@ INDEX_STACK_VH = 52
 VIDEO_HEIGHT = 1080
 VIDEO_AV1_CRF = 34
 VIDEO_H264_CRF = 21
+
+# ── 影评的海报 ──────────────────────────────────────────────────
+# 海报是 2:3 竖幅，显示尺寸远小于照片：首页那面墙上每张约 96px 宽，
+# 影评条目里约 120px。400px 覆盖到 2 倍屏还有余量。
+#
+# ⚠️ **不要套用照片的 900/1600/2400**。那是给 1400px 宽的照片定的，
+#    海报用那一套是白下载——一张 96px 宽的小图没有理由下 2400px。
+#
+# ⚠️ 这两个像素值必须跟 style.css 里 .posterwall 的 --poster-w
+#    和 .note__poster 的宽度对上。对不上不会变形（CSS 说了算），
+#    但会下错档：要么糊，要么白下载大图。跟 MAX_VH / INDEX_COVER_H 同款陷阱。
+POSTER_WIDTHS = [200, 400]
+POSTER_WALL_PX = 96
+POSTER_ENTRY_PX = 120
+POSTER_SRC = SRC_ROOT / "海报"
+
+# 短评单独一种排法（大一号、像格言那样排），不跟长文用同一种版式。
+# 《狮子王》「请记住，不要忘了你自己」当短句是好的，混在长文里才像没写完。
+#
+# 这两个数是渲染出来比出来的，不是拍的：中文按字数、英文按词数分别判，
+# 因为同一段话译成英文之后词数大约是中文字数的六成，用一个数会把
+# 中文的短评判成长文。
+SHORT_NOTE_CHARS = 50
+SHORT_NOTE_WORDS = 30
 
 
 # ---------------------------------------------------------------------------
@@ -385,10 +430,14 @@ def discover(src_dir: Path) -> list[Photo]:
 # ---------------------------------------------------------------------------
 
 
-def widths_for(photo: Photo) -> list[int]:
-    """只生成不超过原图长边的尺寸——放大没有意义。"""
+def widths_for(photo: Photo, widths: list[int] | None = None) -> list[int]:
+    """只生成不超过原图长边的尺寸——放大没有意义。
+
+    `widths` 留空就用照片那一套（WIDTHS）。影评的海报传 POSTER_WIDTHS，
+    因为它只显示到 120px 宽，跟 1400px 的照片不是一个量级。
+    """
     longest = max(photo.width, photo.height)
-    keep = [w for w in WIDTHS if w <= longest]
+    keep = [w for w in (widths or WIDTHS) if w <= longest]
     return keep or [longest]
 
 
@@ -466,13 +515,19 @@ def make_lqip(stage: Path) -> str:
     return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
-def build_images(photos: list[Photo], slug: str, force: bool) -> int:
+def build_images(photos: list[Photo], slug: str, force: bool,
+                 sizes: list[int] | None = None) -> int:
+    """把一批图片压成各档尺寸和格式。`sizes` 留空就用照片那一套。
+
+    影评的海报传 POSTER_WIDTHS 走同一条流水线——AVIF 保险丝、`.noavif` 记号、
+    增量判断全部照常生效，不新增代码路径。
+    """
     out_dir = DIST / "img" / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     total_bytes = 0
 
     for i, photo in enumerate(photos, 1):
-        widths = widths_for(photo)
+        widths = widths_for(photo, sizes)
         label = f"  [{i}/{len(photos)}] {photo.stem}"
 
         if not force and is_fresh(photo, out_dir, widths):
@@ -817,6 +872,66 @@ def build_film(cfg: dict, force: bool) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# 影评
+# ---------------------------------------------------------------------------
+
+
+def build_notes(cfg: dict, force: bool) -> dict:
+    """影评：一个 toml 装 62 条，渲染成一个页面。
+
+    跟 build_series / build_film 不一样的地方：它没有封面、没有张数，
+    **不进「下一组」链条，也不占系列编号**——它是另一种阅读模式，
+    读完一组照片的人不该被送进一页一万三千字。
+
+    海报走的是照片那条流水线，只是换一套宽度（POSTER_WIDTHS）。
+    """
+    entries = cfg.get("entry", [])
+    if not entries:
+        sys.exit("film-notes.toml 里一条 [[entry]] 都没有")
+
+    seen: dict[str, str] = {}
+    for e in entries:
+        e["slug"] = slugify(e["title"])
+        if not e["slug"]:
+            sys.exit(f"影评「{e['title']}」生成不出 slug")
+        if e["slug"] in seen:
+            sys.exit(f"影评 slug 撞车「{e['slug']}」：{seen[e['slug']]} 和 {e['title']}")
+        seen[e["slug"]] = e["title"]
+
+    # 缺海报不炸掉整次构建 —— 62 张里少一张，不该让他连页面都构建不出来。
+    # 记进 missing，构建摘要里报警告，条目照常渲染（正文还在）。
+    loaded, missing = [], []
+    for e in entries:
+        src = POSTER_SRC / f"{e['slug']}.jpg"
+        if not src.exists():
+            missing.append(e["title"])
+            e["poster"] = None
+            continue
+        poster = read_photo(src)
+        poster.alt = f"Poster for {e['title']}"
+        loaded.append((e, poster))
+
+    total_bytes = 0
+    if loaded:
+        print(f"  海报 {len(loaded)} 张：")
+        total_bytes = build_images([p for _, p in loaded], cfg["slug"], force,
+                                   sizes=POSTER_WIDTHS)
+    for e, poster in loaded:
+        e["poster"] = poster
+
+    return {
+        "cfg": cfg,
+        "kind": "notes",
+        "slug": cfg["slug"],
+        "order": cfg.get("order", 999),
+        "entries": entries,
+        "missing_posters": missing,
+        "count": 0,
+        "bytes": total_bytes,
+    }
+
+
 def text_of(cfg: dict, lang: str, key: str, default: str = "") -> str:
     """取某个语言的文案。中文没写的项自动回落到英文，不会开天窗。"""
     if lang != "en":
@@ -1070,6 +1185,138 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
     out.write_text(page, encoding="utf-8")
 
 
+def catnav(lang: str, here: str) -> str:
+    """三大类别导航。here ∈ {"home", "notes"}。
+
+    ⚠️ 相对链接必须落在**本语言**那一层。中文影评页 /zh/film-notes/
+       回中文首页是 `../`，写成 `../../` 会掉进英文站——读者读着中文
+       突然进了英文页。这个坑「下一组」踩过一次。
+       查法：new URL(href, location.href).pathname，看落点在不在同一语言下。
+
+    只放在首页和影评页。系列页、影片页不加——那些是安静的阅读页，
+    已经有「全部作品」和「下一组」，再压一条导航会把注意力从照片上拉走。
+    """
+    L = LANGS[lang]
+    up = "" if here == "home" else "../"
+    items = [
+        ("home", f"{up}#photographs", L["cat_photos"]),
+        ("home", f"{up}#films", L["cat_films"]),
+        ("notes", "" if here == "notes" else "./film-notes/", L["cat_notes"]),
+    ]
+    out = []
+    for owner, href, label in items:
+        if owner == here and not href:
+            out.append(f'    <span class="catnav__item" aria-current="page">'
+                       f'{esc(label)}</span>')
+        else:
+            out.append(f'    <a class="catnav__item" href="{href}">{esc(label)}</a>')
+    return "\n".join(out)
+
+
+def poster_html(entry: dict, prefix: str, lang: str, px: int, klass: str) -> str:
+    """一张海报。没有海报的条目返回空串，页面照常渲染。"""
+    poster = entry.get("poster")
+    if not poster:
+        return ""
+    L = LANGS[lang]
+    title = text_of(entry, lang, "title")
+    alt = L["poster_alt"].replace("{title}", title)
+    # sizes 是一个定值。⚠️ 不能写百分比——`100%` 不是合法的 source-size-value，
+    # 整条属性会被浏览器丢掉、回退成 100vw，于是一张 96px 的小图去下最大档。
+    sizes = f"{px}px"
+    return f"""<picture>
+{picture_sources(poster, prefix, sizes, "          ")}
+          <img class="{klass}" src="{prefix}{poster.variants['jpg'][-1][1]}"
+               srcset="{srcset(poster.variants['jpg'], prefix)}" sizes="{sizes}"
+               width="{poster.width}" height="{poster.height}"
+               alt="{esc(alt)}" loading="lazy" decoding="async">
+        </picture>"""
+
+
+def note_html(entry: dict, lang: str, prefix: str) -> str:
+    """影评页上的一条。"""
+    L = LANGS[lang]
+    body = text_of(entry, lang, "text")
+    # 短评（一句话那种）单独一种排法。中文按字数、英文按词数分别判——
+    # 译成英文后词数大约是中文字数的六成，用同一个数会把中文短评判成长文。
+    n = len(body) if lang == "zh" else len(body.split())
+    limit = SHORT_NOTE_CHARS if lang == "zh" else SHORT_NOTE_WORDS
+    classes = ["note"]
+    if n <= limit:
+        classes.append("note--short")
+    if entry.get("note_kind") == "class":
+        classes.append("note--class")
+    tag = (f'<span class="note__tag">{esc(L["class_notes"])}</span>'
+           if entry.get("note_kind") == "class" else "")
+    return f"""      <li class="{' '.join(classes)}" id="{entry['slug']}">
+        {poster_html(entry, prefix, lang, POSTER_ENTRY_PX, "note__poster")}
+        <div class="note__body">
+          <h2 class="note__title">{esc(text_of(entry, lang, 'title'))}<span
+              class="note__year"> · {entry['year']}</span>{tag}</h2>
+          {paragraphs(body)}
+        </div>
+      </li>"""
+
+
+def render_notes(s: dict, lang: str, site: dict) -> None:
+    """影评页。一页装完 62 条，零 JavaScript。
+
+    每条自己带一张小海报，所以这一页**不再重复一遍首页那面海报墙**——
+    小图已经起到索引作用了。
+    """
+    cfg, L = s["cfg"], LANGS[lang]
+    depth = 2 if L["dir"] else 1
+    prefix = "../" * depth
+    root = "/".join([".."] * depth)
+
+    title = text_of(cfg, lang, "title")
+    name = text_of(site, lang, "name")
+    entries = s["entries"]
+
+    meta = " ".join(f"<span>{esc(x)}</span>" for x in (
+        f"{len(entries)} {L['notes_count']}",
+        year_span_of(entries, lang),
+    ) if x)
+
+    body = render(
+        (TEMPLATES / "film-notes.html").read_text(encoding="utf-8"),
+        title=esc(title),
+        eyebrow=esc(L["notes_eyebrow"]),
+        meta=meta,
+        catnav=catnav(lang, "notes"),
+        statement=paragraphs(text_of(cfg, lang, "statement")),
+        entries="\n".join(note_html(e, lang, prefix) for e in entries),
+        credit=esc(L["poster_credit"]),
+        name=esc(name),
+        scroll=esc(L["scroll"]),
+        skip=esc(L["skip_notes"]),
+        switch_href=switch_href(lang, s["slug"]),
+        switch_label=esc(L["switch_label"]),
+        switch_title=esc(L["switch_title"]),
+    )
+    page = render(
+        (TEMPLATES / "base.html").read_text(encoding="utf-8"),
+        html_lang=L["html_lang"],
+        title=f"{esc(title)} — {esc(name)}",
+        description=esc(text_of(cfg, lang, "description",
+                                f"{len(entries)} films, written about.")),
+        root=root,
+        alternates=alternate_links(s["slug"]),
+        body=body,
+    )
+    out = DIST / L["dir"] / s["slug"] if L["dir"] else DIST / s["slug"]
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "index.html").write_text(page, encoding="utf-8")
+
+
+def year_span_of(entries: list[dict], lang: str) -> str:
+    """影评覆盖的电影年份跨度，比如「1927–2020」。"""
+    years = sorted(int(e["year"]) for e in entries if e.get("year"))
+    if not years:
+        return ""
+    return f"{years[0]}–{years[-1]}"
+
+
 def switch_href(lang: str, slug: str = "") -> str:
     """语言切换按钮：指向对方语言的**同一个**页面，不是跳回首页。
 
@@ -1182,11 +1429,39 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
       </li>"""
 
 
-def write_index(series: list[dict], site: dict, lang: str) -> None:
-    """作品总目录页。
+def posterwall_html(notes: dict, lang: str, prefix: str) -> str:
+    """首页的影评区：62 张小海报密排成一面墙，每张跳到影评页对应的锚点。
+
+    这一面墙**本身就是信息**——「这人看了很多片子」一眼就看到了。
+    做成小图而不是大封面，是为了不跟他自己的照片抢：整站每一张图都是他拍的，
+    那是这个网站最强的地方，62 张好莱坞官方海报做成大卡片会把眼睛全吸走。
+    """
+    out = []
+    for e in notes["entries"]:
+        img = poster_html(e, prefix, lang, POSTER_WALL_PX, "posterwall__img")
+        title = esc(text_of(e, lang, "title"))
+        # 没有海报的条目退化成一个文字块，仍然可点、仍然有落点
+        inner = img or f'<span class="posterwall__fallback">{title}</span>'
+        out.append(
+            f'      <li class="posterwall__item">\n'
+            f'        <a href="./{notes["slug"]}/#{e["slug"]}" title="{title}">'
+            f'{inner}</a>\n'
+            f'      </li>'
+        )
+    return "\n".join(out)
+
+
+def write_index(series: list[dict], site: dict, lang: str,
+                notes: dict | None = None) -> None:
+    """作品总目录页 —— 现在分成三大类别。
 
     英文在 /，中文在 /zh/。每个系列仍然住在 /<slug>/ 和 /zh/<slug>/ ——
     已经发给招生官的链接永远不会失效。
+
+    ⚠️ 分区之后「停止滑动」不再是首页第一眼看到的东西（影片区在照片区之后）。
+       这是有意放弃的：顶部那条 Photographs · Films · Film Notes 导航
+       在第一秒里干的是同一件事，而且一次说出三件而不是一件。
+       见 影评栏目设计.md 第三节。
     """
     L = LANGS[lang]
     depth = 1 if L["dir"] else 0
@@ -1200,12 +1475,14 @@ def write_index(series: list[dict], site: dict, lang: str) -> None:
     # 有影片时在后面单列一项，没有就整条不出现。
     photo_sets = [s for s in ordered if s["kind"] == "series"]
     films = [s for s in ordered if s["kind"] == "film"]
+    n_notes = len(notes["entries"]) if notes else 0
     meta = " ".join(
         f"<span>{esc(x)}</span>" for x in (
             f"{len(photo_sets)} {L['series_count']}",
             f"{sum(s['count'] for s in photo_sets)} {L['photographs']}",
             # 英文要区分单复数：1 film / 2 films。中文两者相同。
             f"{len(films)} {L['films_count' if len(films) > 1 else 'film_count']}" if films else "",
+            f"{n_notes} {L['notes_count']}" if notes else "",
         ) if x
     )
 
@@ -1214,7 +1491,14 @@ def write_index(series: list[dict], site: dict, lang: str) -> None:
         name=esc(name),
         home_eyebrow=esc(L["home_eyebrow"]),
         intro=paragraphs(text_of(site, lang, "intro")),
-        works="\n".join(work_card(s, lang, prefix) for s in ordered),
+        catnav=catnav(lang, "home"),
+        cat_photos=esc(L["cat_photos"]),
+        cat_films=esc(L["cat_films"]),
+        cat_notes=esc(L["cat_notes"]),
+        photo_works="\n".join(work_card(s, lang, prefix) for s in photo_sets),
+        film_works="\n".join(work_card(s, lang, prefix) for s in films),
+        posterwall=posterwall_html(notes, lang, prefix) if notes else "",
+        notes_href=f"./{notes['slug']}/" if notes else "",
         meta=meta,
         footer=esc(text_of(site, lang, "footer")),
         scroll=esc(L["scroll"]),
@@ -1260,12 +1544,26 @@ def main() -> None:
     if not configs:
         sys.exit(f"{CONTENT} 里没有找到作品系列的 .toml 文件")
 
-    built = []
+    # built 只装**作品**（照片 + 影片）。影评单独拿出来，这样「下一组」链条、
+    # 系列编号、首页的 work_card 和构建摘要全都不用为它开特例。
+    built, notes = [], None
     for cfg_path in configs:
         with cfg_path.open("rb") as f:
             cfg = tomllib.load(f)
+        kind = cfg.get("kind")
+        # 作品和影评都必须有 title。没有的多半是有人往 content/ 里放了别的东西
+        # ——生成的数据、备份、草稿。下划线开头的才会被跳过。
+        if "title" not in cfg:
+            sys.exit(
+                f"{cfg_path.name} 里没有 title，它不像一个作品。\n"
+                f"  content/ 里**不以下划线开头**的 .toml 都会被当成作品系列。\n"
+                f"  如果它不是作品（比如生成的数据文件），改名成 _{cfg_path.name}。"
+            )
+        if kind == "notes":
+            notes = build_notes(cfg, args.force)
+            continue
         # toml 里写 kind = "film" 的是影片，其余都按照片系列处理
-        builder = build_film if cfg.get("kind") == "film" else build_series
+        builder = build_film if kind == "film" else build_series
         built.append(builder(cfg, args.force))
 
     # 「下一组」按 order 首尾相接。slug 参与排序只是为了 order 撞车时结果稳定，
@@ -1288,7 +1586,9 @@ def main() -> None:
         for s in built:
             render = render_film if s["kind"] == "film" else render_series
             render(s, lang, site, next_of[s["slug"]])
-        write_index(built, site, lang)
+        if notes:
+            render_notes(notes, lang, site)
+        write_index(built, site, lang, notes)
 
     copy_static()
     WORK.exists() and shutil.rmtree(WORK, ignore_errors=True)
@@ -1309,6 +1609,15 @@ def main() -> None:
         for key in ("name", "intro", "description"):
             if "【" in str(text_of(site, lang, key)):
                 warnings.append(f"首页 {lang}.{key} 还是占位符")
+
+    if notes:
+        print(f"  影评：{len(notes['entries'])} 条，海报共 {notes['bytes'] / 1e6:.1f} MB")
+        for title in notes["missing_posters"]:
+            warnings.append(f"影评「{title}」没有海报（跑 tools/fetch_posters.py --download）")
+        for e in notes["entries"]:
+            for lang in LANGS:
+                if "【" in str(text_of(e, lang, "text")):
+                    warnings.append(f"影评「{e['title']}」的 {lang} 正文还是占位符")
 
     langs = " / ".join(f"/{LANGS[l]['dir']}" if LANGS[l]["dir"] else "/" for l in LANGS)
     print(f"  语言：{langs}（图片共用，不重复生成）")

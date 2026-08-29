@@ -1,4 +1,4 @@
-<a class="skip" href="#works">{{ skip }}</a>
+<a class="skip" href="#photographs">{{ skip }}</a>
 
 <a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
 
@@ -11,6 +11,10 @@
       <p class="masthead__meta">{{ meta }}</p>
     </div>
 
+    <nav class="catnav" aria-label="{{ home_eyebrow }}">
+{{ catnav }}
+    </nav>
+
     <div class="statement">
       {{ intro }}
     </div>
@@ -18,9 +22,31 @@
     <p class="masthead__scroll" aria-hidden="true">{{ scroll }}</p>
   </header>
 
-  <ul class="works" id="works">
-{{ works }}
-  </ul>
+  <!--
+    三大类别。照片在前 —— 招生官点开链接第一眼看到的必须是作品本身。
+    「停止滑动」原来 order = 0 排在最前面当头题，分区之后由顶部那条
+    导航接手同一件事。见 影评栏目设计.md 第三节。
+  -->
+  <section class="cat" id="photographs">
+    <h2 class="cat__title">{{ cat_photos }}</h2>
+    <ul class="works">
+{{ photo_works }}
+    </ul>
+  </section>
+
+  <section class="cat" id="films">
+    <h2 class="cat__title">{{ cat_films }}</h2>
+    <ul class="works">
+{{ film_works }}
+    </ul>
+  </section>
+
+  <section class="cat" id="film-notes">
+    <h2 class="cat__title"><a href="{{ notes_href }}">{{ cat_notes }}</a></h2>
+    <ul class="posterwall">
+{{ posterwall }}
+    </ul>
+  </section>
 
   <footer class="colophon">
     <p class="colophon__gear">{{ footer }}</p>

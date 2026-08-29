@@ -1,0 +1,39 @@
+<a class="skip" href="#notes">{{ skip }}</a>
+
+<a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
+
+<main class="page">
+
+  <header class="masthead">
+    <div class="masthead__card">
+      <p class="masthead__eyebrow">{{ eyebrow }}</p>
+      <h1 class="masthead__title">{{ title }}</h1>
+      <p class="masthead__meta">{{ meta }}</p>
+    </div>
+
+    <nav class="catnav" aria-label="{{ eyebrow }}">
+{{ catnav }}
+    </nav>
+
+    <div class="statement">
+      {{ statement }}
+    </div>
+
+    <p class="masthead__scroll" aria-hidden="true">{{ scroll }}</p>
+  </header>
+
+  <!--
+    顺序 = 观影顺序，不是片名或年份。前二十条基本是一句话，中间开始拆焦段、
+    机位、布光、调度，最后三条是课堂笔记 —— 那条成长线全靠这个顺序才看得出来。
+    见 影评栏目设计.md 第四节。
+  -->
+  <ol class="notes" id="notes">
+{{ entries }}
+  </ol>
+
+  <footer class="colophon">
+    <p class="colophon__gear">{{ credit }}</p>
+    <p class="colophon__name">{{ name }}</p>
+  </footer>
+
+</main>

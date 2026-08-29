@@ -9,9 +9,14 @@
 
   var root = document.documentElement;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // 系列页里是 .plate（照片），目录页里是 .work（作品条目），两边共用同一套进场逻辑
+  // 系列页里是 .plate（照片），目录页里是 .work（作品条目），
+  // 影评页里是 .note（一条影评）—— 三处共用同一套进场逻辑。
+  //
+  // ⚠️ CSS 里凡是写了 .js-reveal X { opacity: 0 } 的 X，**必须**出现在这个
+  //    选择器里，否则它永远等不到 .is-in，开着 JS 的人看到的就是一片空白。
+  //    加新的区块时先改这一行。
   var plates = Array.prototype.slice.call(
-    document.querySelectorAll('.plate, .work')
+    document.querySelectorAll('.plate, .work, .note')
   );
 
   /* ── 图片加载完再淡入 ──────────────────────────────────────── */
