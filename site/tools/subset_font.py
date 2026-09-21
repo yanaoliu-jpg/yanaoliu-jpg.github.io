@@ -6,13 +6,13 @@
 
 什么时候要跑：**改完中文文案、跑完 build.py 之后**。
 
-为什么需要：完整的思源宋体有 20 MB，全量塞进网页是不可接受的。
+为什么需要：完整的思源黑体有 18 MB，全量塞进网页是不可接受的。
 这个脚本扫描已经生成好的网页，找出实际用到的每一个中日韩字符，
 只把这些字打包成一个 woff2。
 
 所以顺序很重要：先 build.py 生成网页，再跑这个，然后再 build.py 一次
 把新字体复制进 docs/。如果你加了新字却忘了跑，那几个字会掉回系统默认字体
-——Mac 上是苹方，Windows 上是微软雅黑，跟旁边的衬线排版打架，
+——Mac 上是苹方，Windows 上是微软雅黑，跟旁边的 DM Sans 打架，
 而且不会报错。脚本最后会替你检查一遍。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -43,13 +43,16 @@ from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent
 DIST = SITE.parent / "docs"
-OUT = SITE / "static" / "fonts" / "noto-serif-sc-subset.woff2"
+OUT = SITE / "static" / "fonts" / "noto-sans-sc-subset.woff2"
 
 # 完整字体缓存在 素材/ 下面 —— 那个目录在 .gitignore 里，不会进仓库。
 # 下载一次就够，之后每次裁都用本地这一份，不联网。
-FULL = SITE.parent / "素材" / "字体" / "NotoSerifSC[wght].ttf"
+#
+# 2026-09 从思源宋体（NotoSerifSC）换成思源黑体（NotoSansSC），配全站的 DM Sans。
+# 见 首页改版设计.md 第六节。旧的宋体缓存留在 素材/字体/ 里没删，想换回去改这两行就行。
+FULL = SITE.parent / "素材" / "字体" / "NotoSansSC[wght].ttf"
 FULL_URL = ("https://raw.githubusercontent.com/google/fonts/main/"
-            "ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf")
+            "ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf")
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
@@ -57,7 +60,7 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
 # 中日韩汉字、全角标点、中文常用的破折号和引号
 CJK = r"[　-〿一-鿿＀-￯—‘-”…]"
 
-MIN_FULL_BYTES = 5_000_000     # 完整字体约 20 MB；明显小于这个数就是没下全
+MIN_FULL_BYTES = 5_000_000     # 完整字体约 18 MB；明显小于这个数就是没下全
 
 
 def fetch_full_font() -> None:
@@ -72,7 +75,7 @@ def fetch_full_font() -> None:
 
     FULL.parent.mkdir(parents=True, exist_ok=True)
     part = FULL.with_suffix(".ttf.part")
-    print(f"下载完整字体（约 20 MB，只下这一次）……")
+    print(f"下载完整字体（约 18 MB，只下这一次）……")
     r = subprocess.run(
         ["curl", "-fSL", "--retry", "3", "--retry-delay", "3",
          "--max-time", "600", "-A", UA, FULL_URL, "-o", str(part)],

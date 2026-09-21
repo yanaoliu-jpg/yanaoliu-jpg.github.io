@@ -1,13 +1,17 @@
 <!DOCTYPE html>
-<html lang="{{ html_lang }}" class="no-js">
+<!--
+  html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
+  首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+-->
+<html lang="{{ html_lang }}" class="no-js{{ html_class }}">
 <head>
 <meta charset="utf-8">
 <script>document.documentElement.classList.remove('no-js')</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ title }}</title>
 <meta name="description" content="{{ description }}">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0d0e11">
+<meta name="color-scheme" content="{{ color_scheme }}">
+<meta name="theme-color" content="{{ theme_color }}">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ title }}">
@@ -19,7 +23,7 @@
 <link rel="icon" href="{{ root }}/static/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="{{ root }}/static/apple-touch-icon.png">
 
-<link rel="preload" href="{{ root }}/static/fonts/newsreader-latin.woff2" as="font"
+<link rel="preload" href="{{ root }}/static/fonts/dm-sans-latin.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{{ root }}/static/style.css">
 </head>

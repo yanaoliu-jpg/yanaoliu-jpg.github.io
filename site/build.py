@@ -181,9 +181,36 @@ MAX_PX = 1400
 #   INDEX_COVER_H  ↔  .works 的 --cover-h        并排时每张封面的高度
 #   INDEX_STACK_PX ↔  @media (max-width: 900px)  换成竖向堆叠的断点
 #   INDEX_STACK_VH ↔  堆叠时 .work 的 52vh
-INDEX_COVER_H = "clamp(300px, 24vw + 54px, 400px)"
+# 2026-09 从 400 降到 300：他要一页装更多、少滚动。
+#   1440 上正好 300（15 × 14.4 + 84），一行四张；1280 上 276；1024 上 238。
+#   下限 220 落在 907px，刚好在 900 的堆叠断点之上。
+#   同一次改动把影片改成了跟照片并排（原来每部独占一行），那才是少滚动的大头。
+INDEX_COVER_H = "clamp(220px, 15vw + 84px, 300px)"
 INDEX_STACK_PX = 900
 INDEX_STACK_VH = 52
+
+# ── 页面主题 ────────────────────────────────────────────────────
+# 首页是亮的（渐变底），其余 22 页是深的。**一套 CSS**：只有首页的 <html>
+# 多一个 theme-home 类，颜色变量在它下面换值，内页一行不改。
+# 见 首页改版设计.md 第四节。
+#
+# ⚠️ HOME_THEME_COLOR 必须等于 style.css 里渐变最上面那一站，
+#    DARK_THEME_COLOR 必须等于 :root 的 --bg。手机地址栏的颜色靠它。
+HOME_THEME_COLOR = "#f3e4dc"
+DARK_THEME_COLOR = "#0d0e11"
+
+
+def shell(home: bool = False) -> dict:
+    """base.html 里跟主题有关的三个槽。首页传 home=True，其余不传。
+
+    html_class 带前导空格，因为模板里写的是 class="no-js{{ html_class }}"——
+    内页的值是空串，不能留一个尾随空格。
+    """
+    return {
+        "html_class": " theme-home" if home else "",
+        "color_scheme": "light" if home else "dark",
+        "theme_color": HOME_THEME_COLOR if home else DARK_THEME_COLOR,
+    }
 
 # ── 视频 ────────────────────────────────────────────────────────
 # 只出两种，跟图片那套「新格式主力 + 老格式兜底」是同一个道理：
@@ -1072,6 +1099,7 @@ def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
         root=root,
         alternates=alternate_links(s["slug"]),
         body=body,
+        **shell(),
     )
 
     out = DIST / L["dir"] / s["slug"] / "index.html" if L["dir"] else DIST / s["slug"] / "index.html"
@@ -1178,6 +1206,7 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
         root=root,
         alternates=alternate_links(s["slug"]),
         body=body,
+        **shell(),
     )
 
     out = DIST / L["dir"] / s["slug"] / "index.html" if L["dir"] else DIST / s["slug"] / "index.html"
@@ -1303,6 +1332,7 @@ def render_notes(s: dict, lang: str, site: dict) -> None:
         root=root,
         alternates=alternate_links(s["slug"]),
         body=body,
+        **shell(),
     )
     out = DIST / L["dir"] / s["slug"] if L["dir"] else DIST / s["slug"]
     out.mkdir(parents=True, exist_ok=True)
@@ -1517,6 +1547,7 @@ def write_index(series: list[dict], site: dict, lang: str,
         root=root,
         alternates=alternate_links(),
         body=body,
+        **shell(home=True),
     )
     out = DIST / L["dir"] / "index.html" if L["dir"] else DIST / "index.html"
     out.parent.mkdir(parents=True, exist_ok=True)

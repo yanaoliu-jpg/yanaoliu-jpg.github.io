@@ -13,6 +13,7 @@
 - 线上：<https://yanaoliu-jpg.github.io/>
 - 仓库：`yanaoliu-jpg/yanaoliu-jpg.github.io`（Public，GitHub Pages 从 `main` 分支 `/docs` 发布）
 - 目前 **7 组照片 63 张 + 3 部影片 + 62 篇影评，中英双语，共 24 个页面**
+- **首页亮底（渐变）、内页深色**，全站 DM Sans + Noto Sans SC —— 2026-09 改的，见 [首页改版设计.md](首页改版设计.md)
 
 ## 三大类别
 
@@ -97,10 +98,15 @@ website/                     ← git 仓库根
 │  ├─ content/*.toml         ← 所有文字都在这里，一个作品一个文件
 │  │  └─ _site.toml          ← 下划线开头 = 站点级配置，不是作品
 │  ├─ templates/             ← base / index / series 三个模板
-│  ├─ static/                ← CSS、JS、字体、favicon
+│  ├─ static/                ← CSS、JS、favicon
+│  │  └─ fonts/              ← dm-sans-latin.woff2（61 KB）、noto-sans-sc-subset.woff2（409 KB）
 │  └─ tools/
-│     ├─ subset_font.py      ← 重新裁中文字体（要联网）
-│     └─ check_font.py       ← 检查字体缺不缺字（不联网）
+│     ├─ subset_font.py      ← 重新裁中文字体（第一次要联网下完整字体，之后本地裁）
+│     ├─ check_font.py       ← 检查字体缺不缺字（不联网）
+│     ├─ fetch_latin_font.py ← 换拉丁字体时从 Google Fonts 取子集（只在换字体时跑）
+│     ├─ fetch_posters.py    ← 影评海报（要 TMDB key）
+│     ├─ check_notes.py      ← 校验 film-notes.toml
+│     └─ verify.js           ← 整站验证（playwright-core 装在仓库外，见第八节）
 ├─ docs/                     ← 构建产物，GitHub Pages 发布这个目录
 └─ 素材/                     ← 原图 11 GB，**不进仓库**
    ├─ 第一年/                 ← 照片，一组一个文件夹
@@ -133,8 +139,14 @@ site/build.py           MAX_VH = 72            ← 写进 <img sizes>，决定�
 首页的封面
 site/static/style.css   .works 的 --cover-h    ← 决定实际显示大小
 site/build.py           INDEX_COVER_H          ← 写进 <img sizes>
+                        （2026-09 起两处都是 clamp(220px, 15vw + 84px, 300px)）
                         INDEX_STACK_PX = 900   ↔  CSS 的 @media (max-width: 900px)
                         INDEX_STACK_VH = 52    ↔  堆叠时 .work 的 52vh
+
+首页的主题色
+site/static/style.css   .theme-home body 渐变的第一站 #f3e4dc
+site/build.py           HOME_THEME_COLOR       ← 写进 <meta theme-color>，手机地址栏的颜色
+                        DARK_THEME_COLOR       ↔  :root 的 --bg
 ```
 
 对不上**不会变形**（CSS 说了算），但会**下错档**：要么糊，要么白下载大图。改一个必须改另一个。
@@ -162,7 +174,32 @@ CSS 里所有 `opacity: 0` 都挂在 `.js-reveal` 下面，而这个类由 `gall
 
 ## 四、几个决定背后的原因
 
-**深色底 `#0d0e11`** —— 这批照片 91% 的像素亮度在 32 以下（满值 255）。白底会让眼睛适应白色，照片退化成黑方块。不用纯黑是因为纯黑会让画面最暗处和页面融成一片，照片失去边界。
+**首页亮底、内页深色（2026-09 起）** —— 原来整站深色，理由是「这批照片 91% 的像素亮度在 32 以下」。
+**那是只有第一组时量的。** 2026-09 把十张封面重新量了一遍：
+
+| | 平均亮度 | 亮度 < 32 的像素 |
+|---|---|---|
+| Good Night（第一组） | 27 | **72%** |
+| 其余九张 | 41–137 | 4%–50% |
+| **十张平均** | **77** | **28%** |
+
+十张里只有第一组还是真的黑。灰调封面放在 `#0d0e11` 上不是暗对暗的高级，是**灰对黑的浑**——
+他说首页「太平了」，说的就是这个。所以**首页换成亮的渐变底**（`.theme-home`，只有 `/` 和 `/zh/`
+的 `<html>` 有这个类，同一批颜色变量在它下面换值，见 [首页改版设计.md](首页改版设计.md)）。
+
+**内页仍然深色**，理由没变：点进 Good Night 看全尺寸时 72% 是暗部，白底会让眼睛适应白色、
+暗部细节直接看没。那是招生官看作品本身的地方，不拿来冒险。画廊就是这么做的：白墙挂画，放映厅关灯。
+内页不用纯黑是因为纯黑会让画面最暗处和页面融成一片，照片失去边界。
+
+首页那套灰阶是**对渐变最深的一站 `#dde3ee` 算的**（深色字在浅底上，底越深对比度越低，
+所以卡脖子的是最深的那站，不是最浅的——这个方向我第一版写反了）。
+`--ink-faint: #64625c` 是 4.73:1，底线。**琥珀色 `#d9a05b` 在首页只能当线不能当字**（1.9:1）。
+
+**字体 DM Sans + Noto Sans SC（2026-09 起，全站）** —— 原来是 Newsreader + Noto Serif SC。
+换成无衬线是为了配首页的渐变底和圆角封面；**全站换而不只换首页**，因为字体是身份不是背景，
+首页无衬线、点进去衬线比换底色刺眼得多；而且只换首页的话中文站要同时背两套中文子集。
+CSS 变量从 `--serif` 改名 `--face`——一个叫「衬线」的变量装着无衬线字体，三年后维护的人会被它骗。
+拉丁子集 61 KB（`tools/fetch_latin_font.py` 从 Google Fonts 取），中文子集 409 KB（比宋体那版还小）。
 
 **横竖片按高度对齐，不按宽度** —— 按宽度铺满的话竖构图会大得离谱、横构图显得小气。限制高度、宽度自然生长，视觉重量才相等。画廊挂不同画幅的照片就是这么对齐的。首页封面同理。
 
@@ -208,8 +245,8 @@ AV1/WebM 只有 6.6 MB，放在前面当主力。这跟图片的 AVIF→WebP→J
 差 14%——那是同一张照片放大到 1400px 宽时的密度差，肉眼基本看不出。
 真要加回来：把 `3200` 写回 `build.py` 的 `WIDTHS`，跑一次增量构建就会补出来。
 
-`JPEG_MAX_WIDTH = 2400` 现在等于"所有档都出 JPEG"，那一行留着是为了以后
-真把 3200 加回来时还能自动生效。
+`JPEG_MAX_WIDTH` 在 2026-08-29 又降到了 1600（JPEG 只服务既不支持 AVIF 也不支持 WebP 的
+老浏览器，那些机器屏幕本来也不大），省了 45 MB。详见 容量规划.md 第四节。
 
 **三档灰阶都过 WCAG AA** —— 最初调得更暗"更高级"，实测序号和参数那行只有 **1.95:1**（标准要求 4.5:1）。招生官在明亮办公室用笔记本看就是一片糊，而且美国大学对无障碍是认真的。
 `--ink-faint: #7a7d85` 是 4.7:1，**底线，别再往下调**。
@@ -507,6 +544,19 @@ git checkout -- site/static/fonts/
 `fetch_posters.py` 和 `subset_font.py` 现在都是失败先退出、不动已有文件。
 报错了先跑 `check_font.py`，够用就照常推送。
 
+### 换拉丁字体
+
+跑 `python3 site/tools/fetch_latin_font.py`。它请求 Google Fonts 的 css2 接口（带 Chrome 的 UA），
+在返回的 CSS 里找 `/* latin */` 那一块的 woff2 地址下回来——那一块覆盖 U+0000-00FF 和
+U+2000-206F，所以 Malèna 的 è、弯引号、破折号都在。换字体只改脚本里的 `FAMILY` 和 `OUT`，
+然后去 `style.css` 改 `@font-face` 和 `--face`。先下到 `.new` 再改名，下坏了不会冲掉好的。
+
+### ⚠️ 浏览器面板的截图会骗人
+
+2026-09 被骗过三次：仿真视口设成 1440×900 之后，面板比它小，截图只合成左上角一块，
+其余是空白；标签不在前台时也截不到帧。**DOM 量值（`getBoundingClientRect`、
+`getComputedStyle`）才作数**；要给人看的截图用 `verify.js` 的第三个参数让 playwright 存整页 png。
+
 ### ⚠️ `site/content/` 里不以下划线开头的 `.toml` 都会被当成作品
 
 `_posters.toml`（海报对照表，`fetch_posters.py` 生成的）**必须**带下划线。
@@ -517,11 +567,17 @@ git checkout -- site/static/fonts/
 
 ## 八、验证的做法
 
-用 `playwright-core` 驱动本机 Chrome（不下载额外浏览器）。装在临时目录，不进仓库：
+脚本在 **`site/tools/verify.js`**（2026-09 起进仓库——它在 scratchpad 里丢过三次）。
+`playwright-core` 驱动本机 Chrome，不下载额外浏览器；**它不进仓库**（仓库里没有 npm），
+装在任何临时目录，用 `NODE_PATH` 指过去：
 
 ```bash
-npm install playwright-core
+mkdir -p /tmp/pw && cd /tmp/pw && npm install playwright-core
+cd ~/Desktop/website && NODE_PATH=/tmp/pw/node_modules node site/tools/verify.js http://localhost:8412
 ```
+
+第三个参数给一个 png 路径的话，末尾会存一张首页整页截图——比浏览器面板的截图可靠得多
+（面板在仿真视口大于面板、或标签不在前台时会截出空白，2026-09 被它骗过三次）。
 
 `executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'`
 
@@ -549,7 +605,13 @@ async function go(pg,u){for(let i=0;i<5;i++){try{return await pg.goto(u,{waitUnt
   读者读着中文突然掉进英文站。系列页都住在自己语言那一层，同级目录只上一层，是 `../slug/`。
   查法：`new URL(href, location.href).pathname`，看落点在不在同一语言下。
 
-**该查的项**：所有页面 200 且占位符为零、各组照片封面等高（只在 >900px 查；**影片那张不参与等高**，它独占一行）、标题和说明起点齐、底边齐、语言切换落在对方语言的同一页（不是跳首页）、**「下一组」首尾相接且不跨语言、自动生成的编号对得上**、中文零缺字形、各设备分辨率档位合适（首页封面和系列页照片都要查）、横向溢出为 0、关掉 JS 渲染结果一致。
+**该查的项**：所有页面 200 且占位符为零、各组照片封面等高（只在 >900px 查；2026-09 起**影片跟照片并排、同高**，也参与等高）、标题和说明起点齐、底边齐、语言切换落在对方语言的同一页（不是跳首页）、**「下一组」首尾相接且不跨语言、自动生成的编号对得上**、中文零缺字形、各设备分辨率档位合适（首页封面和系列页照片都要查）、横向溢出为 0、关掉 JS 渲染结果一致。
+
+**2026-09 首页改版后新增的**：`theme-home` 类只在 `/` 和 `/zh/`；`theme-color` 首页 `#f3e4dc`、内页 `#0d0e11`；
+首页五档灰对渐变**最深**站 `#dde3ee` ≥ 4.5:1（脚本算）；首页没有元素用琥珀色当文字；
+1440 上封面 300px、影片宽 ≈ 533；**整页 ≤ 6.1 屏**（回归防线，实测 6.05）；
+DM Sans 在 24 页都真加载了（看 `document.fonts` 里的 status，**别用 `fonts.check`**——
+没有匹配的 @font-face 它也返回 true）；没有页面还声明旧字体。
 
 影片页另外要查：`controls` 开着、`autoplay`/`loop` 关着、`preload="metadata"`、
 有封面帧、两条 source 的顺序是 webm→mp4 且都能 HEAD 到 200、播放器占高跟照片一样是 72%、
@@ -558,8 +620,9 @@ async function go(pg,u){for(let i=0;i<5;i++){try{return await pg.goto(u,{waitUnt
 **改了影片的 `height` / `av1_crf` / `h264_crf` 不会自动重转**——`is_fresh` 只比对源文件的
 时间戳。必须先 `rm docs/video/<slug>/<slug>.mp4` 再构建，否则改了等于没改。
 
-上一次跑下来是 **585 项全过**（7 组照片 + 3 部影片：6 个屏幕尺寸 × 中英双版 + 22 个页面
-+ 22 条语言切换路径 + 20 条「下一组／下一部」链路 + 影片播放器若干）。
+上一次跑下来是 **434 项全过**（2026-09-21，首页改版后：24 个页面 × 9 项基本检查 + 24 条语言切换
++ 20 条「下一组」+ 编号 + 对比度 + 5 个宽度 × 中英的封面几何 + 影评页 + 6 个宽度 × 中英的海报墙
++ 中文字形 + 关 JS + 影片播放器）。
 其中每个页面还多查一项：**不能再引用 3200px 的图片档**（那一档已删）。
 注意用元素的 `srcset/src` 去查，别 grep 正文——照片参数里的「ISO 3200」不是档位，
 我在这里差点误判过一次。
@@ -570,8 +633,8 @@ async function go(pg,u){for(let i=0;i<5;i++){try{return await pg.goto(u,{waitUnt
 `verify.js` 里是 `SLUGS.slice(0, j+1).filter(s => !FILMS.has(s)).length`。
 其余会自己跟着长。
 
-**scratchpad 会被清空。** 这一路 `verify.js` 和 `node_modules` 丢过一次，
-重装 `playwright-core` 加重写脚本大约十分钟。别把它当成长期存放处。
+**scratchpad 会被清空。** `verify.js` 在那里丢过三次，所以 2026-09 起它住进了
+`site/tools/`。`node_modules` 丢了就重装（`npm install playwright-core`，几秒钟）。
 
 **换行是按宽高比排出来的，行不一定填满。** 六组时是 3+2+1（第二行到 68%、第三行只到 45%），
 七组进来变成 **3+2+2**，整齐多了。那是定高换行的必然结果，不是 bug。

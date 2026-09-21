@@ -1,28 +1,39 @@
 /* ════════════════════════════════════════════════════════════════
-   Good Night — 深色摄影作品集
+   刘延奥的摄影作品集 —— 首页亮底、内页深色
 
-   为什么整站是深色：这组照片 91% 的像素亮度在 32 以下（满值 255）。
-   放在白底上，读者的眼睛会适应白色，照片就退化成一块块黑方块。
+   内页为什么是深色：第一组「晚安」72% 的像素亮度在 32 以下（满值 255）。
+   放在白底上，读者的眼睛会适应白色，暗部细节直接看没。
    背景用 #0d0e11 而不是纯黑——纯黑会让画面最暗处和页面融成一片，
-   照片就失去了边界。
+   照片就失去了边界。这是招生官看作品本身的地方，不拿来冒险。
+
+   首页为什么是亮的（2026-09 起）：十张封面里只有第一组还是真的黑，
+   其余九张平均亮度 77、暗部只占 28%。灰调封面放在深底上不是暗对暗的高级，
+   是灰对黑的浑。画廊就是这么做的：白墙挂画，放映厅关灯。
+   见 首页改版设计.md 第二节的那张表。
    ════════════════════════════════════════════════════════════════ */
 
+/*
+  DM Sans：人文无衬线，变量字体（字重轴 + 光学尺寸轴 9–40）。
+  2026-09 从 Newsreader 换过来的，为了配首页的渐变底和圆角封面（见 首页改版设计.md）。
+  文件由 tools/fetch_latin_font.py 从 Google Fonts 取的拉丁子集，61 KB，自托管。
+  光学尺寸轴让大标题和 10px 的小说明各用各的形——font-optical-sizing 默认就是 auto。
+*/
 @font-face {
-  font-family: 'Newsreader';
-  src: url('fonts/newsreader-latin.woff2') format('woff2-variations');
+  font-family: 'DM Sans';
+  src: url('fonts/dm-sans-latin.woff2') format('woff2-variations');
   font-weight: 300 600;
   font-style: normal;
   font-display: swap;
 }
 
 /*
-  中文衬线体，按页面实际用到的字裁过（完整思源宋体有 15MB，裁完只剩几十 KB）。
-  unicode-range 限定它只对中日韩字符生效，拉丁字母仍然走 Newsreader——
+  中文黑体，按页面实际用到的字裁过（完整思源黑体有 18MB，裁完约 400KB）。
+  unicode-range 限定它只对中日韩字符生效，拉丁字母仍然走 DM Sans——
   两种字体各管各的，混排时不会互相抢。
 */
 @font-face {
-  font-family: 'Noto Serif SC';
-  src: url('fonts/noto-serif-sc-subset.woff2') format('woff2');
+  font-family: 'Noto Sans SC';
+  src: url('fonts/noto-sans-sc-subset.woff2') format('woff2');
   font-weight: 300 600;
   font-style: normal;
   font-display: swap;
@@ -42,12 +53,18 @@
   --ink-dim: #b4b6bd;    /* 9.5:1 */
   --ink-mute: #9a9ca4;   /* 7.1:1 */
   --ink-faint: #7a7d85;  /* 4.7:1 —— 底线，别再往下调 */
+  --ink-text: #d3cfc7;   /* 自述正文：比 --ink 收一点，长段落不刺眼 */
   --amber: #d9a05b;      /* 亮着的窗户的颜色，极少量使用 */
+  /* 细线：页脚的分隔、导航的下划线、语言按钮的边。两个主题各一套。 */
+  --rule: #23262d;
+  --rule-strong: #3a3e47;
 
-  /* Newsreader 在前、中文衬线在后：拉丁字母走 Newsreader，
-     它没有的中文字符自动落到思源宋体。系统字体只是最后的保险。 */
-  --serif: 'Newsreader', 'Noto Serif SC', 'Iowan Old Style', 'Palatino Linotype',
-           Georgia, 'Songti SC', 'Source Han Serif SC', serif;
+  /* DM Sans 在前、中文黑体在后：拉丁字母走 DM Sans，
+     它没有的中文字符自动落到思源黑体。系统字体只是最后的保险。
+     ⚠️ 这个变量以前叫 --serif。2026-09 换成无衬线之后改名——
+        一个叫「衬线」的变量装着无衬线字体，三年后维护的人会被它骗。 */
+  --face: 'DM Sans', 'Noto Sans SC', -apple-system, 'Helvetica Neue',
+          'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
           'PingFang SC', 'Hiragino Sans GB', monospace;
 
@@ -61,6 +78,38 @@
   --gutter: clamp(1.5rem, 6vw, 6rem);
 }
 
+/* ── 首页：亮底 ───────────────────────────────────────────────
+   只有 / 和 /zh/ 的 <html> 有这个类（build.py 的 shell(home=True)）。
+   同一批变量换值，内页什么都不用改。见 首页改版设计.md。
+
+   三档灰是对渐变**最深**那一站 #dde3ee（亮度 0.765）算的，全部 ≥ 4.5:1：
+   深色字在浅底上，底越深对比度越低，所以卡脖子的是最深的一站，不是最浅的。
+   （规格里原来写的是"对最浅站算"，方向反了；五站都算过，以这里为准。）
+     ink #1a1917 13.6 · ink-text #2c2a26 11.1 · dim #3e3c38 8.5 · mute #55534e 5.9 · faint #64625c 4.73
+   琥珀色 #d9a05b 在这里只有 1.9:1，**只能当线，不能当字**。 */
+.theme-home {
+  --bg: #f3e4dc;
+  --bg-lift: rgba(255, 255, 255, 0.55);
+  --ink: #1a1917;
+  --ink-text: #2c2a26;
+  --ink-dim: #3e3c38;
+  --ink-mute: #55534e;
+  --ink-faint: #64625c;      /* 底线，别再往浅调 */
+  --rule: rgba(26, 25, 23, 0.14);
+  --rule-strong: rgba(26, 25, 23, 0.32);
+}
+
+/* 渐变铺在整个文档上（body 有多高就多高），不固定在视口——
+   页面越长过渡越缓，各区自然落在不同的色调里。
+   五个色站从封面的色板里来：玫瑰是「晚安」窗光、青是「海与光」、
+   黄绿是「留给日后」、蓝是「感恩」。
+   ⚠️ 第一站 #f3e4dc 必须等于 build.py 的 HOME_THEME_COLOR。 */
+.theme-home body {
+  background: #f3e4dc
+    linear-gradient(160deg, #f3e4dc 0%, #e7ece4 28%, #d7e9e6 55%, #dde3ee 80%, #efe6dc 100%);
+}
+.theme-home { scrollbar-color: #b9b5ad #f3e4dc; }   /* 深色滚动条压在浅底上太重 */
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
@@ -73,7 +122,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--serif);
+  font-family: var(--face);
   font-weight: 350;
   font-synthesis-weight: none;
   -webkit-font-smoothing: antialiased;
@@ -159,7 +208,7 @@ img { display: block; max-width: 100%; height: auto; }
   right: var(--gutter);
   z-index: 3;
   padding: 0.35em 0.85em;
-  border: 1px solid #23262d;
+  border: 1px solid var(--rule);
   border-radius: 2em;
   font-family: var(--mono);
   font-size: 0.7rem;
@@ -168,7 +217,7 @@ img { display: block; max-width: 100%; height: auto; }
   text-decoration: none;
   transition: color 0.2s, border-color 0.2s;
 }
-.langswitch:hover { color: var(--ink); border-color: #3a3e47; }
+.langswitch:hover { color: var(--ink); border-color: var(--rule-strong); }
 
 /* 中文正文比拉丁文视觉上更"重"，字号和行距要单独调，
    否则同样的 1.1rem 中文会显得又挤又黑 */
@@ -224,7 +273,9 @@ img { display: block; max-width: 100%; height: auto; }
   margin: 0;
   font-size: clamp(3.4rem, 13vw, 9rem);
   font-weight: 300;
-  font-variation-settings: 'opsz' 72;
+  /* DM Sans 的光学尺寸轴到 40 为止（Newsreader 到 72）。标题远大于 40px，
+     钉在轴的顶端就是它最"展示"的那一档；不写的话 auto 也会落到这里。 */
+  font-variation-settings: 'opsz' 40;
   line-height: 0.92;
   letter-spacing: -0.025em;
   text-wrap: balance;
@@ -249,7 +300,7 @@ img { display: block; max-width: 100%; height: auto; }
   margin: clamp(6rem, 16vh, 12rem) 0 0;
   font-size: clamp(1.06rem, 0.95rem + 0.4vw, 1.24rem);
   line-height: 1.78;
-  color: #d3cfc7;
+  color: var(--ink-text);
 }
 
 .statement p { margin: 0 0 1.5em; }
@@ -419,8 +470,14 @@ img { display: block; max-width: 100%; height: auto; }
       · 上限 400px —— 超宽屏上容器被 max-width 卡在 1500px、留白还在长，
                       再大就塞不下第三张了
     结果是 1024px 以上每一档屏幕都是一行三张，封面尽可能大。
+
+    ── 2026-09 降到 300px ──
+    他要一页装更多、少滚动（原话）。1440 上正好 300，一行四张；1280 上 276；
+    1024 上 238；下限 220 落在 907px，刚好在 900 的堆叠断点之上。
+    上面那段 317/360/403 的比较是深底、三张一行的时代量的，留着当历史。
+    ⚠️ 这串必须跟 build.py 的 INDEX_COVER_H 一字不差，否则 sizes 挑错档。
   */
-  --cover-h: clamp(300px, calc(24vw + 54px), 400px);
+  --cover-h: clamp(220px, calc(15vw + 84px), 300px);
 
   max-width: 1500px;
   margin: clamp(4rem, 10vh, 7rem) auto 0;
@@ -431,8 +488,10 @@ img { display: block; max-width: 100%; height: auto; }
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  /* 行距要明显大于列距，否则两行会糊成一片认不出行 */
-  gap: clamp(3.5rem, 8vh, 6rem) clamp(1.25rem, 2.4vw, 2.75rem);
+  /* 行距要明显大于列距，否则两行会糊成一片认不出行。
+     2026-09 封面从 400 缩到 300 时行距同比例收了 25%（8vh → 6vh）——
+     封面小了间距不跟着小，比例就散了。列距没动，那是横向节奏。 */
+  gap: clamp(2.6rem, 6vh, 4.5rem) clamp(1.25rem, 2.4vw, 2.75rem);
 }
 
 .work {
@@ -444,22 +503,11 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 /*
-  影片独占一行：它是**头题**，不是第八组照片。
-
-  做法是 flex-basis: 100% 强行占满一行，后面的照片自然换到下一行；
-  真正的可见宽度由 .work__link 的 max-width 收回来（跟其他封面同一条公式）。
-  不用 max-width 直接卡在 <li> 上，是因为 flex 的换行判断会先被 max-width
-  夹住，那样就断不了行了。
-  下面再多留一截空白，让它读起来是「头题 + 正文」而不是「第一张照片」。
+  2026-09 起影片跟照片并排，按宽高比占位（16:9 在 300 高就是 533 宽）。
+  原来每部独占一行当头题——三部就是 2.3 屏，比七组照片占的还多，
+  是「滚动太多」的大头。头题的活由顶部的分类导航接手了（见 CLAUDE.md 第一节）。
+  .work--film 现在只剩下面那个 ▶ 角标。
 */
-.work--film {
-  flex: 0 0 100%;
-  max-width: none;
-  margin-bottom: clamp(2rem, 5vh, 4rem);
-}
-/* 排在照片后面的影片：空白要加在**上面**，不然它会贴着最后一排照片 */
-.work--film:not(:first-child) { margin-top: clamp(2rem, 5vh, 4rem); }
-.work--film .work__link { max-width: calc(var(--ar) * var(--cover-h)); }
 
 /* 封面正中一个 ▶：不用读文字也知道这是一段影片，不是照片 */
 .work--film .work__frame::after {
@@ -471,15 +519,17 @@ img { display: block; max-width: 100%; height: auto; }
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: rgba(13, 14, 17, 0.42)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6.5v11l9-5.5z' fill='%23fff'/%3E%3C/svg%3E")
+  /* 白底深字：原来是给深底设计的半透明黑，亮底上会发灰 */
+  border: 0;
+  background: rgba(255, 255, 255, 0.9)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6.5v11l9-5.5z' fill='%231a1917'/%3E%3C/svg%3E")
     center / 38% no-repeat;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   transition: background-color 0.25s;
 }
 @media (hover: hover) {
   .work--film .work__link:hover .work__frame::after {
-    background-color: rgba(13, 14, 17, 0.68);
+    background-color: #fff;
   }
 }
 
@@ -494,9 +544,6 @@ img { display: block; max-width: 100%; height: auto; }
     width: min(100%, calc(52vh * var(--ar)));
     margin-bottom: clamp(4rem, 11vh, 8rem);
   }
-  /* 堆叠时没有"行"可言，影片那条也跟其他条目一样占满宽度 */
-  .work--film { flex: none; margin-bottom: clamp(4rem, 11vh, 8rem); }
-  .work--film .work__link { max-width: none; }
   .work:last-child { margin-bottom: 0; }
   /* 堆叠时每条独占整行，标题放大回去，也不需要预留行数 */
   .work__title { font-size: clamp(1.8rem, 6vw, 2.6rem); min-height: 0; }
@@ -517,6 +564,11 @@ img { display: block; max-width: 100%; height: auto; }
   background-size: cover;
   background-position: center;
   overflow: hidden;
+  /* 2026-09：圆角 + 两层影（一层散、一层贴边）。他在样稿上选的，
+     知道圆角会切掉照片的四个角。LQIP 底图在同一个元素上，跟着一起裁。 */
+  border-radius: 10px;
+  box-shadow: 0 22px 44px -22px rgba(20, 30, 40, 0.5),
+              0 2px 6px rgba(20, 30, 40, 0.08);
 }
 
 .work__frame img {
@@ -532,7 +584,7 @@ img { display: block; max-width: 100%; height: auto; }
 /* 悬停时封面极缓慢地推近一点点——暗示"可以点"，但不喧宾夺主 */
 @media (hover: hover) {
   .work__link:hover .work__frame img { transform: scale(1.02); }
-  .work__link:hover .work__title { color: #fff; }
+  .work__link:hover .work__title { color: var(--ink); }
 }
 
 .work__meta {
@@ -639,17 +691,18 @@ img { display: block; max-width: 100%; height: auto; }
 
 .catnav__item[aria-current='page'] {
   color: var(--ink-dim);
-  border-bottom-color: #3a3e47;
+  border-bottom-color: var(--rule-strong);
 }
 @media (hover: hover) {
-  a.catnav__item:hover { color: var(--ink); border-bottom-color: #3a3e47; }
+  a.catnav__item:hover { color: var(--ink); border-bottom-color: var(--rule-strong); }
 }
 
 .cat__title {
   max-width: 1500px;
-  margin: clamp(4.5rem, 11vh, 7.5rem) auto 0;
+  /* 2026-09 同比例收 25%（11vh → 8.25vh），跟封面缩小配套 */
+  margin: clamp(3.4rem, 8.25vh, 5.6rem) auto 0;
   padding: 0 clamp(1.5rem, 3.5vw, 6rem);
-  font-family: var(--serif);
+  font-family: var(--face);
   font-size: 0.82rem;
   font-weight: 400;
   letter-spacing: 0.18em;
@@ -708,12 +761,14 @@ img { display: block; max-width: 100%; height: auto; }
 
 .posterwall__item a {
   display: block;
-  border-radius: 2px;
+  border-radius: 4px;
   overflow: hidden;
   background: var(--bg-lift);
-  /* 海报本身是彩色印刷品，直接铺在深色页上会比照片更跳。
-     压一点亮度和饱和度，让它退回到"索引"的位置上去。 */
-  filter: saturate(0.82) brightness(0.86);
+  /* 海报本身是彩色印刷品，直接铺在页上会比照片更跳，压一点饱和度让它退回
+     到"索引"的位置。原来还压了亮度（brightness .86），那是深底上用的，
+     2026-09 首页换亮底之后去掉了——亮底上压亮度只会发浑。 */
+  filter: saturate(0.9);
+  box-shadow: 0 6px 16px -8px rgba(20, 30, 40, 0.35);
   transition: filter 0.35s ease, transform 0.35s ease;
 }
 
@@ -736,7 +791,7 @@ img { display: block; max-width: 100%; height: auto; }
   line-height: 1.35;
   text-align: center;
   color: var(--ink-faint);
-  border: 1px dashed #2a2e36;
+  border: 1px dashed var(--rule);
 }
 
 @media (hover: hover) {
@@ -781,7 +836,7 @@ img { display: block; max-width: 100%; height: auto; }
 
 .note__title {
   margin: 0 0 0.9rem;
-  font-family: var(--serif);
+  font-family: var(--face);
   font-size: clamp(1.15rem, 2.4vw, 1.5rem);
   font-weight: 400;
   line-height: 1.3;
@@ -816,7 +871,7 @@ img { display: block; max-width: 100%; height: auto; }
 
 .note__body p {
   margin: 0 0 1.1em;
-  font-family: var(--serif);
+  font-family: var(--face);
   font-size: 1rem;
   line-height: 1.85;
   color: var(--ink-dim);
@@ -970,9 +1025,11 @@ img { display: block; max-width: 100%; height: auto; }
   gap: 1rem;
   margin: clamp(9rem, 22vh, 16rem) 0 0;
   padding: 2.2rem var(--gutter) clamp(4rem, 10vh, 7rem);
-  border-top: 1px solid #1c1f25;
+  border-top: 1px solid var(--rule);
 }
 .colophon p { margin: 0; }
+/* 首页的封面缩了 25%，页脚上方那段空白同比例收（22vh → 16.5vh）；内页不动 */
+.theme-home .colophon { margin-top: clamp(6.75rem, 16.5vh, 12rem); }
 .colophon__name { color: var(--ink-dim); }
 
 /* ── 全屏查看 ────────────────────────────────────────────────── */

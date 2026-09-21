@@ -17,7 +17,7 @@ from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent
 DIST = SITE.parent / "docs"
-FONT = DIST / "static" / "fonts" / "noto-serif-sc-subset.woff2"
+FONT = DIST / "static" / "fonts" / "noto-sans-sc-subset.woff2"
 CJK = r"[　-〿一-鿿＀-￯—‘-”…]"
 
 
