@@ -24,3 +24,6 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# ── brainstorming 的样稿，只在本机 ──────────────────────────────
+.superpowers/
