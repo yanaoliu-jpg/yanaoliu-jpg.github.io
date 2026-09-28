@@ -2,6 +2,25 @@
 
 <a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
 
+<!--
+  环境光（motion.js）：三团很大的柔光固定在最底层，颜色是 --a1..3。
+  第一屏跟着镜头里那一组照片走；鼠标停在哪件作品上就换成它的 --w；离开后回到所在区的默认色。
+  --w 的亮度都 ≥ 0.745（build.py 钳住的），深色小字压在上面仍然 ≥ 4.5:1。
+  关掉 JS 时 display: none，页面跟改版前一样。
+-->
+<div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<!--
+  3D 镜头的挂载点（lens.js）。纯装饰：对读屏软件隐藏，关掉 JS 时整个不显示——
+  CSS 里 .lens 默认 display: none，只有 lens.js 成功建好场景后才加 .lens--on。
+  lens-data 是构建时写进来的：七组照片封面的 900px WebP，和作品取出来的颜色。
+-->
+<div class="lens" id="lens" aria-hidden="true">
+  <canvas class="lens__canvas"></canvas>
+  <span class="lens__f">ƒ/16</span>
+</div>
+<script type="application/json" id="lens-data">{{ lens_data }}</script>
+
 <main class="page">
 
   <header class="masthead">
@@ -27,22 +46,27 @@
     「停止滑动」原来 order = 0 排在最前面当头题，分区之后由顶部那条
     导航接手同一件事。见 影评栏目设计.md 第三节。
   -->
-  <section class="cat" id="photographs">
-    <h2 class="cat__title">{{ cat_photos }}</h2>
+  <!--
+    每个区的 style 是它的默认颜色（build.py 的 section_palette / mosaic_palette）：
+    --d 给区标题的渐变字，--w 给环境光。cat__label 包一层是为了让渐变只铺在字上，
+    不铺满整个 h2 的宽度——不然「Photographs」只分到渐变最左边那一截。
+  -->
+  <section class="cat" id="photographs" style="{{ photos_vars }}">
+    <h2 class="cat__title"><span class="cat__label">{{ cat_photos }}</span></h2>
     <ul class="works">
 {{ photo_works }}
     </ul>
   </section>
 
-  <section class="cat" id="films">
-    <h2 class="cat__title">{{ cat_films }}</h2>
+  <section class="cat" id="films" style="{{ films_vars }}">
+    <h2 class="cat__title"><span class="cat__label">{{ cat_films }}</span></h2>
     <ul class="works">
 {{ film_works }}
     </ul>
   </section>
 
-  <section class="cat" id="film-notes">
-    <h2 class="cat__title"><a href="{{ notes_href }}">{{ cat_notes }}</a></h2>
+  <section class="cat" id="film-notes" style="{{ notes_vars }}">
+    <h2 class="cat__title"><a class="cat__label" href="{{ notes_href }}">{{ cat_notes }}</a></h2>
     <ul class="posterwall">
 {{ posterwall }}
     </ul>

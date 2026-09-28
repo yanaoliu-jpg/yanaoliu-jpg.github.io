@@ -2,11 +2,77 @@
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
   首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="en" class="no-js">
 <head>
 <meta charset="utf-8">
-<script>document.documentElement.classList.remove('no-js')</script>
+<script>
+document.documentElement.classList.remove('no-js');
+/*
+  换页动画（View Transitions，样式在 style.css 末尾）：首页封面 ↔ 内页光晕、首页标题 ↔ 内页大标题
+  要形变过去，两边就得有同一个 view-transition-name。名字**只临时给点的那一张**——
+  首页十张卡全写死的话，没配上对的九张会浮在新页面上面淡出。
+  必须写在 <head> 里：pagereveal 在新页面第一帧之前就触发，type="module" 的脚本赶不上。
+  浏览器不支持就整段跳过，只剩光圈换页；再不支持就是普通跳转。
+
+  配对靠 sessionStorage 里一句暗号（"旧页>新页"）：旧页真起了名才写，新页对上了才起。
+  两边各自判断的话，一边起了名另一边没起，那个落单的就会浮在新页面上面淡出。
+*/
+(function () {
+  if (!('onpagereveal' in window)) return;
+  var home = document.documentElement.classList.contains('theme-home');
+  var KEY = 'vt-pair';
+  function key(url) {                     // "/zh/good-night/" → "good-night"；首页 → ""
+    var p = new URL(url, location.href).pathname.split('/').filter(Boolean);
+    if (p[0] === 'zh') p.shift();
+    return p[0] || '';
+  }
+  function pairs(other) {                 // 这一页上跟「另一页」配对的元素
+    if (home) {
+      var card = document.querySelector('.work[data-slug="' + other + '"]');
+      return card ? [[card.querySelector('.work__frame'), 'cover'],
+                     [card.querySelector('.work__title'), 'title']] : [];
+    }
+    if (other) return [];                 // 内页只跟首页配对；内页之间只走光圈
+    return [].map.call(document.querySelectorAll('[data-vt]'),
+                       function (el) { return [el, el.getAttribute('data-vt')]; });
+  }
+  function name(list) {                   // 只给看得见的起名；返回撤销函数和起了几个
+    var named = list.filter(function (p) {
+      var r = p[0] && p[0].getBoundingClientRect();
+      return r && r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+    });
+    named.forEach(function (p) { p[0].style.viewTransitionName = 'vt-' + p[1]; });
+    return { n: named.length, undo: function () {
+      named.forEach(function (p) { p[0].style.viewTransitionName = ''; });
+    } };
+  }
+  function store(v) {                     // 两页之间对暗号：旧页起了名，新页才起
+    try { if (v) sessionStorage.setItem(KEY, v); else sessionStorage.removeItem(KEY); } catch (e) {}
+  }
+  addEventListener('pageswap', function (e) {
+    store('');
+    var to = e.activation && e.activation.entry;
+    if (!e.viewTransition || !to) return;
+    // 内页回首页只在「后退」时配对：点「全部作品」回去，首页在最顶上，那张卡根本不在屏幕里
+    if (!home && e.activation.navigationType !== 'traverse') return;
+    var got = name(pairs(key(to.url)));
+    if (!got.n) return;
+    store(key(location.href) + '>' + key(to.url));
+    // 从往返缓存（bfcache）回到这一页时名字不能还挂着，不然下次换页会带着它
+    addEventListener('pageshow', got.undo, { once: true });
+  });
+  addEventListener('pagereveal', function (e) {
+    var pair = '';
+    try { pair = sessionStorage.getItem(KEY) || ''; } catch (err) {}
+    store('');
+    var ends = pair.split('>');
+    if (!e.viewTransition || ends.length !== 2 || ends[1] !== key(location.href)) return;
+    e.viewTransition.finished.finally(name(pairs(ends[0])).undo);
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Make a Wish — Yanao (Leo) Liu</title>
 <meta name="description" content="A ten-minute film about asking someone what she wants, July 2026.">
@@ -29,18 +95,21 @@
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../static/style.css">
 </head>
-<body>
+<body style="--c1: #3b719b; --c2: #3b9b6f; --c3: #3f9b3b">
 <a class="skip" href="#film">Skip to the film</a>
 
 <a class="backlink" href="../"><span aria-hidden="true">←</span> All work</a>
 <a class="langswitch" href="../zh/make-a-wish/" title="Read in Chinese">中文</a>
+<div class="progress" aria-hidden="true"></div>
 
 <main class="page">
 
   <header class="masthead">
     <div class="masthead__card">
+      <!-- 光晕：同 series.html，颜色来自这部片子的封面帧 -->
+      <div class="glow" data-vt="cover" aria-hidden="true"></div>
       <p class="masthead__eyebrow">Film <span aria-hidden="true">·</span> 2026</p>
-      <h1 class="masthead__title">Make a Wish</h1>
+      <h1 class="masthead__title" data-vt="title">Make a Wish</h1>
       <p class="masthead__meta"><span>10:11</span> <span>July 2026</span></p>
     </div>
 
@@ -73,7 +142,7 @@
   </section>
 
   <nav class="nextup" aria-label="Next film">
-    <a class="nextup__link" href="../stop-scrolling/">
+    <a class="nextup__link" href="../stop-scrolling/" style="--nw: #eddecf; --n1: #b97d46; --n2: #b7b946; --n3: #9b463b">
       <span class="nextup__label">Next film</span>
       <span class="nextup__title">Stop Scrolling, Stay Alive</span>
       <span class="nextup__meta"><span>Film</span> <span>32 seconds</span> <span>March 2026</span></span>
@@ -88,5 +157,6 @@
 </main>
 
 <script src="../static/gallery.js" defer></script>
+<script type="module" src="../static/motion.js"></script>
 </body>
 </html>

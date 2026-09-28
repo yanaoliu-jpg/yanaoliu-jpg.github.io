@@ -2,11 +2,77 @@
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
   首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="en" class="no-js theme-home">
 <head>
 <meta charset="utf-8">
-<script>document.documentElement.classList.remove('no-js')</script>
+<script>
+document.documentElement.classList.remove('no-js');
+/*
+  换页动画（View Transitions，样式在 style.css 末尾）：首页封面 ↔ 内页光晕、首页标题 ↔ 内页大标题
+  要形变过去，两边就得有同一个 view-transition-name。名字**只临时给点的那一张**——
+  首页十张卡全写死的话，没配上对的九张会浮在新页面上面淡出。
+  必须写在 <head> 里：pagereveal 在新页面第一帧之前就触发，type="module" 的脚本赶不上。
+  浏览器不支持就整段跳过，只剩光圈换页；再不支持就是普通跳转。
+
+  配对靠 sessionStorage 里一句暗号（"旧页>新页"）：旧页真起了名才写，新页对上了才起。
+  两边各自判断的话，一边起了名另一边没起，那个落单的就会浮在新页面上面淡出。
+*/
+(function () {
+  if (!('onpagereveal' in window)) return;
+  var home = document.documentElement.classList.contains('theme-home');
+  var KEY = 'vt-pair';
+  function key(url) {                     // "/zh/good-night/" → "good-night"；首页 → ""
+    var p = new URL(url, location.href).pathname.split('/').filter(Boolean);
+    if (p[0] === 'zh') p.shift();
+    return p[0] || '';
+  }
+  function pairs(other) {                 // 这一页上跟「另一页」配对的元素
+    if (home) {
+      var card = document.querySelector('.work[data-slug="' + other + '"]');
+      return card ? [[card.querySelector('.work__frame'), 'cover'],
+                     [card.querySelector('.work__title'), 'title']] : [];
+    }
+    if (other) return [];                 // 内页只跟首页配对；内页之间只走光圈
+    return [].map.call(document.querySelectorAll('[data-vt]'),
+                       function (el) { return [el, el.getAttribute('data-vt')]; });
+  }
+  function name(list) {                   // 只给看得见的起名；返回撤销函数和起了几个
+    var named = list.filter(function (p) {
+      var r = p[0] && p[0].getBoundingClientRect();
+      return r && r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+    });
+    named.forEach(function (p) { p[0].style.viewTransitionName = 'vt-' + p[1]; });
+    return { n: named.length, undo: function () {
+      named.forEach(function (p) { p[0].style.viewTransitionName = ''; });
+    } };
+  }
+  function store(v) {                     // 两页之间对暗号：旧页起了名，新页才起
+    try { if (v) sessionStorage.setItem(KEY, v); else sessionStorage.removeItem(KEY); } catch (e) {}
+  }
+  addEventListener('pageswap', function (e) {
+    store('');
+    var to = e.activation && e.activation.entry;
+    if (!e.viewTransition || !to) return;
+    // 内页回首页只在「后退」时配对：点「全部作品」回去，首页在最顶上，那张卡根本不在屏幕里
+    if (!home && e.activation.navigationType !== 'traverse') return;
+    var got = name(pairs(key(to.url)));
+    if (!got.n) return;
+    store(key(location.href) + '>' + key(to.url));
+    // 从往返缓存（bfcache）回到这一页时名字不能还挂着，不然下次换页会带着它
+    addEventListener('pageshow', got.undo, { once: true });
+  });
+  addEventListener('pagereveal', function (e) {
+    var pair = '';
+    try { pair = sessionStorage.getItem(KEY) || ''; } catch (err) {}
+    store('');
+    var ends = pair.split('>');
+    if (!e.viewTransition || ends.length !== 2 || ends[1] !== key(location.href)) return;
+    e.viewTransition.finished.finally(name(pairs(ends[0])).undo);
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Yanao (Leo) Liu</title>
 <meta name="description" content="Photographs made in China, 2023–2026.">
@@ -33,6 +99,25 @@
 <a class="skip" href="#photographs">Skip to the work</a>
 
 <a class="langswitch" href="./zh/" title="Read in Chinese">中文</a>
+
+<!--
+  环境光（motion.js）：三团很大的柔光固定在最底层，颜色是 --a1..3。
+  第一屏跟着镜头里那一组照片走；鼠标停在哪件作品上就换成它的 --w；离开后回到所在区的默认色。
+  --w 的亮度都 ≥ 0.745（build.py 钳住的），深色小字压在上面仍然 ≥ 4.5:1。
+  关掉 JS 时 display: none，页面跟改版前一样。
+-->
+<div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<!--
+  3D 镜头的挂载点（lens.js）。纯装饰：对读屏软件隐藏，关掉 JS 时整个不显示——
+  CSS 里 .lens 默认 display: none，只有 lens.js 成功建好场景后才加 .lens--on。
+  lens-data 是构建时写进来的：七组照片封面的 900px WebP，和作品取出来的颜色。
+-->
+<div class="lens" id="lens" aria-hidden="true">
+  <canvas class="lens__canvas"></canvas>
+  <span class="lens__f">ƒ/16</span>
+</div>
+<script type="application/json" id="lens-data">{"covers": ["img/good-night/DSC05547-900.webp", "img/goodbye-renfen/00650c89435290da7420ad155eff930-900.webp", "img/the-old-days/DSC09243-900.webp", "img/night-wind/DSC00692-900.webp", "img/keep-going-back/20250801-DSC08901-900.webp", "img/looking-forward/DSC00195-900.webp", "img/sea-and-light/DSC005751-900.webp"], "slugs": ["good-night", "goodbye-renfen", "the-old-days", "night-wind", "keep-going-back", "looking-forward", "sea-and-light"], "accents": ["#9b3b4c", "#729b3b", "#c49f63", "#3b989b", "#3a819d", "#3b9b7b", "#28ae90"], "colors": ["#9b3b4c", "#9b5b3b", "#729b3b", "#ca7c72", "#c49f63", "#589b3b", "#3b989b", "#3b649b", "#3a819d", "#3b9b88", "#3b9b7b", "#609b3b", "#28ae90", "#2885ae", "#b97d46", "#b7b946", "#254ab1", "#be7c53", "#3b719b", "#3b9b6f"]}</script>
 
 <main class="page">
 
@@ -62,12 +147,19 @@
     「停止滑动」原来 order = 0 排在最前面当头题，分区之后由顶部那条
     导航接手同一件事。见 影评栏目设计.md 第三节。
   -->
-  <section class="cat" id="photographs">
-    <h2 class="cat__title">Photographs</h2>
+  <!--
+    每个区的 style 是它的默认颜色（build.py 的 section_palette / mosaic_palette）：
+    --d 给区标题的渐变字，--w 给环境光。cat__label 包一层是为了让渐变只铺在字上，
+    不铺满整个 h2 的宽度——不然「Photographs」只分到渐变最左边那一截。
+  -->
+  <section class="cat" id="photographs" style="--w1: #f1dbdf; --d1: #c9455d; --w2: #aeecde; --d2: #1e836c; --w3: #d5e6be; --d3: #597f25">
+    <h2 class="cat__title"><span class="cat__label">Photographs</span></h2>
     <ul class="works">
 
-      <li class="work" style="--ar: 1.5000">
-        <a class="work__link" href="./good-night/">
+      <li class="work" data-slug="good-night"
+          style="--ar: 1.5000; --c1: #9b3b4c; --w1: #f1dbdf; --d1: #c9455d; --c2: #9b5b3b; --w2: #efddd4; --d2: #b15d33; --c3: #9b3b70; --w3: #f1dae7; --d3: #c73f8a">
+        <a class="work__link" href="./good-night/"
+           data-cursor="View">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAMEBv/EAB0QAAICAgMBAAAAAAAAAAAAAAERAAIDMQQSUcH/xAAUAQEAAAAAAAAAAAAAAAAAAAAB/8QAFREBAQAAAAAAAAAAAAAAAAAAABH/2gAMAwEAAhEDEQA/AOU42OhNQUXK5cVWSAN6mCuS1UilqVtybktowNLYx2PwRI9z7EQ//9k=)">
             <picture>
@@ -87,8 +179,10 @@
         </a>
       </li>
 
-      <li class="work" style="--ar: 0.8000">
-        <a class="work__link" href="./goodbye-renfen/">
+      <li class="work" data-slug="goodbye-renfen"
+          style="--ar: 0.8000; --c1: #729b3b; --w1: #d5e6be; --d1: #597f25; --c2: #ca7c72; --w2: #f1dbd9; --d2: #c64c3c; --c3: #969b3b; --w3: #e1e3b6; --d3: #747923">
+        <a class="work__link" href="./goodbye-renfen/"
+           data-cursor="View">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUABADASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAgP/xAAjEAACAQQBAwUAAAAAAAAAAAABAgMABAURIRIxQRQyQrHh/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAEC/8QAFREBAQAAAAAAAAAAAAAAAAAAAEH/2gAMAwEAAhEDEQA/AE8IDXCqVLDyNVeRB6llVCo7657UY+5mjySvFGZCB7R54rW7upXyJkmhMbEaKftZDDDooy6AAa6B9VGfVTkmGvhuiikV/9k=)">
             <picture>
@@ -108,8 +202,10 @@
         </a>
       </li>
 
-      <li class="work" style="--ar: 0.6667">
-        <a class="work__link" href="./the-old-days/">
+      <li class="work" data-slug="the-old-days"
+          style="--ar: 0.6667; --c1: #c49f63; --w1: #ebdfca; --d1: #956d2b; --c2: #589b3b; --w2: #cde8c2; --d2: #428326; --c3: #719b3b; --w3: #d5e6be; --d3: #587f25">
+        <a class="work__link" href="./the-old-days/"
+           data-cursor="View">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUAA0DASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAMEAf/EACEQAAEEAgICAwAAAAAAAAAAAAECAwQRAAUSIRMiMUGB/8QAFgEBAQEAAAAAAAAAAAAAAAAAAgED/8QAGBEAAwEBAAAAAAAAAAAAAAAAAAERIQL/2gAMAwEAAhEDEQA/AM1M1UXWeB18N0u01ZNfeQuSZE6Q6sqCkg+pWe6xmp1aXkOOPyUIoAAKySZHkLdrkF8RXR6zKxjXFGMSnW2wEkfoyeTJc8lEih8dYYY0tK3h/9k=)">
             <picture>
@@ -129,8 +225,10 @@
         </a>
       </li>
 
-      <li class="work" style="--ar: 0.6667">
-        <a class="work__link" href="./night-wind/">
+      <li class="work" data-slug="night-wind"
+          style="--ar: 0.6667; --c1: #3b989b; --w1: #c3e7e8; --d1: #268084; --c2: #3b649b; --w2: #d6e1f0; --d2: #3975c4; --c3: #3b9b7c; --w3: #c3e8dc; --d3: #268364">
+        <a class="work__link" href="./night-wind/"
+           data-cursor="View">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUAA0DASIAAhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAAQCAwUG/8QAIRAAAgMAAQMFAAAAAAAAAAAAAQIAAxEFITFBBBITUWH/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAv/EABYRAQEBAAAAAAAAAAAAAAAAAAABIf/aAAwDAQACEQMRAD8A5j4GcA50+xKXrZDhE2q+NU1UGj1Aax6w5BwAfkW5RSLkDhQc6+0ZsJ2E1sZU8HO2+JB7XbNO52hCB//Z)">
             <picture>
@@ -150,8 +248,10 @@
         </a>
       </li>
 
-      <li class="work" style="--ar: 1.5000">
-        <a class="work__link" href="./keep-going-back/">
+      <li class="work" data-slug="keep-going-back"
+          style="--ar: 1.5000; --c1: #3a819d; --w1: #cde4ed; --d1: #2d7d9b; --c2: #3b9b88; --w2: #c2e8e0; --d2: #26826f; --c3: #3a9d94; --w3: #c0e8e4; --d3: #258179">
+        <a class="work__link" href="./keep-going-back/"
+           data-cursor="View">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAwACBf/EACEQAAEDBAIDAQAAAAAAAAAAAAEAAgMEERIxBSIjQWGS/8QAFQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAWEQEBAQAAAAAAAAAAAAAAAAAAEQH/2gAMAwEAAhEDEQA/AOTR8lVzytia6MZaLm3Q8tDKyUOndG9zhfr8Q08YlmEYAFwDfaxk0g9N396TUTaNtTNiPK/9KRk5bAUgv//Z)">
             <picture>
@@ -171,8 +271,10 @@
         </a>
       </li>
 
-      <li class="work" style="--ar: 1.5000">
-        <a class="work__link" href="./looking-forward/">
+      <li class="work" data-slug="looking-forward"
+          style="--ar: 1.5000; --c1: #3b9b7b; --w1: #c3e8dc; --d1: #268364; --c2: #609b3b; --w2: #cfe7c1; --d2: #498226; --c3: #479b3b; --w3: #c9e9c4; --d3: #328527">
+        <a class="work__link" href="./looking-forward/"
+           data-cursor="View">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAMBAgb/xAAfEAACAwABBQEAAAAAAAAAAAABAgADEQQSISJRYaH/xAAWAQEBAQAAAAAAAAAAAAAAAAABAAL/xAAXEQEBAQEAAAAAAAAAAAAAAAAAAREh/9oADAMBAAIRAxEAPwDNcfiG1SV6fmtkH4z1HzH7K11K1YJLe82TemKMZu406YZWdhT0sHIO6IRTDGI0wj1P/9k=)">
             <picture>
@@ -192,8 +294,10 @@
         </a>
       </li>
 
-      <li class="work" style="--ar: 1.5000">
-        <a class="work__link" href="./sea-and-light/">
+      <li class="work" data-slug="sea-and-light"
+          style="--ar: 1.5000; --c1: #28ae90; --w1: #aeecde; --d1: #1e836c; --c2: #2885ae; --w2: #c7e5f2; --d2: #257ca3; --c3: #28ae5e; --w3: #b2edca; --d3: #1e8548">
+        <a class="work__link" href="./sea-and-light/"
+           data-cursor="View">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAQFAQL/xAAiEAABBAAGAwEAAAAAAAAAAAABAAIDEQQFEhQhMVFhYuH/xAAXAQADAQAAAAAAAAAAAAAAAAAAAQID/8QAFREBAQAAAAAAAAAAAAAAAAAAACH/2gAMAwEAAhEDEQA/AIGUQ4N/OLjL/V0np4cr27xHhqfXB1/qiQTiNoBYXV9Uutw3W4lhN/XSbKl3gB5A6tCxxtxPlCFv/9k=)">
             <picture>
@@ -215,12 +319,14 @@
     </ul>
   </section>
 
-  <section class="cat" id="films">
-    <h2 class="cat__title">Films</h2>
+  <section class="cat" id="films" style="--w1: #eddecf; --d1: #a2662f; --w2: #d3e2ee; --d2: #3379b0; --w3: #d8e0f7; --d3: #486ed9">
+    <h2 class="cat__title"><span class="cat__label">Films</span></h2>
     <ul class="works">
 
-      <li class="work work--film" style="--ar: 1.7778">
-        <a class="work__link" href="./stop-scrolling/">
+      <li class="work work--film" data-slug="stop-scrolling"
+          style="--ar: 1.7778; --c1: #b97d46; --w1: #eddecf; --d1: #a2662f; --c2: #b7b946; --w2: #e2e3b5; --d2: #777823; --c3: #9b463b; --w3: #f0dbd9; --d3: #c64c3c">
+        <a class="work__link" href="./stop-scrolling/"
+           data-cursor="Play">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAEEAwX/xAAfEAACAgICAwEAAAAAAAAAAAABAgADBBESMRMUYSH/xAAWAQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwDnYz1cNsNH7FTkDxH2uCsW0p1rYixCQw+ibZdSXVMLEVtdfkrKWxU5mEkLEHswgf/Z)">
             <picture>
@@ -240,8 +346,10 @@
         </a>
       </li>
 
-      <li class="work work--film" style="--ar: 1.7778">
-        <a class="work__link" href="./gratitude/">
+      <li class="work work--film" data-slug="gratitude"
+          style="--ar: 1.7778; --c1: #254ab1; --w1: #d8e0f7; --d1: #486ed9; --c2: #be7c53; --w2: #eeddd2; --d2: #ac6032; --c3: #257db1; --w3: #c9e4f4; --d3: #247bae">
+        <a class="work__link" href="./gratitude/"
+           data-cursor="Play">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAIEBf/EACIQAAEEAgIBBQAAAAAAAAAAAAECAwQRABITIUEFIjFRYf/EABYBAQEBAAAAAAAAAAAAAAAAAAABAv/EABgRAQADAQAAAAAAAAAAAAAAAAEAAhED/9oADAMBAAIRAxEAPwCqHakLc1Bb3NKu+vwYs6Uy1CdDbpbXXWp83juHigDj9tWOsxPWm0CMysJAUokEj5Oa5lbWxi2hs12JLzsZlbbuuyAVUm+/OGTQ0BMRnWxaAeifrDIoMBP/2Q==)">
             <picture>
@@ -261,8 +369,10 @@
         </a>
       </li>
 
-      <li class="work work--film" style="--ar: 1.7778">
-        <a class="work__link" href="./make-a-wish/">
+      <li class="work work--film" data-slug="make-a-wish"
+          style="--ar: 1.7778; --c1: #3b719b; --w1: #d3e2ee; --d1: #3379b0; --c2: #3b9b6f; --w2: #c3e8d8; --d2: #268359; --c3: #3f9b3b; --w3: #c7e9c5; --d3: #2b8527">
+        <a class="work__link" href="./make-a-wish/"
+           data-cursor="Play">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAGQAAAQUAAAAAAAAAAAAAAAAAAAEDBAUG/8QAHxAAAQQCAwEBAAAAAAAAAAAAAQACAxEEEgUhQSJR/8QAFgEBAQEAAAAAAAAAAAAAAAAAAQAC/8QAGBEBAAMBAAAAAAAAAAAAAAAAAAEREhP/2gAMAwEAAhEDEQA/ADgc3Hxo5Q3VrS8ho2okeEpZcrG3Y+YfUhdQ2KzRJbKQ0kWBddWrfGgjlhi3BPX6UYtm0iXO45sha5k1jo6GghPjj8UgXC0mvbQnnK0//9k=)">
             <picture>
@@ -284,11 +394,11 @@
     </ul>
   </section>
 
-  <section class="cat" id="film-notes">
-    <h2 class="cat__title"><a href="./film-notes/">Film Notes</a></h2>
+  <section class="cat" id="film-notes" style="--w1: #eeddd2; --d1: #ac6132; --w2: #c6e6e9; --d2: #277f88; --w3: #d8e0f0; --d3: #4672c9">
+    <h2 class="cat__title"><a class="cat__label" href="./film-notes/">Film Notes</a></h2>
     <ul class="posterwall">
       <li class="posterwall__item">
-        <a href="./film-notes/#the-prestige" title="The Prestige"><picture>
+        <a href="./film-notes/#the-prestige" title="The Prestige" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-prestige-200.avif 200w, img/film-notes/the-prestige-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-prestige-200.webp 200w, img/film-notes/the-prestige-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-prestige-400.jpg"
@@ -298,7 +408,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#dead-poets-society" title="Dead Poets Society"><picture>
+        <a href="./film-notes/#dead-poets-society" title="Dead Poets Society" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/dead-poets-society-200.avif 200w, img/film-notes/dead-poets-society-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/dead-poets-society-200.webp 200w, img/film-notes/dead-poets-society-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/dead-poets-society-400.jpg"
@@ -308,7 +418,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#catch-me-if-you-can" title="Catch Me If You Can"><picture>
+        <a href="./film-notes/#catch-me-if-you-can" title="Catch Me If You Can" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/catch-me-if-you-can-200.avif 200w, img/film-notes/catch-me-if-you-can-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/catch-me-if-you-can-200.webp 200w, img/film-notes/catch-me-if-you-can-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/catch-me-if-you-can-400.jpg"
@@ -318,7 +428,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#love-letter" title="Love Letter"><picture>
+        <a href="./film-notes/#love-letter" title="Love Letter" data-cursor="Read"><picture>
           <source type="image/webp" srcset="img/film-notes/love-letter-200.webp 200w, img/film-notes/love-letter-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/love-letter-400.jpg"
                srcset="img/film-notes/love-letter-200.jpg 200w, img/film-notes/love-letter-400.jpg 400w" sizes="96px"
@@ -327,7 +437,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#to-live" title="To Live"><picture>
+        <a href="./film-notes/#to-live" title="To Live" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/to-live-200.avif 200w, img/film-notes/to-live-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/to-live-200.webp 200w, img/film-notes/to-live-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/to-live-400.jpg"
@@ -337,7 +447,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-grand-budapest-hotel" title="The Grand Budapest Hotel"><picture>
+        <a href="./film-notes/#the-grand-budapest-hotel" title="The Grand Budapest Hotel" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-grand-budapest-hotel-200.avif 200w, img/film-notes/the-grand-budapest-hotel-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-grand-budapest-hotel-200.webp 200w, img/film-notes/the-grand-budapest-hotel-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-grand-budapest-hotel-400.jpg"
@@ -347,7 +457,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#harry-potter-and-the-prisoner-of-azkaban" title="Harry Potter and the Prisoner of Azkaban"><picture>
+        <a href="./film-notes/#harry-potter-and-the-prisoner-of-azkaban" title="Harry Potter and the Prisoner of Azkaban" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/harry-potter-and-the-prisoner-of-azkaban-200.avif 200w, img/film-notes/harry-potter-and-the-prisoner-of-azkaban-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/harry-potter-and-the-prisoner-of-azkaban-200.webp 200w, img/film-notes/harry-potter-and-the-prisoner-of-azkaban-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/harry-potter-and-the-prisoner-of-azkaban-400.jpg"
@@ -357,7 +467,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#la-la-land" title="La La Land"><picture>
+        <a href="./film-notes/#la-la-land" title="La La Land" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/la-la-land-200.avif 200w, img/film-notes/la-la-land-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/la-la-land-200.webp 200w, img/film-notes/la-la-land-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/la-la-land-400.jpg"
@@ -367,7 +477,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-pianist" title="The Pianist"><picture>
+        <a href="./film-notes/#the-pianist" title="The Pianist" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-pianist-200.avif 200w, img/film-notes/the-pianist-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-pianist-200.webp 200w, img/film-notes/the-pianist-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-pianist-400.jpg"
@@ -377,7 +487,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#a-chinese-odyssey-part-one-pandora-s-box" title="A Chinese Odyssey Part One: Pandora&#x27;s Box"><picture>
+        <a href="./film-notes/#a-chinese-odyssey-part-one-pandora-s-box" title="A Chinese Odyssey Part One: Pandora&#x27;s Box" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/a-chinese-odyssey-part-one-pandora-s-box-200.avif 200w, img/film-notes/a-chinese-odyssey-part-one-pandora-s-box-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/a-chinese-odyssey-part-one-pandora-s-box-200.webp 200w, img/film-notes/a-chinese-odyssey-part-one-pandora-s-box-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/a-chinese-odyssey-part-one-pandora-s-box-400.jpg"
@@ -387,7 +497,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#scent-of-a-woman" title="Scent of a Woman"><picture>
+        <a href="./film-notes/#scent-of-a-woman" title="Scent of a Woman" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/scent-of-a-woman-200.avif 200w, img/film-notes/scent-of-a-woman-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/scent-of-a-woman-200.webp 200w, img/film-notes/scent-of-a-woman-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/scent-of-a-woman-400.jpg"
@@ -397,7 +507,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#green-book" title="Green Book"><picture>
+        <a href="./film-notes/#green-book" title="Green Book" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/green-book-200.avif 200w, img/film-notes/green-book-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/green-book-200.webp 200w, img/film-notes/green-book-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/green-book-400.jpg"
@@ -407,7 +517,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#roman-holiday" title="Roman Holiday"><picture>
+        <a href="./film-notes/#roman-holiday" title="Roman Holiday" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/roman-holiday-200.avif 200w, img/film-notes/roman-holiday-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/roman-holiday-200.webp 200w, img/film-notes/roman-holiday-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/roman-holiday-400.jpg"
@@ -417,7 +527,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#havoc-in-heaven" title="Havoc in Heaven"><picture>
+        <a href="./film-notes/#havoc-in-heaven" title="Havoc in Heaven" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/havoc-in-heaven-200.avif 200w, img/film-notes/havoc-in-heaven-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/havoc-in-heaven-200.webp 200w, img/film-notes/havoc-in-heaven-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/havoc-in-heaven-400.jpg"
@@ -427,7 +537,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#cinema-paradiso" title="Cinema Paradiso"><picture>
+        <a href="./film-notes/#cinema-paradiso" title="Cinema Paradiso" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/cinema-paradiso-200.avif 200w, img/film-notes/cinema-paradiso-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/cinema-paradiso-200.webp 200w, img/film-notes/cinema-paradiso-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/cinema-paradiso-400.jpg"
@@ -437,7 +547,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-matrix" title="The Matrix"><picture>
+        <a href="./film-notes/#the-matrix" title="The Matrix" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-matrix-200.avif 200w, img/film-notes/the-matrix-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-matrix-200.webp 200w, img/film-notes/the-matrix-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-matrix-400.jpg"
@@ -447,7 +557,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-lion-king" title="The Lion King"><picture>
+        <a href="./film-notes/#the-lion-king" title="The Lion King" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-lion-king-200.avif 200w, img/film-notes/the-lion-king-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-lion-king-200.webp 200w, img/film-notes/the-lion-king-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-lion-king-400.jpg"
@@ -457,7 +567,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-attorney" title="The Attorney"><picture>
+        <a href="./film-notes/#the-attorney" title="The Attorney" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-attorney-200.avif 200w, img/film-notes/the-attorney-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-attorney-200.webp 200w, img/film-notes/the-attorney-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-attorney-400.jpg"
@@ -467,7 +577,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#eat-drink-man-woman" title="Eat Drink Man Woman"><picture>
+        <a href="./film-notes/#eat-drink-man-woman" title="Eat Drink Man Woman" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/eat-drink-man-woman-200.avif 200w, img/film-notes/eat-drink-man-woman-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/eat-drink-man-woman-200.webp 200w, img/film-notes/eat-drink-man-woman-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/eat-drink-man-woman-400.jpg"
@@ -477,7 +587,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#fight-club" title="Fight Club"><picture>
+        <a href="./film-notes/#fight-club" title="Fight Club" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/fight-club-200.avif 200w, img/film-notes/fight-club-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/fight-club-200.webp 200w, img/film-notes/fight-club-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/fight-club-400.jpg"
@@ -487,7 +597,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-curious-case-of-benjamin-button" title="The Curious Case of Benjamin Button"><picture>
+        <a href="./film-notes/#the-curious-case-of-benjamin-button" title="The Curious Case of Benjamin Button" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-curious-case-of-benjamin-button-200.avif 200w, img/film-notes/the-curious-case-of-benjamin-button-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-curious-case-of-benjamin-button-200.webp 200w, img/film-notes/the-curious-case-of-benjamin-button-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-curious-case-of-benjamin-button-400.jpg"
@@ -497,7 +607,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#a-beautiful-mind" title="A Beautiful Mind"><picture>
+        <a href="./film-notes/#a-beautiful-mind" title="A Beautiful Mind" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/a-beautiful-mind-200.avif 200w, img/film-notes/a-beautiful-mind-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/a-beautiful-mind-200.webp 200w, img/film-notes/a-beautiful-mind-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/a-beautiful-mind-400.jpg"
@@ -507,7 +617,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-boy-in-the-striped-pyjamas" title="The Boy in the Striped Pyjamas"><picture>
+        <a href="./film-notes/#the-boy-in-the-striped-pyjamas" title="The Boy in the Striped Pyjamas" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-boy-in-the-striped-pyjamas-200.avif 200w, img/film-notes/the-boy-in-the-striped-pyjamas-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-boy-in-the-striped-pyjamas-200.webp 200w, img/film-notes/the-boy-in-the-striped-pyjamas-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-boy-in-the-striped-pyjamas-400.jpg"
@@ -517,7 +627,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-lives-of-others" title="The Lives of Others"><picture>
+        <a href="./film-notes/#the-lives-of-others" title="The Lives of Others" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-lives-of-others-200.avif 200w, img/film-notes/the-lives-of-others-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-lives-of-others-200.webp 200w, img/film-notes/the-lives-of-others-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-lives-of-others-400.jpg"
@@ -527,7 +637,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#tenet" title="Tenet"><picture>
+        <a href="./film-notes/#tenet" title="Tenet" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/tenet-200.avif 200w, img/film-notes/tenet-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/tenet-200.webp 200w, img/film-notes/tenet-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/tenet-400.jpg"
@@ -537,7 +647,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#malena" title="Malèna"><picture>
+        <a href="./film-notes/#malena" title="Malèna" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/malena-200.avif 200w, img/film-notes/malena-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/malena-200.webp 200w, img/film-notes/malena-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/malena-400.jpg"
@@ -547,7 +657,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-sound-of-music" title="The Sound of Music"><picture>
+        <a href="./film-notes/#the-sound-of-music" title="The Sound of Music" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-sound-of-music-200.avif 200w, img/film-notes/the-sound-of-music-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-sound-of-music-200.webp 200w, img/film-notes/the-sound-of-music-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-sound-of-music-400.jpg"
@@ -557,7 +667,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-invisible-guest" title="The Invisible Guest"><picture>
+        <a href="./film-notes/#the-invisible-guest" title="The Invisible Guest" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-invisible-guest-200.avif 200w, img/film-notes/the-invisible-guest-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-invisible-guest-200.webp 200w, img/film-notes/the-invisible-guest-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-invisible-guest-400.jpg"
@@ -567,7 +677,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#avatar" title="Avatar"><picture>
+        <a href="./film-notes/#avatar" title="Avatar" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/avatar-200.avif 200w, img/film-notes/avatar-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/avatar-200.webp 200w, img/film-notes/avatar-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/avatar-400.jpg"
@@ -577,7 +687,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#saving-private-ryan" title="Saving Private Ryan"><picture>
+        <a href="./film-notes/#saving-private-ryan" title="Saving Private Ryan" data-cursor="Read"><picture>
           <source type="image/webp" srcset="img/film-notes/saving-private-ryan-200.webp 200w, img/film-notes/saving-private-ryan-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/saving-private-ryan-400.jpg"
                srcset="img/film-notes/saving-private-ryan-200.jpg 200w, img/film-notes/saving-private-ryan-400.jpg 400w" sizes="96px"
@@ -586,7 +696,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#one-flew-over-the-cuckoo-s-nest" title="One Flew Over the Cuckoo&#x27;s Nest"><picture>
+        <a href="./film-notes/#one-flew-over-the-cuckoo-s-nest" title="One Flew Over the Cuckoo&#x27;s Nest" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/one-flew-over-the-cuckoo-s-nest-200.avif 200w, img/film-notes/one-flew-over-the-cuckoo-s-nest-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/one-flew-over-the-cuckoo-s-nest-200.webp 200w, img/film-notes/one-flew-over-the-cuckoo-s-nest-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/one-flew-over-the-cuckoo-s-nest-400.jpg"
@@ -596,7 +706,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#children-of-heaven" title="Children of Heaven"><picture>
+        <a href="./film-notes/#children-of-heaven" title="Children of Heaven" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/children-of-heaven-200.avif 200w, img/film-notes/children-of-heaven-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/children-of-heaven-200.webp 200w, img/film-notes/children-of-heaven-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/children-of-heaven-400.jpg"
@@ -606,7 +716,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-silence-of-the-lambs" title="The Silence of the Lambs"><picture>
+        <a href="./film-notes/#the-silence-of-the-lambs" title="The Silence of the Lambs" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-silence-of-the-lambs-200.avif 200w, img/film-notes/the-silence-of-the-lambs-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-silence-of-the-lambs-200.webp 200w, img/film-notes/the-silence-of-the-lambs-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-silence-of-the-lambs-400.jpg"
@@ -616,7 +726,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#blade-runner-2049" title="Blade Runner 2049"><picture>
+        <a href="./film-notes/#blade-runner-2049" title="Blade Runner 2049" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/blade-runner-2049-200.avif 200w, img/film-notes/blade-runner-2049-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/blade-runner-2049-200.webp 200w, img/film-notes/blade-runner-2049-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/blade-runner-2049-400.jpg"
@@ -626,7 +736,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#kung-fu-hustle" title="Kung Fu Hustle"><picture>
+        <a href="./film-notes/#kung-fu-hustle" title="Kung Fu Hustle" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/kung-fu-hustle-200.avif 200w, img/film-notes/kung-fu-hustle-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/kung-fu-hustle-200.webp 200w, img/film-notes/kung-fu-hustle-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/kung-fu-hustle-400.jpg"
@@ -636,7 +746,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#shutter-island" title="Shutter Island"><picture>
+        <a href="./film-notes/#shutter-island" title="Shutter Island" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/shutter-island-200.avif 200w, img/film-notes/shutter-island-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/shutter-island-200.webp 200w, img/film-notes/shutter-island-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/shutter-island-400.jpg"
@@ -646,7 +756,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-butterfly-effect" title="The Butterfly Effect"><picture>
+        <a href="./film-notes/#the-butterfly-effect" title="The Butterfly Effect" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-butterfly-effect-200.avif 200w, img/film-notes/the-butterfly-effect-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-butterfly-effect-200.webp 200w, img/film-notes/the-butterfly-effect-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-butterfly-effect-400.jpg"
@@ -656,7 +766,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#good-will-hunting" title="Good Will Hunting"><picture>
+        <a href="./film-notes/#good-will-hunting" title="Good Will Hunting" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/good-will-hunting-200.avif 200w, img/film-notes/good-will-hunting-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/good-will-hunting-200.webp 200w, img/film-notes/good-will-hunting-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/good-will-hunting-400.jpg"
@@ -666,7 +776,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#detachment" title="Detachment"><picture>
+        <a href="./film-notes/#detachment" title="Detachment" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/detachment-200.avif 200w, img/film-notes/detachment-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/detachment-200.webp 200w, img/film-notes/detachment-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/detachment-400.jpg"
@@ -676,7 +786,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#pulp-fiction" title="Pulp Fiction"><picture>
+        <a href="./film-notes/#pulp-fiction" title="Pulp Fiction" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/pulp-fiction-200.avif 200w, img/film-notes/pulp-fiction-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/pulp-fiction-200.webp 200w, img/film-notes/pulp-fiction-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/pulp-fiction-400.jpg"
@@ -686,7 +796,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#modern-times" title="Modern Times"><picture>
+        <a href="./film-notes/#modern-times" title="Modern Times" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/modern-times-200.avif 200w, img/film-notes/modern-times-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/modern-times-200.webp 200w, img/film-notes/modern-times-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/modern-times-400.jpg"
@@ -696,7 +806,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#the-cove" title="The Cove"><picture>
+        <a href="./film-notes/#the-cove" title="The Cove" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/the-cove-200.avif 200w, img/film-notes/the-cove-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/the-cove-200.webp 200w, img/film-notes/the-cove-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/the-cove-400.jpg"
@@ -706,7 +816,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#king-of-comedy" title="King of Comedy"><picture>
+        <a href="./film-notes/#king-of-comedy" title="King of Comedy" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/king-of-comedy-200.avif 200w, img/film-notes/king-of-comedy-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/king-of-comedy-200.webp 200w, img/film-notes/king-of-comedy-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/king-of-comedy-400.jpg"
@@ -716,7 +826,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#once-upon-a-time-in-america" title="Once Upon a Time in America"><picture>
+        <a href="./film-notes/#once-upon-a-time-in-america" title="Once Upon a Time in America" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/once-upon-a-time-in-america-200.avif 200w, img/film-notes/once-upon-a-time-in-america-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/once-upon-a-time-in-america-200.webp 200w, img/film-notes/once-upon-a-time-in-america-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/once-upon-a-time-in-america-400.jpg"
@@ -726,7 +836,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#identity" title="Identity"><picture>
+        <a href="./film-notes/#identity" title="Identity" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/identity-200.avif 200w, img/film-notes/identity-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/identity-200.webp 200w, img/film-notes/identity-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/identity-400.jpg"
@@ -736,7 +846,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#memories-of-murder" title="Memories of Murder"><picture>
+        <a href="./film-notes/#memories-of-murder" title="Memories of Murder" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/memories-of-murder-200.avif 200w, img/film-notes/memories-of-murder-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/memories-of-murder-200.webp 200w, img/film-notes/memories-of-murder-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/memories-of-murder-400.jpg"
@@ -746,7 +856,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#paprika" title="Paprika"><picture>
+        <a href="./film-notes/#paprika" title="Paprika" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/paprika-200.avif 200w, img/film-notes/paprika-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/paprika-200.webp 200w, img/film-notes/paprika-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/paprika-400.jpg"
@@ -756,7 +866,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#flirting-scholar" title="Flirting Scholar"><picture>
+        <a href="./film-notes/#flirting-scholar" title="Flirting Scholar" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/flirting-scholar-200.avif 200w, img/film-notes/flirting-scholar-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/flirting-scholar-200.webp 200w, img/film-notes/flirting-scholar-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/flirting-scholar-400.jpg"
@@ -766,7 +876,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#brokeback-mountain" title="Brokeback Mountain"><picture>
+        <a href="./film-notes/#brokeback-mountain" title="Brokeback Mountain" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/brokeback-mountain-200.avif 200w, img/film-notes/brokeback-mountain-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/brokeback-mountain-200.webp 200w, img/film-notes/brokeback-mountain-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/brokeback-mountain-400.jpg"
@@ -776,7 +886,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#parasite" title="Parasite"><picture>
+        <a href="./film-notes/#parasite" title="Parasite" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/parasite-200.avif 200w, img/film-notes/parasite-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/parasite-200.webp 200w, img/film-notes/parasite-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/parasite-400.jpg"
@@ -786,7 +896,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#before-sunset" title="Before Sunset"><picture>
+        <a href="./film-notes/#before-sunset" title="Before Sunset" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/before-sunset-200.avif 200w, img/film-notes/before-sunset-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/before-sunset-200.webp 200w, img/film-notes/before-sunset-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/before-sunset-400.jpg"
@@ -796,7 +906,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#princess-mononoke" title="Princess Mononoke"><picture>
+        <a href="./film-notes/#princess-mononoke" title="Princess Mononoke" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/princess-mononoke-200.avif 200w, img/film-notes/princess-mononoke-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/princess-mononoke-200.webp 200w, img/film-notes/princess-mononoke-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/princess-mononoke-400.jpg"
@@ -806,7 +916,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#edward-scissorhands" title="Edward Scissorhands"><picture>
+        <a href="./film-notes/#edward-scissorhands" title="Edward Scissorhands" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/edward-scissorhands-200.avif 200w, img/film-notes/edward-scissorhands-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/edward-scissorhands-200.webp 200w, img/film-notes/edward-scissorhands-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/edward-scissorhands-400.jpg"
@@ -816,7 +926,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#inside-out" title="Inside Out"><picture>
+        <a href="./film-notes/#inside-out" title="Inside Out" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/inside-out-200.avif 200w, img/film-notes/inside-out-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/inside-out-200.webp 200w, img/film-notes/inside-out-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/inside-out-400.jpg"
@@ -826,7 +936,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#whiplash" title="Whiplash"><picture>
+        <a href="./film-notes/#whiplash" title="Whiplash" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/whiplash-200.avif 200w, img/film-notes/whiplash-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/whiplash-200.webp 200w, img/film-notes/whiplash-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/whiplash-400.jpg"
@@ -836,7 +946,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#singin-in-the-rain" title="Singin&#x27; in the Rain"><picture>
+        <a href="./film-notes/#singin-in-the-rain" title="Singin&#x27; in the Rain" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/singin-in-the-rain-200.avif 200w, img/film-notes/singin-in-the-rain-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/singin-in-the-rain-200.webp 200w, img/film-notes/singin-in-the-rain-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/singin-in-the-rain-400.jpg"
@@ -846,7 +956,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#metropolis" title="Metropolis"><picture>
+        <a href="./film-notes/#metropolis" title="Metropolis" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/metropolis-200.avif 200w, img/film-notes/metropolis-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/metropolis-200.webp 200w, img/film-notes/metropolis-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/metropolis-400.jpg"
@@ -856,7 +966,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#grizzly-man" title="Grizzly Man"><picture>
+        <a href="./film-notes/#grizzly-man" title="Grizzly Man" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/grizzly-man-200.avif 200w, img/film-notes/grizzly-man-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/grizzly-man-200.webp 200w, img/film-notes/grizzly-man-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/grizzly-man-400.jpg"
@@ -866,7 +976,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#blade-runner" title="Blade Runner"><picture>
+        <a href="./film-notes/#blade-runner" title="Blade Runner" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/blade-runner-200.avif 200w, img/film-notes/blade-runner-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/blade-runner-200.webp 200w, img/film-notes/blade-runner-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/blade-runner-400.jpg"
@@ -876,7 +986,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#how-to-train-your-dragon" title="How to Train Your Dragon"><picture>
+        <a href="./film-notes/#how-to-train-your-dragon" title="How to Train Your Dragon" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/how-to-train-your-dragon-200.avif 200w, img/film-notes/how-to-train-your-dragon-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/how-to-train-your-dragon-200.webp 200w, img/film-notes/how-to-train-your-dragon-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/how-to-train-your-dragon-400.jpg"
@@ -886,7 +996,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#a-man-called-ove" title="A Man Called Ove"><picture>
+        <a href="./film-notes/#a-man-called-ove" title="A Man Called Ove" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/a-man-called-ove-200.avif 200w, img/film-notes/a-man-called-ove-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/a-man-called-ove-200.webp 200w, img/film-notes/a-man-called-ove-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/a-man-called-ove-400.jpg"
@@ -896,7 +1006,7 @@
         </picture></a>
       </li>
       <li class="posterwall__item">
-        <a href="./film-notes/#in-the-mood-for-love" title="In the Mood for Love"><picture>
+        <a href="./film-notes/#in-the-mood-for-love" title="In the Mood for Love" data-cursor="Read"><picture>
           <source type="image/avif" srcset="img/film-notes/in-the-mood-for-love-200.avif 200w, img/film-notes/in-the-mood-for-love-400.avif 400w" sizes="96px">
           <source type="image/webp" srcset="img/film-notes/in-the-mood-for-love-200.webp 200w, img/film-notes/in-the-mood-for-love-400.webp 400w" sizes="96px">
           <img class="posterwall__img" src="img/film-notes/in-the-mood-for-love-400.jpg"
@@ -916,5 +1026,7 @@
 </main>
 
 <script src="./static/gallery.js" defer></script>
+<script type="module" src="./static/motion.js"></script>
+<script type="module" src="./static/lens.js"></script>
 </body>
 </html>

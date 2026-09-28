@@ -2,13 +2,20 @@
 
 <a class="backlink" href="{{ back_href }}"><span aria-hidden="true">←</span> {{ back_label }}</a>
 <a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
+<div class="progress" aria-hidden="true"></div>
 
 <main class="page">
 
   <header class="masthead">
     <div class="masthead__card">
+      <!--
+        光晕：本组封面取出来的 --c1..3（写在 <body> 上）。它是标题卡里的第一个弹性项，
+        占掉标题上方那一整段空白，下沿停在第一行字上面——标题几行都一样，
+        所以永远不会压在任何字下面。见 透过镜头设计.md「内页」。
+      -->
+      <div class="glow" data-vt="cover" aria-hidden="true"></div>
       <p class="masthead__eyebrow">{{ eyebrow }} <span aria-hidden="true">·</span> {{ year }}</p>
-      <h1 class="masthead__title">{{ title }}</h1>
+      <h1 class="masthead__title" data-vt="title">{{ title }}</h1>
       <p class="masthead__meta"><span>{{ count_label }}</span> <span>{{ span }}</span> <span>{{ place }}</span></p>
     </div>
 
@@ -24,7 +31,7 @@
   </section>
 
   <nav class="nextup" aria-label="{{ nextup_label }}">
-    <a class="nextup__link" href="{{ nextup_href }}">
+    <a class="nextup__link" href="{{ nextup_href }}" style="{{ nextup_vars }}">
       <span class="nextup__label">{{ nextup_label }}</span>
       <span class="nextup__title">{{ nextup_title }}</span>
       <span class="nextup__meta">{{ nextup_meta }}</span>

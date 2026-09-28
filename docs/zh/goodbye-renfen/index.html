@@ -2,11 +2,77 @@
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
   首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="zh-Hans" class="no-js">
 <head>
 <meta charset="utf-8">
-<script>document.documentElement.classList.remove('no-js')</script>
+<script>
+document.documentElement.classList.remove('no-js');
+/*
+  换页动画（View Transitions，样式在 style.css 末尾）：首页封面 ↔ 内页光晕、首页标题 ↔ 内页大标题
+  要形变过去，两边就得有同一个 view-transition-name。名字**只临时给点的那一张**——
+  首页十张卡全写死的话，没配上对的九张会浮在新页面上面淡出。
+  必须写在 <head> 里：pagereveal 在新页面第一帧之前就触发，type="module" 的脚本赶不上。
+  浏览器不支持就整段跳过，只剩光圈换页；再不支持就是普通跳转。
+
+  配对靠 sessionStorage 里一句暗号（"旧页>新页"）：旧页真起了名才写，新页对上了才起。
+  两边各自判断的话，一边起了名另一边没起，那个落单的就会浮在新页面上面淡出。
+*/
+(function () {
+  if (!('onpagereveal' in window)) return;
+  var home = document.documentElement.classList.contains('theme-home');
+  var KEY = 'vt-pair';
+  function key(url) {                     // "/zh/good-night/" → "good-night"；首页 → ""
+    var p = new URL(url, location.href).pathname.split('/').filter(Boolean);
+    if (p[0] === 'zh') p.shift();
+    return p[0] || '';
+  }
+  function pairs(other) {                 // 这一页上跟「另一页」配对的元素
+    if (home) {
+      var card = document.querySelector('.work[data-slug="' + other + '"]');
+      return card ? [[card.querySelector('.work__frame'), 'cover'],
+                     [card.querySelector('.work__title'), 'title']] : [];
+    }
+    if (other) return [];                 // 内页只跟首页配对；内页之间只走光圈
+    return [].map.call(document.querySelectorAll('[data-vt]'),
+                       function (el) { return [el, el.getAttribute('data-vt')]; });
+  }
+  function name(list) {                   // 只给看得见的起名；返回撤销函数和起了几个
+    var named = list.filter(function (p) {
+      var r = p[0] && p[0].getBoundingClientRect();
+      return r && r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+    });
+    named.forEach(function (p) { p[0].style.viewTransitionName = 'vt-' + p[1]; });
+    return { n: named.length, undo: function () {
+      named.forEach(function (p) { p[0].style.viewTransitionName = ''; });
+    } };
+  }
+  function store(v) {                     // 两页之间对暗号：旧页起了名，新页才起
+    try { if (v) sessionStorage.setItem(KEY, v); else sessionStorage.removeItem(KEY); } catch (e) {}
+  }
+  addEventListener('pageswap', function (e) {
+    store('');
+    var to = e.activation && e.activation.entry;
+    if (!e.viewTransition || !to) return;
+    // 内页回首页只在「后退」时配对：点「全部作品」回去，首页在最顶上，那张卡根本不在屏幕里
+    if (!home && e.activation.navigationType !== 'traverse') return;
+    var got = name(pairs(key(to.url)));
+    if (!got.n) return;
+    store(key(location.href) + '>' + key(to.url));
+    // 从往返缓存（bfcache）回到这一页时名字不能还挂着，不然下次换页会带着它
+    addEventListener('pageshow', got.undo, { once: true });
+  });
+  addEventListener('pagereveal', function (e) {
+    var pair = '';
+    try { pair = sessionStorage.getItem(KEY) || ''; } catch (err) {}
+    store('');
+    var ends = pair.split('>');
+    if (!e.viewTransition || ends.length !== 2 || ends[1] !== key(location.href)) return;
+    e.viewTransition.finished.finally(name(pairs(ends[0])).undo);
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>再见，人分 — 刘延奥</title>
 <meta name="description" content="2024 年 5 月，重返初中母校时拍下的九张照片。">
@@ -29,18 +95,25 @@
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../../static/style.css">
 </head>
-<body>
+<body style="--c1: #729b3b; --c2: #ca7c72; --c3: #969b3b">
 <a class="skip" href="#plates">跳到照片</a>
 
 <a class="backlink" href="../../"><span aria-hidden="true">←</span> 全部作品</a>
 <a class="langswitch" href="../../goodbye-renfen/" title="Read in English">EN</a>
+<div class="progress" aria-hidden="true"></div>
 
 <main class="page">
 
   <header class="masthead">
     <div class="masthead__card">
+      <!--
+        光晕：本组封面取出来的 --c1..3（写在 <body> 上）。它是标题卡里的第一个弹性项，
+        占掉标题上方那一整段空白，下沿停在第一行字上面——标题几行都一样，
+        所以永远不会压在任何字下面。见 透过镜头设计.md「内页」。
+      -->
+      <div class="glow" data-vt="cover" aria-hidden="true"></div>
       <p class="masthead__eyebrow">第二组 <span aria-hidden="true">·</span> 2024</p>
-      <h1 class="masthead__title">再见，人分</h1>
+      <h1 class="masthead__title" data-vt="title">再见，人分</h1>
       <p class="masthead__meta"><span>9 张</span> <span>2024 年 5 月</span> <span>北京</span></p>
     </div>
 
@@ -290,7 +363,7 @@
   </section>
 
   <nav class="nextup" aria-label="下一组">
-    <a class="nextup__link" href="../the-old-days/">
+    <a class="nextup__link" href="../the-old-days/" style="--nw: #ebdfca; --n1: #c49f63; --n2: #589b3b; --n3: #719b3b">
       <span class="nextup__label">下一组</span>
       <span class="nextup__title">旧时光</span>
       <span class="nextup__meta"><span>第三组</span> <span>9 张</span> <span>2025 年 5 月</span></span>
@@ -333,5 +406,6 @@
 <script type="application/json" id="photo-data">[{"avif":"../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-900.avif 900w, ../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-1600.avif 1600w, ../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-2400.avif 2400w","webp":"../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-900.webp 900w, ../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-1600.webp 1600w, ../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-2400.webp 2400w","jpg":"../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-900.jpg 900w, ../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-1600.jpg 1600w","src":"../../img/goodbye-renfen/a8af893b939abdb65be9b75abe4cf07-1600.jpg","w":3072,"h":4096,"alt":"Three views stacked vertically: a classroom smartboard displaying a ninth-grade class page; a window and an empty chair beside a curtain; a blackboard covered in chalk-drawn flowers.","date":"","time":"","exif":""},{"avif":"../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-900.avif 900w, ../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-1600.avif 1600w, ../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-2400.avif 2400w","webp":"../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-900.webp 900w, ../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-1600.webp 1600w, ../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-2400.webp 2400w","jpg":"../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-900.jpg 900w, ../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-1600.jpg 1600w","src":"../../img/goodbye-renfen/a561d25a02a4610749315a04440137e-1600.jpg","w":5852,"h":3901,"alt":"A woman in a dark dress walks away down a paved path beside a long red school building, under a large tree, with the courtyard opening beyond.","date":"","time":"","exif":"70mm · f/5.6 · 1/640s · ISO 500"},{"avif":"../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-900.avif 900w, ../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-1600.avif 1600w, ../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-2400.avif 2400w","webp":"../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-900.webp 900w, ../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-1600.webp 1600w, ../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-2400.webp 2400w","jpg":"../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-900.jpg 900w, ../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-1600.jpg 1600w","src":"../../img/goodbye-renfen/ade26d47940376f140409ee2caf9b51-1600.jpg","w":3072,"h":4096,"alt":"Three views stacked vertically: a white 'I love RDF' sculpture above the school's name plate; the school gate at dismissal, with guards and students passing through; basketball courts seen from above against a wall of apartment blocks.","date":"","time":"","exif":""},{"avif":"../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-900.avif 900w, ../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-1600.avif 1600w, ../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-2400.avif 2400w","webp":"../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-900.webp 900w, ../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-1600.webp 1600w, ../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-2400.webp 2400w","jpg":"../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-900.jpg 900w, ../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-1600.jpg 1600w","src":"../../img/goodbye-renfen/f2394a50ea97f2c1baca8d297bb531f-1600.jpg","w":4672,"h":5840,"alt":"An instant photograph of classmates in white sports uniforms, propped in a clear acrylic frame on a desk, shot through the blur of objects in the foreground.","date":"","time":"","exif":"70mm · f/5.6 · 1/160s · ISO 1000"},{"avif":"../../img/goodbye-renfen/00650c89435290da7420ad155eff930-900.avif 900w, ../../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.avif 1600w, ../../img/goodbye-renfen/00650c89435290da7420ad155eff930-2400.avif 2400w","webp":"../../img/goodbye-renfen/00650c89435290da7420ad155eff930-900.webp 900w, ../../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.webp 1600w, ../../img/goodbye-renfen/00650c89435290da7420ad155eff930-2400.webp 2400w","jpg":"../../img/goodbye-renfen/00650c89435290da7420ad155eff930-900.jpg 900w, ../../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.jpg 1600w","src":"../../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.jpg","w":4437,"h":5546,"alt":"A school corridor in the afternoon, lit only by a bank of windows at the far end; a yellow wet-floor sign stands in the right foreground.","date":"","time":"","exif":"70mm · f/6.3 · 1/200s · ISO 800"},{"avif":"../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-900.avif 900w, ../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-1600.avif 1600w, ../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-2400.avif 2400w","webp":"../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-900.webp 900w, ../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-1600.webp 1600w, ../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-2400.webp 2400w","jpg":"../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-900.jpg 900w, ../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-1600.jpg 1600w","src":"../../img/goodbye-renfen/750ec6422ca54b64a7204f2e6787aef-1600.jpg","w":5840,"h":4672,"alt":"A red and white sail-shaped banner raised in a school courtyard, carrying exam-year slogans, framed through a narrow gap between two buildings.","date":"","time":"","exif":"70mm · f/5.6 · 1/2000s · ISO 1000"},{"avif":"../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-900.avif 900w, ../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-1600.avif 1600w, ../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-2400.avif 2400w","webp":"../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-900.webp 900w, ../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-1600.webp 1600w, ../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-2400.webp 2400w","jpg":"../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-900.jpg 900w, ../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-1600.jpg 1600w","src":"../../img/goodbye-renfen/900bb52c921afa6af87d2e7a0620963-1600.jpg","w":4388,"h":5485,"alt":"A red-walled guard post with a Chinese flag overhead and a black public telephone resting on a wooden ledge.","date":"","time":"","exif":"24mm · f/4.5 · 1/2500s · ISO 500"},{"avif":"../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-900.avif 900w, ../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-1600.avif 1600w, ../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-2400.avif 2400w","webp":"../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-900.webp 900w, ../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-1600.webp 1600w, ../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-2400.webp 2400w","jpg":"../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-900.jpg 900w, ../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-1600.jpg 1600w","src":"../../img/goodbye-renfen/55925438cc7bb809ee7b35b1cb9fcf0-1600.jpg","w":3072,"h":4096,"alt":"Three views stacked vertically: a chalk blackboard reading 'keep going' among drawn sunflowers; an empty blue basketball court between red school buildings; a classroom of empty desks beside tall windows.","date":"","time":"","exif":""},{"avif":"../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-900.avif 900w, ../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-1600.avif 1600w, ../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-2400.avif 2400w","webp":"../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-900.webp 900w, ../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-1600.webp 1600w, ../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-2400.webp 2400w","jpg":"../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-900.jpg 900w, ../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-1600.jpg 1600w","src":"../../img/goodbye-renfen/fd02c564f86ada4f8f2d73fdb20d061-1600.jpg","w":3072,"h":4096,"alt":"Three views stacked vertically: a desk crowded with a globe, ornaments and handwritten notes; a student reading alone in an empty classroom; a closed door labelled as the ninth-grade examination office.","date":"","time":"","exif":""}]</script>
 
 <script src="../../static/gallery.js" defer></script>
+<script type="module" src="../../static/motion.js"></script>
 </body>
 </html>

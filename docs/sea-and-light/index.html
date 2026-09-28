@@ -2,11 +2,77 @@
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
   首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="en" class="no-js">
 <head>
 <meta charset="utf-8">
-<script>document.documentElement.classList.remove('no-js')</script>
+<script>
+document.documentElement.classList.remove('no-js');
+/*
+  换页动画（View Transitions，样式在 style.css 末尾）：首页封面 ↔ 内页光晕、首页标题 ↔ 内页大标题
+  要形变过去，两边就得有同一个 view-transition-name。名字**只临时给点的那一张**——
+  首页十张卡全写死的话，没配上对的九张会浮在新页面上面淡出。
+  必须写在 <head> 里：pagereveal 在新页面第一帧之前就触发，type="module" 的脚本赶不上。
+  浏览器不支持就整段跳过，只剩光圈换页；再不支持就是普通跳转。
+
+  配对靠 sessionStorage 里一句暗号（"旧页>新页"）：旧页真起了名才写，新页对上了才起。
+  两边各自判断的话，一边起了名另一边没起，那个落单的就会浮在新页面上面淡出。
+*/
+(function () {
+  if (!('onpagereveal' in window)) return;
+  var home = document.documentElement.classList.contains('theme-home');
+  var KEY = 'vt-pair';
+  function key(url) {                     // "/zh/good-night/" → "good-night"；首页 → ""
+    var p = new URL(url, location.href).pathname.split('/').filter(Boolean);
+    if (p[0] === 'zh') p.shift();
+    return p[0] || '';
+  }
+  function pairs(other) {                 // 这一页上跟「另一页」配对的元素
+    if (home) {
+      var card = document.querySelector('.work[data-slug="' + other + '"]');
+      return card ? [[card.querySelector('.work__frame'), 'cover'],
+                     [card.querySelector('.work__title'), 'title']] : [];
+    }
+    if (other) return [];                 // 内页只跟首页配对；内页之间只走光圈
+    return [].map.call(document.querySelectorAll('[data-vt]'),
+                       function (el) { return [el, el.getAttribute('data-vt')]; });
+  }
+  function name(list) {                   // 只给看得见的起名；返回撤销函数和起了几个
+    var named = list.filter(function (p) {
+      var r = p[0] && p[0].getBoundingClientRect();
+      return r && r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+    });
+    named.forEach(function (p) { p[0].style.viewTransitionName = 'vt-' + p[1]; });
+    return { n: named.length, undo: function () {
+      named.forEach(function (p) { p[0].style.viewTransitionName = ''; });
+    } };
+  }
+  function store(v) {                     // 两页之间对暗号：旧页起了名，新页才起
+    try { if (v) sessionStorage.setItem(KEY, v); else sessionStorage.removeItem(KEY); } catch (e) {}
+  }
+  addEventListener('pageswap', function (e) {
+    store('');
+    var to = e.activation && e.activation.entry;
+    if (!e.viewTransition || !to) return;
+    // 内页回首页只在「后退」时配对：点「全部作品」回去，首页在最顶上，那张卡根本不在屏幕里
+    if (!home && e.activation.navigationType !== 'traverse') return;
+    var got = name(pairs(key(to.url)));
+    if (!got.n) return;
+    store(key(location.href) + '>' + key(to.url));
+    // 从往返缓存（bfcache）回到这一页时名字不能还挂着，不然下次换页会带着它
+    addEventListener('pageshow', got.undo, { once: true });
+  });
+  addEventListener('pagereveal', function (e) {
+    var pair = '';
+    try { pair = sessionStorage.getItem(KEY) || ''; } catch (err) {}
+    store('');
+    var ends = pair.split('>');
+    if (!e.viewTransition || ends.length !== 2 || ends[1] !== key(location.href)) return;
+    e.viewTransition.finished.finally(name(pairs(ends[0])).undo);
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sea and Light — Yanao (Leo) Liu</title>
 <meta name="description" content="Nine photographs made over two days in Zhuhai, March 2026.">
@@ -29,18 +95,25 @@
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../static/style.css">
 </head>
-<body>
+<body style="--c1: #28ae90; --c2: #2885ae; --c3: #28ae5e">
 <a class="skip" href="#plates">Skip to the photographs</a>
 
 <a class="backlink" href="../"><span aria-hidden="true">←</span> All work</a>
 <a class="langswitch" href="../zh/sea-and-light/" title="Read in Chinese">中文</a>
+<div class="progress" aria-hidden="true"></div>
 
 <main class="page">
 
   <header class="masthead">
     <div class="masthead__card">
+      <!--
+        光晕：本组封面取出来的 --c1..3（写在 <body> 上）。它是标题卡里的第一个弹性项，
+        占掉标题上方那一整段空白，下沿停在第一行字上面——标题几行都一样，
+        所以永远不会压在任何字下面。见 透过镜头设计.md「内页」。
+      -->
+      <div class="glow" data-vt="cover" aria-hidden="true"></div>
       <p class="masthead__eyebrow">Series 07 <span aria-hidden="true">·</span> 2026</p>
-      <h1 class="masthead__title">Sea and Light</h1>
+      <h1 class="masthead__title" data-vt="title">Sea and Light</h1>
       <p class="masthead__meta"><span>9 photographs</span> <span>March 2026</span> <span>Zhuhai</span></p>
     </div>
 
@@ -302,7 +375,7 @@
   </section>
 
   <nav class="nextup" aria-label="Next film">
-    <a class="nextup__link" href="../gratitude/">
+    <a class="nextup__link" href="../gratitude/" style="--nw: #d8e0f7; --n1: #254ab1; --n2: #be7c53; --n3: #257db1">
       <span class="nextup__label">Next film</span>
       <span class="nextup__title">Gratitude, Quietly</span>
       <span class="nextup__meta"><span>Film</span> <span>5:21</span> <span>November 2025</span></span>
@@ -345,5 +418,6 @@
 <script type="application/json" id="photo-data">[{"avif":"../img/sea-and-light/DSC005321-900.avif 900w, ../img/sea-and-light/DSC005321-1600.avif 1600w, ../img/sea-and-light/DSC005321-2400.avif 2400w","webp":"../img/sea-and-light/DSC005321-900.webp 900w, ../img/sea-and-light/DSC005321-1600.webp 1600w, ../img/sea-and-light/DSC005321-2400.webp 2400w","jpg":"../img/sea-and-light/DSC005321-900.jpg 900w, ../img/sea-and-light/DSC005321-1600.jpg 1600w","src":"../img/sea-and-light/DSC005321-1600.jpg","w":4672,"h":7008,"alt":"Inside an aquarium tunnel: a person in a blue cap sits on the ledge with their head lowered while large fish drift past behind the curved glass.","date":"2026.03.22","time":"16:09","exif":"36mm · f/2.8 · 1/500s · ISO 800"},{"avif":"../img/sea-and-light/DSC005381-900.avif 900w, ../img/sea-and-light/DSC005381-1600.avif 1600w, ../img/sea-and-light/DSC005381-2400.avif 2400w","webp":"../img/sea-and-light/DSC005381-900.webp 900w, ../img/sea-and-light/DSC005381-1600.webp 1600w, ../img/sea-and-light/DSC005381-2400.webp 2400w","jpg":"../img/sea-and-light/DSC005381-900.jpg 900w, ../img/sea-and-light/DSC005381-1600.jpg 1600w","src":"../img/sea-and-light/DSC005381-1600.jpg","w":4672,"h":7008,"alt":"A dark chamber lit only by a round opening in the carved stone ceiling; one figure stands in silhouette below it, looking up.","date":"2026.03.22","time":"16:12","exif":"24mm · f/2.8 · 1/800s · ISO 800"},{"avif":"../img/sea-and-light/DSC005601-900.avif 900w, ../img/sea-and-light/DSC005601-1600.avif 1600w, ../img/sea-and-light/DSC005601-2400.avif 2400w","webp":"../img/sea-and-light/DSC005601-900.webp 900w, ../img/sea-and-light/DSC005601-1600.webp 1600w, ../img/sea-and-light/DSC005601-2400.webp 2400w","jpg":"../img/sea-and-light/DSC005601-900.jpg 900w, ../img/sea-and-light/DSC005601-1600.jpg 1600w","src":"../img/sea-and-light/DSC005601-1600.jpg","w":4672,"h":7008,"alt":"A huge whale shark sculpture rising out of sculpted waves above a theme park walkway, with palm trees, blue parasols and visitors below.","date":"2026.03.22","time":"16:24","exif":"40mm · f/2.8 · 1/8000s · ISO 250"},{"avif":"../img/sea-and-light/DSC005751-900.avif 900w, ../img/sea-and-light/DSC005751-1600.avif 1600w, ../img/sea-and-light/DSC005751-2400.avif 2400w","webp":"../img/sea-and-light/DSC005751-900.webp 900w, ../img/sea-and-light/DSC005751-1600.webp 1600w, ../img/sea-and-light/DSC005751-2400.webp 2400w","jpg":"../img/sea-and-light/DSC005751-900.jpg 900w, ../img/sea-and-light/DSC005751-1600.jpg 1600w","src":"../img/sea-and-light/DSC005751-1600.jpg","w":7008,"h":4672,"alt":"A wide aquarium window glowing in a dark room, tall kelp and fish inside it, a single figure standing in silhouette against the glass.","date":"2026.03.22","time":"16:30","exif":"31mm · f/2.8 · 1/640s · ISO 1600"},{"avif":"../img/sea-and-light/DSC007321-900.avif 900w, ../img/sea-and-light/DSC007321-1600.avif 1600w, ../img/sea-and-light/DSC007321-2400.avif 2400w","webp":"../img/sea-and-light/DSC007321-900.webp 900w, ../img/sea-and-light/DSC007321-1600.webp 1600w, ../img/sea-and-light/DSC007321-2400.webp 2400w","jpg":"../img/sea-and-light/DSC007321-900.jpg 900w, ../img/sea-and-light/DSC007321-1600.jpg 1600w","src":"../img/sea-and-light/DSC007321-1600.jpg","w":4672,"h":7008,"alt":"A night sky where drone lights form a jellyfish above searchlight beams and palm trees; in the foreground a person watches from behind.","date":"2026.03.22","time":"20:00","exif":"25mm · f/2.8 · 1/400s · ISO 8000"},{"avif":"../img/sea-and-light/DSC007471-900.avif 900w, ../img/sea-and-light/DSC007471-1600.avif 1600w, ../img/sea-and-light/DSC007471-2400.avif 2400w","webp":"../img/sea-and-light/DSC007471-900.webp 900w, ../img/sea-and-light/DSC007471-1600.webp 1600w, ../img/sea-and-light/DSC007471-2400.webp 2400w","jpg":"../img/sea-and-light/DSC007471-900.jpg 900w, ../img/sea-and-light/DSC007471-1600.jpg 1600w","src":"../img/sea-and-light/DSC007471-1600.jpg","w":7008,"h":4672,"alt":"A night sky split in two: a blue constellation of drone lights above, red fireworks and smoke rising through palm fronds below.","date":"2026.03.22","time":"20:01","exif":"24mm · f/2.8 · 1/400s · ISO 8000"},{"avif":"../img/sea-and-light/DSC008611-900.avif 900w, ../img/sea-and-light/DSC008611-1600.avif 1600w, ../img/sea-and-light/DSC008611-2400.avif 2400w","webp":"../img/sea-and-light/DSC008611-900.webp 900w, ../img/sea-and-light/DSC008611-1600.webp 1600w, ../img/sea-and-light/DSC008611-2400.webp 2400w","jpg":"../img/sea-and-light/DSC008611-900.jpg 900w, ../img/sea-and-light/DSC008611-1600.jpg 1600w","src":"../img/sea-and-light/DSC008611-1600.jpg","w":4672,"h":7008,"alt":"Seen through a white arch: a person with an orange tote stands among shrubs facing an empty road beneath a pale concrete flyover.","date":"2026.03.23","time":"11:26","exif":"68mm · f/5.6 · 1/400s · ISO 100"},{"avif":"../img/sea-and-light/DSC009441-900.avif 900w, ../img/sea-and-light/DSC009441-1600.avif 1600w, ../img/sea-and-light/DSC009441-2400.avif 2400w","webp":"../img/sea-and-light/DSC009441-900.webp 900w, ../img/sea-and-light/DSC009441-1600.webp 1600w, ../img/sea-and-light/DSC009441-2400.webp 2400w","jpg":"../img/sea-and-light/DSC009441-900.jpg 900w, ../img/sea-and-light/DSC009441-1600.jpg 1600w","src":"../img/sea-and-light/DSC009441-1600.jpg","w":4672,"h":7008,"alt":"A small white tower with a red roof at the edge of a hazy sea; a person in a straw hat sits on a stone bench looking out, flowers blurred in the foreground.","date":"2026.03.23","time":"11:54","exif":"70mm · f/13 · 1/400s · ISO 125"},{"avif":"../img/sea-and-light/DSC009841-900.avif 900w, ../img/sea-and-light/DSC009841-1600.avif 1600w, ../img/sea-and-light/DSC009841-2400.avif 2400w","webp":"../img/sea-and-light/DSC009841-900.webp 900w, ../img/sea-and-light/DSC009841-1600.webp 1600w, ../img/sea-and-light/DSC009841-2400.webp 2400w","jpg":"../img/sea-and-light/DSC009841-900.jpg 900w, ../img/sea-and-light/DSC009841-1600.jpg 1600w","src":"../img/sea-and-light/DSC009841-1600.jpg","w":7008,"h":4672,"alt":"Under a blue sky with clouds, a person stands with both arms outstretched, back to the camera, facing a large yellow animal sculpture.","date":"2026.03.23","time":"12:13","exif":"36mm · f/10 · 1/400s · ISO 160"}]</script>
 
 <script src="../static/gallery.js" defer></script>
+<script type="module" src="../static/motion.js"></script>
 </body>
 </html>

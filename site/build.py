@@ -19,8 +19,10 @@ from __future__ import annotations
 
 import argparse
 import base64
+import colorsys
 import html
 import io
+import json
 import os
 import re
 import shutil
@@ -122,6 +124,11 @@ LANGS = {
         "close": "Close",
         "prev": "Previous photograph",
         "next": "Next photograph",
+        # 跟随光标停在作品上时展开成的标签（motion.js）。界面提示词，不是内容；
+        # 写在 data-cursor 属性里——关掉 JS 时谁也看不见它。
+        "cursor_view": "View",
+        "cursor_play": "Play",
+        "cursor_read": "Read",
     },
     "zh": {
         "dir": "zh",
@@ -160,6 +167,9 @@ LANGS = {
         "close": "关闭",
         "prev": "上一张",
         "next": "下一张",
+        "cursor_view": "看",
+        "cursor_play": "播放",
+        "cursor_read": "阅读",
     },
 }
 
@@ -200,16 +210,28 @@ HOME_THEME_COLOR = "#f3e4dc"
 DARK_THEME_COLOR = "#0d0e11"
 
 
-def shell(home: bool = False) -> dict:
-    """base.html 里跟主题有关的三个槽。首页传 home=True，其余不传。
+def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
+    """base.html 里跟主题和脚本有关的槽。首页传 home=True，其余不传。
 
     html_class 带前导空格，因为模板里写的是 class="no-js{{ html_class }}"——
-    内页的值是空串，不能留一个尾随空格。
+    内页的值是空串，不能留一个尾随空格。body_attrs 同理。
+
+    scripts：motion.js 全站都有；lens.js（3D 镜头）**只在首页**。
+    两个都是 type="module"：老浏览器不认识 module，会整个跳过——
+    它们拿到的就是静态版，这正是想要的渐进增强。module 天然是 defer 的。
+
+    palette：内页（系列、影片、影评）把本页的颜色写在 <body> 上，
+    顶部的光晕和进度条从这里取 --c1..3。
     """
+    scripts = [f'<script type="module" src="{root}/static/motion.js"></script>']
+    if home:
+        scripts.append(f'<script type="module" src="{root}/static/lens.js"></script>')
     return {
         "html_class": " theme-home" if home else "",
         "color_scheme": "light" if home else "dark",
         "theme_color": HOME_THEME_COLOR if home else DARK_THEME_COLOR,
+        "scripts": "\n".join(scripts),
+        "body_attrs": f' style="{palette_vars(palette, "c")}"' if palette else "",
     }
 
 # ── 视频 ────────────────────────────────────────────────────────
@@ -303,6 +325,191 @@ def slugify(text: str) -> str:
     text = "".join(c for c in text if not unicodedata.combining(c))
     s = re.sub(r"[^\w\-]+", "-", text, flags=re.UNICODE)
     return re.sub(r"-{2,}", "-", s).strip("-")
+
+
+# ---------------------------------------------------------------------------
+# 取色：每件作品的颜色从它自己的封面里来（2026-09「透过镜头」改版）
+# ---------------------------------------------------------------------------
+#
+# 首页的环境光、区标题的渐变字、内页顶部的光晕、3D 镜头映出的彩光，
+# 全部用这里算出来的颜色。颜色是作品自己的，不是外加的。
+#
+# 每个主色派生三种用途，**亮度约束是算出来钳住的，不是凭眼睛调的**：
+#
+#   c1..c3  内页光晕、强调色、镜头灯光    饱和度 ≥ 0.45，中等明度
+#   w1..w3  首页环境光（浅底上晕染）      相对亮度 ≥ 0.745 → 深色小字压上去仍 ≥ 4.5:1
+#   d1..d3  首页区标题的渐变大字          相对亮度 ≤ 0.175 → 大字在最深的底上仍 ≥ 3:1
+#
+# ⚠️ 0.745 / 0.175 比验收线（0.74 / 0.18）各留了一点余量：量化和取整会差一点。
+#    verify.js 按实际渲染出来的像素再查一遍（见 透过镜头设计.md 第八节）。
+
+
+def rel_lum(rgb) -> float:
+    """WCAG 相对亮度，rgb 是 0–255 的三元组。"""
+    def ch(c):
+        c /= 255
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+    r, g, b = rgb
+    return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b)
+
+
+def _hex(rgb) -> str:
+    return "#%02x%02x%02x" % tuple(max(0, min(255, round(v))) for v in rgb)
+
+
+def _hls_rgb(h: float, l: float, s: float) -> tuple:
+    return tuple(v * 255 for v in colorsys.hls_to_rgb(h, l, s))
+
+
+def _fit_lightness(h: float, s: float, *, at_least: float | None = None,
+                   at_most: float | None = None) -> float:
+    """同色相、同饱和度下，二分找一个满足亮度约束的明度 L。
+
+    at_least：找满足 rel_lum ≥ at_least 的**最小** L（够亮就行，别白到没颜色）
+    at_most ：找满足 rel_lum ≤ at_most 的**最大** L（够深就行，别黑到没颜色）
+    """
+    lo, hi = 0.0, 1.0
+    for _ in range(32):
+        mid = (lo + hi) / 2
+        lum = rel_lum(_hls_rgb(h, mid, s))
+        if at_least is not None:
+            if lum >= at_least:
+                hi = mid
+            else:
+                lo = mid
+        else:
+            if lum <= at_most:
+                lo = mid
+            else:
+                hi = mid
+    # 取确定满足约束的那一端，避免二分停在边界外侧一点点
+    return hi if at_least is not None else lo
+
+
+def palette_for(path: Path) -> dict:
+    """从一张图里取三个主色，每个派生 c / w / d 三种用途，共九个 #rrggbb。
+
+    缩到 64×64、中位切分量化成 12 色；去掉近黑（明度 < 0.08）和近灰（饱和度 < 0.10）；
+    按「占比 ×（0.3 + 饱和度）」打分。第一色取分最高的；第二色要跟第一色差 40° 以上的色相，
+    不然两个颜色一个样；第三色取剩下里最深的那个，给渐变一个沉下去的端点。
+    纯黑白的照片一个有色都取不到时，退回一个中性的暖灰。
+    """
+    with Image.open(path) as im:
+        small = im.convert("RGB").resize((64, 64), Image.LANCZOS)
+    q = small.quantize(colors=12, method=Image.Quantize.MEDIANCUT)
+    pal = q.getpalette()[: 12 * 3]
+    counts = sorted(q.getcolors(), reverse=True)
+
+    cands = []
+    for n, idx in counts:
+        r, g, b = pal[idx * 3: idx * 3 + 3]
+        h, l, s = colorsys.rgb_to_hls(r / 255, g / 255, b / 255)
+        if l < 0.08 or s < 0.10:
+            continue
+        cands.append((n * (0.3 + s), h, l, s))
+    cands.sort(reverse=True)
+    if not cands:
+        cands = [(1.0, 0.08, 0.5, 0.2)]
+
+    def hue_gap(a, b):          # 两个色相之间的角度（度）
+        d = abs(a - b)
+        return min(d, 1 - d) * 360
+
+    first = cands[0]
+    # 第二色：先找差 40° 以上的；照片色相太单一（夜景、水族馆）就放宽到 20°；
+    # 还是没有，就在第一色旁边偏 32° 造一个邻近色——还是同一个色系，
+    # 只是让渐变有两端，不至于三个变量写出来是同一个颜色。
+    second = (next((c for c in cands[1:] if hue_gap(c[1], first[1]) >= 40), None)
+              or next((c for c in cands[1:] if hue_gap(c[1], first[1]) >= 20), None)
+              or (0, (first[1] + 32 / 360) % 1, first[2], first[3]))
+    # 第三色：剩下里最深的、而且跟前两个色相差 15° 以上的；没有就把第一色往反方向偏 22°。
+    rest = [c for c in cands if c is not first and c is not second
+            and hue_gap(c[1], first[1]) >= 15 and hue_gap(c[1], second[1]) >= 15]
+    third = (min(rest, key=lambda c: c[2]) if rest
+             else (0, (first[1] - 22 / 360) % 1, max(first[2] - 0.12, 0.2), first[3]))
+    picked = [first, second, third]
+
+    out = {}
+    for i, (_, h, l, s) in enumerate(picked, 1):
+        rich = max(s, 0.45)
+        out[f"c{i}"] = _hex(_hls_rgb(h, min(max(l, 0.42), 0.62), rich))
+        ws = min(rich, 0.75)
+        out[f"w{i}"] = _hex(_hls_rgb(h, _fit_lightness(h, ws, at_least=0.745), ws))
+        ds = max(rich, 0.55)
+        out[f"d{i}"] = _hex(_hls_rgb(h, _fit_lightness(h, ds, at_most=0.175), ds))
+    return out
+
+
+def cover_palette(cover: "Photo") -> dict:
+    """用封面最小那档 JPEG 取色——一定存在，而且小，算得快。"""
+    return palette_for(DIST / cover.variants["jpg"][0][1])
+
+
+def palette_vars(pal: dict, keys: str = "cwd") -> str:
+    """把 palette 写成 CSS 变量串，放进 style 属性里。"""
+    return "; ".join(f"--{k}: {v}" for k, v in pal.items() if k[0] in keys)
+
+
+def mosaic_palette(photos: list) -> dict:
+    """很多张小图拼成一张马赛克再取色。
+
+    影评区没有封面，它的颜色就从 62 张海报里来：每张缩成 16×24 贴进一张大图，
+    再走 palette_for 那一套。最后一行没铺满的格子是黑的，会被「去掉近黑」那条筛掉。
+    """
+    tiles = [p for p in photos if p is not None]
+    if not tiles:
+        return palette_for_fallback()
+    cols = 8
+    sheet = Image.new("RGB", (cols * 16, -(-len(tiles) // cols) * 24))
+    for i, p in enumerate(tiles):
+        with Image.open(DIST / p.variants["jpg"][0][1]) as im:
+            sheet.paste(im.convert("RGB").resize((16, 24), Image.LANCZOS),
+                        ((i % cols) * 16, (i // cols) * 24))
+    buf = io.BytesIO()
+    sheet.save(buf, "PNG")
+    buf.seek(0)
+    return palette_for(buf)
+
+
+def palette_for_fallback() -> dict:
+    """一张图都没有时：一块 1×1 的暖灰，走同一套派生，约束照样成立。"""
+    buf = io.BytesIO()
+    Image.new("RGB", (1, 1), (150, 128, 112)).save(buf, "PNG")
+    buf.seek(0)
+    return palette_for(buf)
+
+
+def section_palette(pals: list[dict]) -> dict:
+    """一个区（照片 / 影片）的默认颜色：从区里各作品的主色里挑三个色相最散开的。
+
+    第一个取区里第一件作品的；之后每次挑「跟已选的色相最远」的那件。
+    这样照片区会同时有「晚安」的酒红和「海与光」的青，而不是三个挨着的绿。
+    """
+    if not pals:
+        return palette_for_fallback()
+
+    def hue(hexcol):
+        r, g, b = (int(hexcol[i:i + 2], 16) / 255 for i in (1, 3, 5))
+        return colorsys.rgb_to_hls(r, g, b)[0]
+
+    def gap(a, b):
+        d = abs(a - b)
+        return min(d, 1 - d)
+
+    picked, rest = [pals[0]], list(pals[1:])
+    while len(picked) < 3 and rest:
+        best = max(rest, key=lambda p: min(gap(hue(p["c1"]), hue(q["c1"])) for q in picked))
+        picked.append(best)
+        rest.remove(best)
+    out = {}
+    for i in range(1, 4):
+        if i <= len(picked):
+            src, key = picked[i - 1], "1"
+        else:                  # 区里不到三件：用第一件自己的 c2 / c3，颜色仍然是作品里来的
+            src, key = pals[0], str(i)
+        for kind in "cwd":
+            out[f"{kind}{i}"] = src[f"{kind}{key}"]
+    return out
 
 
 def render(template: str, **values) -> str:
@@ -772,6 +979,7 @@ def build_series(cfg: dict, force: bool) -> dict:
         "count": len(photos),
         "bytes": total_bytes,
         "cover": cover,
+        "palette": cover_palette(cover),
         "photos": photos,
     }
 
@@ -895,6 +1103,7 @@ def build_film(cfg: dict, force: bool) -> dict:
         "aspect": w / h,
         "bytes": total_bytes,
         "cover": cover,
+        "palette": cover_palette(cover),
         "photos": [],
     }
 
@@ -956,6 +1165,8 @@ def build_notes(cfg: dict, force: bool) -> dict:
         "missing_posters": missing,
         "count": 0,
         "bytes": total_bytes,
+        # 首页影评区的环境光 / 渐变标题、影评页的光晕，都用海报拼起来取的色
+        "palette": mosaic_palette([p for _, p in loaded]),
     }
 
 
@@ -1099,7 +1310,7 @@ def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
         root=root,
         alternates=alternate_links(s["slug"]),
         body=body,
-        **shell(),
+        **shell(root, palette=s["palette"]),
     )
 
     out = DIST / L["dir"] / s["slug"] / "index.html" if L["dir"] else DIST / s["slug"] / "index.html"
@@ -1128,6 +1339,11 @@ def nextup_values(s: dict, nxt: dict, lang: str, root: str) -> dict:
             f"<span>{esc(x)}</span>"
             for x in (eyebrow_for(nxt, lang), *detail_bits(nxt, lang)) if x
         ),
+        # 悬停时带上**下一组**的颜色：标题变成它的 w1（浅色，深底上 ≥ 14:1），
+        # 上沿那条线变成它 c1→c3 的渐变。c 色不能直接当字——深底上最低只有 2.9:1。
+        nextup_vars=(f"--nw: {nxt['palette']['w1']}; "
+                     + palette_vars({k.replace("c", "n"): v for k, v in nxt["palette"].items()
+                                     if k[0] == "c"}, "n")),
         back_href=f"{root}/",
         back_label=esc(L["all_work"]),
     )
@@ -1206,7 +1422,7 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
         root=root,
         alternates=alternate_links(s["slug"]),
         body=body,
-        **shell(),
+        **shell(root, palette=s["palette"]),
     )
 
     out = DIST / L["dir"] / s["slug"] / "index.html" if L["dir"] else DIST / s["slug"] / "index.html"
@@ -1332,7 +1548,7 @@ def render_notes(s: dict, lang: str, site: dict) -> None:
         root=root,
         alternates=alternate_links(s["slug"]),
         body=body,
-        **shell(),
+        **shell(root, palette=s["palette"]),
     )
     out = DIST / L["dir"] / s["slug"] if L["dir"] else DIST / s["slug"]
     out.mkdir(parents=True, exist_ok=True)
@@ -1436,10 +1652,17 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
     )
     eyebrow = eyebrow_for(s, lang)
     year = str(text_of(cfg, lang, "year"))
+    film = s["kind"] == "film"
 
+    # data-slug：换页动画（base.html 头部那段脚本）靠它找到「点的是哪一张」；
+    #            首页镜头换封面时，环境光也靠它找到那一组的颜色。
+    # style 里的 --c/--w/--d：这件作品自己的颜色（palette_for），悬停时环境光换成它的 --w。
+    # data-cursor：跟随光标停在这张上时显示的字（motion.js）。
     return f"""
-      <li class="work{' work--film' if s['kind'] == 'film' else ''}" style="--ar: {cover.aspect:.4f}">
-        <a class="work__link" href="./{s['slug']}/">
+      <li class="work{' work--film' if film else ''}" data-slug="{s['slug']}"
+          style="--ar: {cover.aspect:.4f}; {palette_vars(s['palette'])}">
+        <a class="work__link" href="./{s['slug']}/"
+           data-cursor="{esc(L['cursor_play' if film else 'cursor_view'])}">
           <span class="work__frame"
                 style="background-image: url(data:image/jpeg;base64,{cover.lqip})">
             <picture>
@@ -1459,6 +1682,28 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
       </li>"""
 
 
+def lens_data(photo_sets: list[dict], works: list[dict], prefix: str) -> str:
+    """首页 3D 镜头要的数据：光圈里轮流显示的封面，和映在金属上的颜色。
+
+    封面用 900px 那档 WebP：光圈最大时也就占屏幕一半，900 够了；
+    WebP 是所有能跑 WebGL2 的浏览器都认的格式，不用再判断 AVIF。
+    颜色用每件作品的 c1、c2——镜头叶片上映出来的，就是他作品里的颜色。
+
+    ⚠️ 这段 JSON 放在 <script type="application/json"> 里。URL 和颜色里
+       不会出现 "</"，所以 json.dumps 的结果可以直接放；以后往里加别的字段时要留意。
+    """
+    shown = [s for s in photo_sets if s["cover"].variants.get("webp")]
+    return json.dumps({
+        "covers": [prefix + s["cover"].variants["webp"][0][1] for s in shown],
+        # 光圈里换到哪一组，就发一个 lens:cover 事件带上它的 slug——
+        # motion.js 按 slug 找到首页那张卡，把第一屏的环境光换成那一组的颜色
+        "slugs": [s["slug"] for s in shown],
+        # 每张封面自己的强调色：光圈里换到哪一组，镜筒上那圈色环就变成那一组的颜色
+        "accents": [s["palette"]["c1"] for s in shown],
+        "colors": [s["palette"][k] for s in works for k in ("c1", "c2")],
+    }, ensure_ascii=False)
+
+
 def posterwall_html(notes: dict, lang: str, prefix: str) -> str:
     """首页的影评区：62 张小海报密排成一面墙，每张跳到影评页对应的锚点。
 
@@ -1474,7 +1719,8 @@ def posterwall_html(notes: dict, lang: str, prefix: str) -> str:
         inner = img or f'<span class="posterwall__fallback">{title}</span>'
         out.append(
             f'      <li class="posterwall__item">\n'
-            f'        <a href="./{notes["slug"]}/#{e["slug"]}" title="{title}">'
+            f'        <a href="./{notes["slug"]}/#{e["slug"]}" title="{title}"'
+            f' data-cursor="{esc(LANGS[lang]["cursor_read"])}">'
             f'{inner}</a>\n'
             f'      </li>'
         )
@@ -1528,6 +1774,11 @@ def write_index(series: list[dict], site: dict, lang: str,
         photo_works="\n".join(work_card(s, lang, prefix) for s in photo_sets),
         film_works="\n".join(work_card(s, lang, prefix) for s in films),
         posterwall=posterwall_html(notes, lang, prefix) if notes else "",
+        lens_data=lens_data(photo_sets, photo_sets + films, prefix),
+        # 三个区各自的默认颜色：环境光离开作品后回到它，区标题的渐变字用它的 --d
+        photos_vars=palette_vars(section_palette([s["palette"] for s in photo_sets]), "wd"),
+        films_vars=palette_vars(section_palette([s["palette"] for s in films]), "wd"),
+        notes_vars=palette_vars(notes["palette"], "wd") if notes else "",
         notes_href=f"./{notes['slug']}/" if notes else "",
         meta=meta,
         footer=esc(text_of(site, lang, "footer")),
@@ -1547,7 +1798,7 @@ def write_index(series: list[dict], site: dict, lang: str,
         root=root,
         alternates=alternate_links(),
         body=body,
-        **shell(home=True),
+        **shell(root, home=True),
     )
     out = DIST / L["dir"] / "index.html" if L["dir"] else DIST / "index.html"
     out.parent.mkdir(parents=True, exist_ok=True)

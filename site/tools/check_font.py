@@ -30,6 +30,8 @@ def main() -> None:
     for page in pages:
         html = re.sub(r"<script.*?</script>", "",
                       page.read_text(encoding="utf-8"), flags=re.S)
+        # 跟 subset_font.py 同一套：注释不显示，不算；属性里的字（data-cursor）要算
+        html = re.sub(r"<!--.*?-->", "", html, flags=re.S)
         chars |= set(re.findall(CJK, html))
 
     if not chars:

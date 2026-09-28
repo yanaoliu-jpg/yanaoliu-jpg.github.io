@@ -1,11 +1,15 @@
 <a class="skip" href="#notes">{{ skip }}</a>
 
 <a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
+<div class="progress" aria-hidden="true"></div>
 
 <main class="page">
 
   <header class="masthead">
     <div class="masthead__card">
+      <!-- 光晕：颜色从 62 张海报拼起来取（build.py 的 mosaic_palette）。
+           不带 data-vt：影评页不参与首页封面 ↔ 内页的形变，只走光圈换页。 -->
+      <div class="glow" aria-hidden="true"></div>
       <p class="masthead__eyebrow">{{ eyebrow }}</p>
       <h1 class="masthead__title">{{ title }}</h1>
       <p class="masthead__meta">{{ meta }}</p>

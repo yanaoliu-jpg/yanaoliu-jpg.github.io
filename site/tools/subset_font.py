@@ -101,6 +101,10 @@ def scan_chars() -> set[str]:
     for page in pages:
         html = page.read_text(encoding="utf-8")
         html = re.sub(r"<script.*?</script>", "", html, flags=re.S)  # 排除内嵌数据
+        # 模板里的注释会原样进 HTML，但从来不显示——那些字不该占字体（2026-09 加的，
+        # 「透过镜头」改版的中文注释一下子让 check_font.py 报了 13 个假缺字）。
+        # ⚠️ data-cursor 这种属性里的字**要算**：跟随光标会把它显示出来。
+        html = re.sub(r"<!--.*?-->", "", html, flags=re.S)
         chars |= set(re.findall(CJK, html))
     print(f"扫描 {len(pages)} 个页面，用到 {len(chars)} 个中日韩字符")
     return chars

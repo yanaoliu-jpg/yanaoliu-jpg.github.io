@@ -2,11 +2,77 @@
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
   首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="zh-Hans" class="no-js">
 <head>
 <meta charset="utf-8">
-<script>document.documentElement.classList.remove('no-js')</script>
+<script>
+document.documentElement.classList.remove('no-js');
+/*
+  换页动画（View Transitions，样式在 style.css 末尾）：首页封面 ↔ 内页光晕、首页标题 ↔ 内页大标题
+  要形变过去，两边就得有同一个 view-transition-name。名字**只临时给点的那一张**——
+  首页十张卡全写死的话，没配上对的九张会浮在新页面上面淡出。
+  必须写在 <head> 里：pagereveal 在新页面第一帧之前就触发，type="module" 的脚本赶不上。
+  浏览器不支持就整段跳过，只剩光圈换页；再不支持就是普通跳转。
+
+  配对靠 sessionStorage 里一句暗号（"旧页>新页"）：旧页真起了名才写，新页对上了才起。
+  两边各自判断的话，一边起了名另一边没起，那个落单的就会浮在新页面上面淡出。
+*/
+(function () {
+  if (!('onpagereveal' in window)) return;
+  var home = document.documentElement.classList.contains('theme-home');
+  var KEY = 'vt-pair';
+  function key(url) {                     // "/zh/good-night/" → "good-night"；首页 → ""
+    var p = new URL(url, location.href).pathname.split('/').filter(Boolean);
+    if (p[0] === 'zh') p.shift();
+    return p[0] || '';
+  }
+  function pairs(other) {                 // 这一页上跟「另一页」配对的元素
+    if (home) {
+      var card = document.querySelector('.work[data-slug="' + other + '"]');
+      return card ? [[card.querySelector('.work__frame'), 'cover'],
+                     [card.querySelector('.work__title'), 'title']] : [];
+    }
+    if (other) return [];                 // 内页只跟首页配对；内页之间只走光圈
+    return [].map.call(document.querySelectorAll('[data-vt]'),
+                       function (el) { return [el, el.getAttribute('data-vt')]; });
+  }
+  function name(list) {                   // 只给看得见的起名；返回撤销函数和起了几个
+    var named = list.filter(function (p) {
+      var r = p[0] && p[0].getBoundingClientRect();
+      return r && r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+    });
+    named.forEach(function (p) { p[0].style.viewTransitionName = 'vt-' + p[1]; });
+    return { n: named.length, undo: function () {
+      named.forEach(function (p) { p[0].style.viewTransitionName = ''; });
+    } };
+  }
+  function store(v) {                     // 两页之间对暗号：旧页起了名，新页才起
+    try { if (v) sessionStorage.setItem(KEY, v); else sessionStorage.removeItem(KEY); } catch (e) {}
+  }
+  addEventListener('pageswap', function (e) {
+    store('');
+    var to = e.activation && e.activation.entry;
+    if (!e.viewTransition || !to) return;
+    // 内页回首页只在「后退」时配对：点「全部作品」回去，首页在最顶上，那张卡根本不在屏幕里
+    if (!home && e.activation.navigationType !== 'traverse') return;
+    var got = name(pairs(key(to.url)));
+    if (!got.n) return;
+    store(key(location.href) + '>' + key(to.url));
+    // 从往返缓存（bfcache）回到这一页时名字不能还挂着，不然下次换页会带着它
+    addEventListener('pageshow', got.undo, { once: true });
+  });
+  addEventListener('pagereveal', function (e) {
+    var pair = '';
+    try { pair = sessionStorage.getItem(KEY) || ''; } catch (err) {}
+    store('');
+    var ends = pair.split('>');
+    if (!e.viewTransition || ends.length !== 2 || ends[1] !== key(location.href)) return;
+    e.viewTransition.finished.finally(name(pairs(ends[0])).undo);
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>我总是回到那几天 — 刘延奥</title>
 <meta name="description" content="2025 年 7 月底到 8 月初，上海的三天，九张照片。">
@@ -29,18 +95,25 @@
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../../static/style.css">
 </head>
-<body>
+<body style="--c1: #3a819d; --c2: #3b9b88; --c3: #3a9d94">
 <a class="skip" href="#plates">跳到照片</a>
 
 <a class="backlink" href="../../"><span aria-hidden="true">←</span> 全部作品</a>
 <a class="langswitch" href="../../keep-going-back/" title="Read in English">EN</a>
+<div class="progress" aria-hidden="true"></div>
 
 <main class="page">
 
   <header class="masthead">
     <div class="masthead__card">
+      <!--
+        光晕：本组封面取出来的 --c1..3（写在 <body> 上）。它是标题卡里的第一个弹性项，
+        占掉标题上方那一整段空白，下沿停在第一行字上面——标题几行都一样，
+        所以永远不会压在任何字下面。见 透过镜头设计.md「内页」。
+      -->
+      <div class="glow" data-vt="cover" aria-hidden="true"></div>
       <p class="masthead__eyebrow">第五组 <span aria-hidden="true">·</span> 2025</p>
-      <h1 class="masthead__title">我总是回到那几天</h1>
+      <h1 class="masthead__title" data-vt="title">我总是回到那几天</h1>
       <p class="masthead__meta"><span>9 张</span> <span>2025 年 7–8 月</span> <span>上海</span></p>
     </div>
 
@@ -301,7 +374,7 @@
   </section>
 
   <nav class="nextup" aria-label="下一组">
-    <a class="nextup__link" href="../looking-forward/">
+    <a class="nextup__link" href="../looking-forward/" style="--nw: #c3e8dc; --n1: #3b9b7b; --n2: #609b3b; --n3: #479b3b">
       <span class="nextup__label">下一组</span>
       <span class="nextup__title">留给日后</span>
       <span class="nextup__meta"><span>第六组</span> <span>9 张</span> <span>2026 年 3 月</span></span>
@@ -344,5 +417,6 @@
 <script type="application/json" id="photo-data">[{"avif":"../../img/keep-going-back/20250730-DSC01947-900.avif 900w, ../../img/keep-going-back/20250730-DSC01947-1600.avif 1600w, ../../img/keep-going-back/20250730-DSC01947-2400.avif 2400w","webp":"../../img/keep-going-back/20250730-DSC01947-900.webp 900w, ../../img/keep-going-back/20250730-DSC01947-1600.webp 1600w, ../../img/keep-going-back/20250730-DSC01947-2400.webp 2400w","jpg":"../../img/keep-going-back/20250730-DSC01947-900.jpg 900w, ../../img/keep-going-back/20250730-DSC01947-1600.jpg 1600w","src":"../../img/keep-going-back/20250730-DSC01947-1600.jpg","w":7008,"h":4672,"alt":"A large hall with thousands of small glass spheres hung from the ceiling; four students sit talking on the carpet below, a red projection glowing on the far wall.","date":"2025.07.30","time":"20:54","exif":""},{"avif":"../../img/keep-going-back/20250731-DSC02147-900.avif 900w, ../../img/keep-going-back/20250731-DSC02147-1600.avif 1600w, ../../img/keep-going-back/20250731-DSC02147-2400.avif 2400w","webp":"../../img/keep-going-back/20250731-DSC02147-900.webp 900w, ../../img/keep-going-back/20250731-DSC02147-1600.webp 1600w, ../../img/keep-going-back/20250731-DSC02147-2400.webp 2400w","jpg":"../../img/keep-going-back/20250731-DSC02147-900.jpg 900w, ../../img/keep-going-back/20250731-DSC02147-1600.jpg 1600w","src":"../../img/keep-going-back/20250731-DSC02147-1600.jpg","w":7008,"h":3942,"alt":"An empty campus road running straight to the horizon between two rows of tall trees under a pale overcast sky; two figures walk along the far pavement.","date":"2025.07.31","time":"17:06","exif":""},{"avif":"../../img/keep-going-back/20250731-DSC02181-900.avif 900w, ../../img/keep-going-back/20250731-DSC02181-1600.avif 1600w, ../../img/keep-going-back/20250731-DSC02181-2400.avif 2400w","webp":"../../img/keep-going-back/20250731-DSC02181-900.webp 900w, ../../img/keep-going-back/20250731-DSC02181-1600.webp 1600w, ../../img/keep-going-back/20250731-DSC02181-2400.webp 2400w","jpg":"../../img/keep-going-back/20250731-DSC02181-900.jpg 900w, ../../img/keep-going-back/20250731-DSC02181-1600.jpg 1600w","src":"../../img/keep-going-back/20250731-DSC02181-1600.jpg","w":7008,"h":4672,"alt":"An empty running track and playing field in front of a covered grandstand, with a single runner in white crossing the far side.","date":"2025.07.31","time":"17:17","exif":""},{"avif":"../../img/keep-going-back/20250731-DSC02200-900.avif 900w, ../../img/keep-going-back/20250731-DSC02200-1600.avif 1600w, ../../img/keep-going-back/20250731-DSC02200-2400.avif 2400w","webp":"../../img/keep-going-back/20250731-DSC02200-900.webp 900w, ../../img/keep-going-back/20250731-DSC02200-1600.webp 1600w, ../../img/keep-going-back/20250731-DSC02200-2400.webp 2400w","jpg":"../../img/keep-going-back/20250731-DSC02200-900.jpg 900w, ../../img/keep-going-back/20250731-DSC02200-1600.jpg 1600w","src":"../../img/keep-going-back/20250731-DSC02200-1600.jpg","w":6480,"h":4320,"alt":"A city at dusk seen through a rain-blurred window: a long building with its windows lit, a white tented roof below, distant lights beyond.","date":"2025.07.31","time":"19:08","exif":""},{"avif":"../../img/keep-going-back/20250801-DSC08635-900.avif 900w, ../../img/keep-going-back/20250801-DSC08635-1600.avif 1600w, ../../img/keep-going-back/20250801-DSC08635-2400.avif 2400w","webp":"../../img/keep-going-back/20250801-DSC08635-900.webp 900w, ../../img/keep-going-back/20250801-DSC08635-1600.webp 1600w, ../../img/keep-going-back/20250801-DSC08635-2400.webp 2400w","jpg":"../../img/keep-going-back/20250801-DSC08635-900.jpg 900w, ../../img/keep-going-back/20250801-DSC08635-1600.jpg 1600w","src":"../../img/keep-going-back/20250801-DSC08635-1600.jpg","w":7008,"h":4672,"alt":"A person stands in a dark museum gallery looking down at a display case, a lit wall of old film posters behind them.","date":"2025.08.01","time":"12:18","exif":""},{"avif":"../../img/keep-going-back/20250801-DSC08660-900.avif 900w, ../../img/keep-going-back/20250801-DSC08660-1600.avif 1600w, ../../img/keep-going-back/20250801-DSC08660-2400.avif 2400w","webp":"../../img/keep-going-back/20250801-DSC08660-900.webp 900w, ../../img/keep-going-back/20250801-DSC08660-1600.webp 1600w, ../../img/keep-going-back/20250801-DSC08660-2400.webp 2400w","jpg":"../../img/keep-going-back/20250801-DSC08660-900.jpg 900w, ../../img/keep-going-back/20250801-DSC08660-1600.jpg 1600w","src":"../../img/keep-going-back/20250801-DSC08660-1600.jpg","w":7008,"h":4672,"alt":"Seen through reflecting glass: a row of old movie cameras on tripods and stacks of film canisters, with a person leaning in to look.","date":"2025.08.01","time":"12:26","exif":""},{"avif":"../../img/keep-going-back/20250801-DSC08717-900.avif 900w, ../../img/keep-going-back/20250801-DSC08717-1600.avif 1600w, ../../img/keep-going-back/20250801-DSC08717-2400.avif 2400w","webp":"../../img/keep-going-back/20250801-DSC08717-900.webp 900w, ../../img/keep-going-back/20250801-DSC08717-1600.webp 1600w, ../../img/keep-going-back/20250801-DSC08717-2400.webp 2400w","jpg":"../../img/keep-going-back/20250801-DSC08717-900.jpg 900w, ../../img/keep-going-back/20250801-DSC08717-1600.jpg 1600w","src":"../../img/keep-going-back/20250801-DSC08717-1600.jpg","w":7008,"h":4672,"alt":"A visitor in a backwards cap with a camera on their shoulder reaches out to spin a zoetrope printed with rings of red and blue running figures.","date":"2025.08.01","time":"12:46","exif":""},{"avif":"../../img/keep-going-back/20250801-DSC08888-900.avif 900w, ../../img/keep-going-back/20250801-DSC08888-1600.avif 1600w, ../../img/keep-going-back/20250801-DSC08888-2400.avif 2400w","webp":"../../img/keep-going-back/20250801-DSC08888-900.webp 900w, ../../img/keep-going-back/20250801-DSC08888-1600.webp 1600w, ../../img/keep-going-back/20250801-DSC08888-2400.webp 2400w","jpg":"../../img/keep-going-back/20250801-DSC08888-900.jpg 900w, ../../img/keep-going-back/20250801-DSC08888-1600.jpg 1600w","src":"../../img/keep-going-back/20250801-DSC08888-1600.jpg","w":7008,"h":4672,"alt":"A view through a window over treetops to a round building with a wide flared roof and a white curved structure beyond, in hazy afternoon light.","date":"2025.08.01","time":"17:18","exif":""},{"avif":"../../img/keep-going-back/20250801-DSC08901-900.avif 900w, ../../img/keep-going-back/20250801-DSC08901-1600.avif 1600w, ../../img/keep-going-back/20250801-DSC08901-2400.avif 2400w","webp":"../../img/keep-going-back/20250801-DSC08901-900.webp 900w, ../../img/keep-going-back/20250801-DSC08901-1600.webp 1600w, ../../img/keep-going-back/20250801-DSC08901-2400.webp 2400w","jpg":"../../img/keep-going-back/20250801-DSC08901-900.jpg 900w, ../../img/keep-going-back/20250801-DSC08901-1600.jpg 1600w","src":"../../img/keep-going-back/20250801-DSC08901-1600.jpg","w":7008,"h":4672,"alt":"A dim room at night where someone sits on the floor playing a guitar to a screen of song lyrics, surrounded by about twenty people, most holding up their phones.","date":"2025.08.01","time":"21:53","exif":""}]</script>
 
 <script src="../../static/gallery.js" defer></script>
+<script type="module" src="../../static/motion.js"></script>
 </body>
 </html>
