@@ -438,16 +438,18 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
     await sctx.close();
   }
 
-  /* ── about. 「关于」：两段开场白；几行事实都来自网站上已有的内容；邮箱空着时没有「联系」那行；页脚
-     （2026-09-29「放映厅」改版）。他发来邮箱之后：FACTS 两边各加一行 ['Contact', 邮箱] / ['联系', 邮箱]，
-     页脚的期望值改成「北京 · 邮箱」。── */
+  /* ── about. 「关于」：两段开场白；几行事实都来自网站上已有的内容；「联系」那行和页脚的邮箱能点、
+     源码里不露明文（2026-09-29「放映厅」改版）。邮箱换了就改下面的 EMAIL。── */
   if (want('about')) {
+    const EMAIL = 'yanao_liu@jidjdfz.com';
     const FACTS = {
       '': [['Based in', 'Beijing'], ['Camera', 'Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art'],
            ['Work', '7 series 63 photographs 3 films 62 notes'], ['Years', '2023–2026'],
-           ['Recognition', 'National Outstanding Honor · Public Service Announcement · HOSA 2026 — Stop Scrolling, Stay Alive']],
+           ['Recognition', 'National Outstanding Honor · Public Service Announcement · HOSA 2026 — Stop Scrolling, Stay Alive'],
+           ['Contact', EMAIL]],
       '/zh': [['所在', '北京'], ['器材', '索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art'], ['作品', '7 组 63 张 3 部影片 62 篇影评'],
-              ['年份', '2023 至 2026'], ['获奖', '国家级卓越奖 · 公益广告 · 2026 HOSA 生物与健康未来领袖挑战——《停止滑动，面对生活》']],
+              ['年份', '2023 至 2026'], ['获奖', '国家级卓越奖 · 公益广告 · 2026 HOSA 生物与健康未来领袖挑战——《停止滑动，面对生活》'],
+              ['联系', EMAIL]],
     };
     for (const dir of ['', '/zh']) {
       await go(pg, `${BASE}${dir}/`);
@@ -458,11 +460,16 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
           rows: [...sec.querySelectorAll('.about__facts > div')].map((r) => [
             r.querySelector('dt').textContent.trim(), r.querySelector('dd').textContent.replace(/\s+/g, ' ').trim()]),
           footer: document.querySelector('.colophon__gear').textContent.replace(/\s+/g, ' ').trim(),
+          mailto: [...document.querySelectorAll('#about a[href^="mailto:"], .colophon a[href^="mailto:"]')].map((a) => a.href),
         };
       });
+      // 源码里不该有明文邮箱（字符编码成 &#NNN;，挡一部分扫邮箱的程序），浏览器里照常显示、照常能点
+      const src = await (await fetch(`${BASE}${dir}/`)).text().catch(() => '');
+      ok(src.length > 1000 && !src.includes(EMAIL) && !src.includes('mailto:'), `${dir}/ 源码里露出了明文邮箱（或没拿到源码：${src.length} 字节）`);
+      ok(!!d && d.mailto.length === 2 && d.mailto.every((h) => h === `mailto:${EMAIL}`), `${dir}/ 邮箱链接：${d && JSON.stringify(d.mailto)}`);
       ok(!!d && d.paras === 2, `${dir}/ 「关于」应有两段开场白：${d && d.paras}`);
       ok(!!d && JSON.stringify(d.rows) === JSON.stringify(FACTS[dir]), `${dir}/ 「关于」的事实：${d && JSON.stringify(d.rows)}`);
-      ok(!!d && d.footer === FACTS[dir][0][1], `${dir}/ 页脚是「${d && d.footer}」`);
+      ok(!!d && d.footer === `${FACTS[dir][0][1]} · ${EMAIL}`, `${dir}/ 页脚是「${d && d.footer}」`);
     }
   }
 

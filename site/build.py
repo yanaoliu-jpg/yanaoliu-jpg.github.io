@@ -1814,6 +1814,15 @@ def work_counts(photo_sets: list[dict], films: list[dict], n_notes: int, lang: s
     ) if x]
 
 
+def mailto(email: str) -> str:
+    """邮箱链接。地址和 mailto: 的每个字符都写成 &#NNN;——浏览器、读屏软件照常显示、照常能点，
+    只是 HTML 源码里不露明文，挡掉一部分按正则扫邮箱的垃圾邮件程序。零 JavaScript。
+    ⚠️ 不要再套 esc()：它会把 & 转成 &amp;，页面上就显示成一串乱码。
+    """
+    enc = lambda text: "".join(f"&#{ord(c)};" for c in text)
+    return f'<a href="{enc("mailto:" + email)}">{enc(email)}</a>'
+
+
 def about_html(site: dict, lang: str, ordered: list[dict], counts: list[str], series: list[dict]) -> str:
     """「关于」（2026-09-29「放映厅」改版）：左边开场白两段，右边几行事实——**全部来自网站上已有的内容**。
 
@@ -1831,7 +1840,7 @@ def about_html(site: dict, lang: str, ordered: list[dict], counts: list[str], se
         (L["about_years"], esc(year_span(series, lang))),
         (L["about_awards"], "<br>".join(
             esc(f"{a}——《{t}》" if lang == "zh" else f"{a} — {t}") for a, t in awards)),
-        (L["about_contact"], f'<a href="mailto:{esc(email)}">{esc(email)}</a>' if email else ""),
+        (L["about_contact"], mailto(email) if email else ""),
     ]
     facts = "\n".join(f"        <div><dt>{esc(k)}</dt><dd>{v}</dd></div>" for k, v in rows if v)
     return f"""<div class="about">
@@ -1922,8 +1931,7 @@ def write_index(series: list[dict], site: dict, lang: str,
         notes_href=f"./{notes['slug']}/" if notes else "",
         meta=meta,
         footer=esc(text_of(site, lang, "place")) + (
-            f' · <a href="mailto:{esc(site["email"].strip())}">{esc(site["email"].strip())}</a>'
-            if site.get("email", "").strip() else ""),
+            f' · {mailto(site["email"].strip())}' if site.get("email", "").strip() else ""),
         cat_about=esc(L["cat_about"]),
         about=about_html(site, lang, ordered, counts, series),
         # 「关于」这一区的颜色：从全部作品里挑三个色相最散开的

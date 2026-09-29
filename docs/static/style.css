@@ -1666,6 +1666,16 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   border-top: 1px solid var(--rule);
 }
 .colophon p { margin: 0; }
+/* 页脚里的邮箱（首页）：跟页脚同色；地址不跟着页脚转大写——邮箱写成大写看着像另一个地址 */
+.colophon a {
+  color: inherit;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 0.2em;
+  transition: color 0.2s;
+}
+.colophon a:hover { color: var(--ink); }
 /* 首页的封面缩了 25%，页脚上方那段空白同比例收（22vh → 16.5vh）；内页不动 */
 .theme-home .colophon { margin-top: clamp(6.75rem, 16.5vh, 12rem); }
 .colophon__name { color: var(--ink-dim); }

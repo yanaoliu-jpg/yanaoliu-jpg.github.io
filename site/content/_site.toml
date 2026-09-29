@@ -38,9 +38,11 @@ The camera is my brush and my way of looking. I use it to set down the world as 
 # ─────────────────────────────────────────────────────────────────
 place = "Beijing"                                    # 所在。原来叫 footer，页脚也用它
 gear = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"   # 器材，原样抄自各组的署名
-# 联系邮箱。空着就不显示「联系」那一行，页脚也不写。填了之后跑 build.py。
+# 联系邮箱。空着就不显示「联系」那一行，页脚也不写。改了之后跑 build.py。
 # ⚠️ 网站是公开的，谁都看得到——公开的邮箱会收到垃圾邮件。
-email = ""
+#    网页源码里它会被写成字符编码（&#121;&#97;…），挡掉一部分按正则扫邮箱的程序；读者看到的一样。
+#    换邮箱的话，site/tools/verify.js 的 about 节里 EMAIL 也要改。
+email = "yanao_liu@jidjdfz.com"
 
 
 # ═══════════════════════════════════════════════════════════════════

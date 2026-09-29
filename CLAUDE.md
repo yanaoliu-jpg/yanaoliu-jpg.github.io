@@ -839,7 +839,7 @@ DM Sans 在 24 页都真加载了（看 `document.fonts` 里的 status，**别�
 还没做，计划接在 [放映厅实现计划.md](放映厅实现计划.md) 后面写。
 
 **他拍板的**：首页暗色电影感（镜头撤掉）；第一屏用照片（七组封面）；「关于」= 开场白 + 已有的事实；
-联系留邮箱（**地址还没给**，`_site.toml` 的 `email` 空着，那一行就不出现）；三部片子的类型
+联系留邮箱（`yanao_liu@jidjdfz.com`，2026-09-29 给的，写在 `_site.toml` 的 `email`）；三部片子的类型
 （公益广告 / 纪录短片 / 纪录短片，第二步才用）。
 
 ### 两套颜色
@@ -896,7 +896,9 @@ DM Sans 在 24 页都真加载了（看 `document.fonts` 里的 status，**别�
 - 左边开场白两段（`_site.toml` 的 `intro`，第一段也是第一屏那句话）；右边事实全部来自已有内容：
   `place`、`gear`、`email` 手写在 `_site.toml`；作品数（`work_counts()`，第一屏那行也用它）、年份、
   获奖（各作品 toml 的 `award` 原文 + 片名）构建时收，不会过期
-- 他发来邮箱之后：填 `_site.toml` 的 `email`，`verify.js` 的 about 节里 `FACTS` 两边各加一行、页脚期望值改掉
+- 邮箱（`_site.toml` 的 `email`）在「关于」最后一行和首页页脚。HTML 里每个字符写成 `&#NNN;`（`build.py` 的 `mailto()`）：
+  浏览器、读屏软件照常显示、照常能点，源码里不露明文，挡一部分扫邮箱的程序。⚠️ 别再套 `esc()`，`&` 会被转义成乱码。
+  页脚的链接不跟着页脚转大写（`.colophon a`）。换邮箱要同时改 `verify.js` about 节的 `EMAIL`
 
 ### 验证（`verify.js`）
 
