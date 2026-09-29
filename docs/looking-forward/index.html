@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
-  首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  它只表示「这是首页」；颜色见下面那段主题脚本和 style.css 的 data-theme（放映厅改版设计.md 第四节）。
   body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="en" class="no-js">
@@ -78,6 +78,21 @@ document.documentElement.classList.remove('no-js');
 <meta name="description" content="Nine photographs made in Tung Chung, Hong Kong, over two days in March 2026.">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0e11">
+<script>
+/*
+  亮暗模式（2026-09-29「放映厅」改版）：默认暗色；读者点过切换、选了亮色，就记在 localStorage 的 theme 里。
+  必须写在样式表之前：先把 data-theme 设好再画第一帧，换页才不会先闪一下暗色。
+  隐私模式下 localStorage 会抛错——拿不到就当暗色。亮色的 theme-color 由 build.py 按页面写进来。
+*/
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('theme'); } catch (e) {}
+  if (t !== 'light') return;
+  document.documentElement.setAttribute('data-theme', 'light');
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f2efe9');
+  document.querySelector('meta[name="color-scheme"]').setAttribute('content', 'light');
+})();
+</script>
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Looking Forward — Yanao (Leo) Liu">
@@ -98,8 +113,23 @@ document.documentElement.classList.remove('no-js');
 <body style="--c1: #3b9b7b; --c2: #609b3b; --c3: #479b3b">
 <a class="skip" href="#plates">Skip to the photographs</a>
 
-<a class="backlink" href="../"><span aria-hidden="true">←</span> All work</a>
-<a class="langswitch" href="../zh/looking-forward/" title="Read in Chinese">中文</a>
+<header class="sitenav">
+  <a class="sitenav__name" href="../">Yanao (Leo) Liu</a>
+  <nav class="sitenav__links" id="sitenav-links" aria-label="Sections" popover>
+    <a class="sitenav__link" href="../#photographs" aria-current="true">Photographs</a>
+    <a class="sitenav__link" href="../#films">Films</a>
+    <a class="sitenav__link" href="../#film-notes">Film Notes</a>
+    <a class="sitenav__link" href="../#about">About</a>
+  </nav>
+  <div class="sitenav__tools">
+    <button class="sitenav__menu" type="button" popovertarget="sitenav-links">Menu</button>
+    <button class="sitenav__theme" type="button" hidden
+            aria-label="Switch to light mode" title="Switch to light mode"
+            data-to-light="Switch to light mode" data-to-dark="Switch to dark mode"
+            data-dark="#0d0e11" data-light="#f2efe9"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M5.4 18.6l1.5-1.5M17.1 6.9l1.5-1.5"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.8A8.2 8.2 0 1 1 9.2 4a6.5 6.5 0 0 0 10.8 10.8z"/></svg></button>
+    <a class="langswitch" href="../zh/looking-forward/" title="Read in Chinese">中文</a>
+  </div>
+</header>
 <div class="progress" aria-hidden="true"></div>
 
 <main class="page">
@@ -375,7 +405,7 @@ document.documentElement.classList.remove('no-js');
   </section>
 
   <nav class="nextup" aria-label="Next series">
-    <a class="nextup__link" href="../sea-and-light/" style="--nw: #aeecde; --n1: #28ae90; --n2: #2885ae; --n3: #28ae5e">
+    <a class="nextup__link" href="../sea-and-light/" style="--nw: #aeecde; --nd: #1e836c; --n1: #28ae90; --n2: #2885ae; --n3: #28ae5e">
       <span class="nextup__label">Next series</span>
       <span class="nextup__title">Sea and Light</span>
       <span class="nextup__meta"><span>Series 07</span> <span>9 photographs</span> <span>March 2026</span></span>

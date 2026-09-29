@@ -1,45 +1,44 @@
 <a class="skip" href="#photographs">{{ skip }}</a>
 
-<a class="langswitch" href="{{ switch_href }}" title="{{ switch_title }}">{{ switch_label }}</a>
+{{ sitenav }}
 
 <!--
   环境光（motion.js）：三团很大的柔光固定在最底层，颜色是 --a1..3。
-  第一屏跟着镜头里那一组照片走；鼠标停在哪件作品上就换成它的 --w；离开后回到所在区的默认色。
-  --w 的亮度都 ≥ 0.745（build.py 钳住的），深色小字压在上面仍然 ≥ 4.5:1。
-  关掉 JS 时 display: none，页面跟改版前一样。
+  motion.js 按视口正中落在哪一区、鼠标停在哪件作品上换色；
+  颜色从 --amb 取：暗色是各作品的 --c、很淡，亮色是 --w（style.css 映射）。
+  关掉 JS 时 display: none。
 -->
 <div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
 
-<!--
-  3D 镜头的挂载点（lens.js）。纯装饰：对读屏软件隐藏，关掉 JS 时整个不显示——
-  CSS 里 .lens 默认 display: none，只有 lens.js 成功建好场景后才加 .lens--on。
-  lens-data 是构建时写进来的：七组照片封面的 900px WebP，和作品取出来的颜色。
--->
-<div class="lens" id="lens" aria-hidden="true">
-  <canvas class="lens__canvas"></canvas>
-  <span class="lens__f">ƒ/16</span>
-</div>
-<script type="application/json" id="lens-data">{{ lens_data }}</script>
-
 <main class="page">
 
-  <header class="masthead">
-    <div class="masthead__card">
-      <p class="masthead__eyebrow">{{ home_eyebrow }}</p>
-      <h1 class="masthead__title">{{ name }}</h1>
-      <p class="masthead__meta">{{ meta }}</p>
+  <!--
+    第一屏（hero.js，2026-09-29「放映厅」改版）：七组照片的封面轮流全屏。
+    只有第一张写在这里——关掉 JS、减少动态效果、省流量时就是它，静止。
+    其余六张在页尾的 #hero-data 里，轮到它之前 2 秒才由 hero.js 建、才下载。
+    字压在 .hero__shade 那层渐黑上；对比度由 verify.js 的像素探针七张逐张量（起点和终点）。
+    见 放映厅改版设计.md 第五节。
+  -->
+  <section class="hero" id="top">
+    <div class="hero__reel">
+      {{ hero_slide }}
     </div>
-
-    <nav class="catnav" aria-label="{{ home_eyebrow }}">
-{{ catnav }}
-    </nav>
-
-    <div class="statement">
-      {{ intro }}
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="hero__text">
+      <h1 class="hero__name">{{ name }}</h1>
+      <p class="hero__line">{{ tagline }}</p>
+      <p class="hero__meta">{{ meta }}</p>
+      <p class="hero__scroll" aria-hidden="true">{{ scroll }}</p>
     </div>
-
-    <p class="masthead__scroll" aria-hidden="true">{{ scroll }}</p>
-  </header>
+    <div class="hero__now">
+      <a class="hero__caption" href="{{ now_href }}"><span class="hero__label">{{ now_showing }}</span>
+        <span class="hero__work">{{ now_label }}</span></a>
+      <button class="hero__pause" type="button" hidden aria-pressed="false" aria-label="{{ hero_pause }}" title="{{ hero_pause }}">
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5v11M15 6.5v11"/></svg>
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 6.2v11.6l9.2-5.8z"/></svg>
+      </button>
+    </div>
+  </section>
 
   <!--
     三大类别。照片在前 —— 招生官点开链接第一眼看到的必须是作品本身。
@@ -48,8 +47,9 @@
   -->
   <!--
     每个区的 style 是它的默认颜色（build.py 的 section_palette / mosaic_palette）：
-    --d 给区标题的渐变字，--w 给环境光。cat__label 包一层是为了让渐变只铺在字上，
-    不铺满整个 h2 的宽度——不然「Photographs」只分到渐变最左边那一截。
+    --d / --w 给区标题的渐变字（按模式挑，style.css 的 --g），--c / --w 给环境光（--amb）。
+    cat__label 包一层是为了让渐变只铺在字上，不铺满整个 h2 的宽度——
+    不然「Photographs」只分到渐变最左边那一截。
   -->
   <section class="cat" id="photographs" style="{{ photos_vars }}">
     <h2 class="cat__title"><span class="cat__label">{{ cat_photos }}</span></h2>
@@ -72,9 +72,17 @@
     </ul>
   </section>
 
+  <!-- 关于：开场白两段 + 几行事实（build.py 的 about_html，全部来自网站上已有的内容） -->
+  <section class="cat" id="about" style="{{ about_vars }}">
+    <h2 class="cat__title"><span class="cat__label">{{ cat_about }}</span></h2>
+    {{ about }}
+  </section>
+
   <footer class="colophon">
     <p class="colophon__gear">{{ footer }}</p>
     <p class="colophon__name">{{ name }}</p>
   </footer>
 
 </main>
+
+<script type="application/json" id="hero-data">{{ hero_data }}</script>

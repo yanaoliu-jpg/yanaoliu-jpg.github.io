@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   全站交互（「透过镜头」改版）：环境光、封面倾斜反光、跟随光标、走马盘、进度条兜底
+   全站交互（「透过镜头」改版起）：顶部导航、环境光、封面倾斜反光、跟随光标、走马盘、进度条兜底
 
    type="module"：老浏览器不认识，会整个跳过——它们拿到的就是静态版。
    所有效果都叠在现有 HTML 上；关掉 JS 时页面跟改版前一样。
@@ -19,6 +19,8 @@ const home = root.classList.contains('theme-home');
 root.classList.add('fx');
 
 for (const [wanted, feature] of [
+  [true, nav],
+  [true, themeToggle],
   [home, ambient],
   [home && fine && !reduce, tilt],          // 减少动态效果：封面不倾斜
   [home && fine && !reduce, cursor],        // 减少动态效果：没有跟随光标
@@ -29,11 +31,77 @@ for (const [wanted, feature] of [
   try { feature(); } catch (err) { console.warn(`[motion] ${feature.name} 已关闭：`, err); }
 }
 
+/* ── 顶部导航（全站）────────────────────────────────────────────────
+   · 首页在最顶上时透明（.is-over-hero）。只在最顶上：一往下滚，第一屏自己的大名字就会
+     从导航底下经过，透明的话两行字叠在一起（2026-09-29 截图看到的）——磨砂才把它糊开
+   · 往下读时收起（.is-away），往上滑超过 4px 出来；在最上面 80px、手机菜单开着时不收
+   · 手机菜单（原生 popover）点了一项就收起——原生的只在点外面时自己收
+   关掉 JS：一直是磨砂、一直显示（style.css）。 */
+function nav() {
+  const bar = document.querySelector('.sitenav');
+  if (!bar) return;
+  const menu = bar.querySelector('.sitenav__links');
+  const hero = document.querySelector('.hero');
+  const menuOpen = () => { try { return menu.matches(':popover-open'); } catch (e) { return false; } };
+  menu?.addEventListener('click', (e) => { if (e.target.closest('a') && menuOpen()) menu.hidePopover(); });
+
+  let lastY = scrollY, queued = false;
+  function update() {
+    queued = false;
+    const y = scrollY;
+    bar.classList.toggle('is-over-hero', !!hero && y < 8);
+    if (y < 80 || menuOpen()) bar.classList.remove('is-away');
+    else if (y > lastY + 4) bar.classList.add('is-away');
+    else if (y < lastY - 4) bar.classList.remove('is-away');
+    if (Math.abs(y - lastY) > 4) lastY = y;
+  }
+  addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update);
+  update();
+}
+
+/* ── 亮暗切换（全站）────────────────────────────────────────────────
+   默认暗色；点了切到亮色，记在 localStorage（下一页由 base.html 头部脚本在样式表之前读）。
+   按钮上写着 data-dark / data-light 两个 theme-color（build.py 按页面给的），
+   data-to-light / data-to-dark 两个 aria-label。整页淡入淡出过去；减少动态效果时直接换。 */
+function themeToggle() {
+  const btn = document.querySelector('.sitenav__theme');
+  if (!btn) return;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const scheme = document.querySelector('meta[name="color-scheme"]');
+  const label = () => {
+    const text = root.dataset.theme === 'light' ? btn.dataset.toDark : btn.dataset.toLight;
+    btn.setAttribute('aria-label', text);
+    btn.title = text;
+  };
+  const apply = (light) => {
+    if (light) root.dataset.theme = 'light';
+    else delete root.dataset.theme;
+    meta?.setAttribute('content', light ? btn.dataset.light : btn.dataset.dark);
+    scheme?.setAttribute('content', light ? 'light' : 'dark');
+    try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (e) { /* 隐私模式：只这一页换 */ }
+    label();
+    document.dispatchEvent(new CustomEvent('site:theme'));
+  };
+  btn.addEventListener('click', () => {
+    const light = root.dataset.theme !== 'light';
+    // 同一页的 View Transition 也会用到 ::view-transition-new(root)，那里挂着换页的光圈——
+    // 加 .vt-local，让根节点这一次只淡入淡出（style.css 末尾）
+    if (reduce || !document.startViewTransition) { apply(light); return; }
+    root.classList.add('vt-local');
+    document.startViewTransition(() => apply(light)).finished
+      .finally(() => root.classList.remove('vt-local'));
+  });
+  label();
+  btn.hidden = false;
+}
+
 /* ── 环境光（首页）────────────────────────────────────────────────
    三团柔光的颜色 --a1..3 按优先级取：
-     1. 鼠标 / 键盘焦点停在哪件作品上 → 那件作品的 --w1..3
-     2. 视口正中那条线落在哪一区 → 那一区 <section> 上的 --w1..3
-     3. 第一屏 → 镜头光圈里此刻那一组照片的颜色（lens.js 发 lens:cover 事件）
+     1. 鼠标 / 键盘焦点停在哪件作品上 → 那件作品的 --amb1..3
+     2. 视口正中那条线落在哪一区 → 那一区 <section> 上的 --amb1..3
+     3. 还在第一屏（照片盖满，光在它后面看不见）→ 照片区的颜色，往下滚时已经是对的
+   --amb 是 style.css 按模式映射的：暗色是各作品的 --c（很淡），亮色是 --w。
    颜色全是 build.py 取好、钳住亮度的，这里只负责挑一个、交给 CSS 过渡。 */
 function ambient() {
   const layer = document.querySelector('.ambient');
@@ -41,27 +109,19 @@ function ambient() {
 
   const colorsOf = (el) => {
     const cs = getComputedStyle(el);
-    return [1, 2, 3].map((i) => cs.getPropertyValue(`--w${i}`).trim());
+    return [1, 2, 3].map((i) => cs.getPropertyValue(`--amb${i}`).trim());
   };
-  const cards = new Map([...document.querySelectorAll('.work[data-slug]')]
-    .map((el) => [el.dataset.slug, el]));
-  const first = document.querySelector('#photographs .work');
-  let lensColors = first ? colorsOf(first) : null;   // 镜头的第一张就是照片区的第一组
-  let zone = 'masthead';
+  const cards = [...document.querySelectorAll('.work[data-slug]')];
+  const zones = [...document.querySelectorAll('.cat')];
+  let zone = zones[0] || null;
   let hovered = null;
-
-  const zones = new Map();
-  const masthead = document.querySelector('.masthead');
-  if (masthead) zones.set(masthead, 'masthead');
-  for (const s of document.querySelectorAll('.cat')) zones.set(s, s.id);
-  const zoneEl = (name) => [...zones].find(([, n]) => n === name)?.[0];
 
   let shown = '';
   function apply() {
-    const colors = hovered ? colorsOf(hovered)
-      : zone === 'masthead' ? lensColors
-        : colorsOf(zoneEl(zone));
-    if (!colors || !colors[0]) return;
+    const src = hovered || zone;
+    if (!src) return;
+    const colors = colorsOf(src);
+    if (!colors[0]) return;
     const key = colors.join();
     if (key === shown) return;
     shown = key;
@@ -71,10 +131,10 @@ function ambient() {
   // 视口正中那条线（上下各缩进 50% 之后只剩一条线）落在哪一区。
   // 落在两区之间的空隙里时什么都不改，保持上一区的颜色。
   const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) zone = zones.get(e.target);
+    for (const e of entries) if (e.isIntersecting) zone = e.target;
     apply();
   }, { rootMargin: '-50% 0px -50% 0px' });
-  for (const el of zones.keys()) io.observe(el);
+  zones.forEach((z) => io.observe(z));
 
   // 扫过一排封面时不要每张都闪一下：进入要停 90ms 才算，离开给 260ms 的余地
   let enterTimer = 0, leaveTimer = 0;
@@ -86,19 +146,15 @@ function ambient() {
     clearTimeout(enterTimer); clearTimeout(leaveTimer);
     leaveTimer = setTimeout(() => { hovered = null; apply(); }, 260);
   };
-  for (const card of cards.values()) {
+  for (const card of cards) {
     card.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') enter(card); });
     card.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') leave(); });
     card.addEventListener('focusin', () => enter(card));
     card.addEventListener('focusout', leave);
   }
 
-  addEventListener('lens:cover', (e) => {
-    const card = cards.get(e.detail?.slug);
-    if (!card) return;
-    lensColors = colorsOf(card);
-    apply();
-  });
+  // 换了亮暗模式：同一件作品的 --amb 换了一套，重新取
+  document.addEventListener('site:theme', () => { shown = ''; apply(); });
 
   apply();
   // 先让「display: block + opacity: 0」落地一帧，再加 is-on，淡入才会真的发生
@@ -107,12 +163,12 @@ function ambient() {
 }
 
 /* ── 封面倾斜 + 反光（首页，只在有鼠标的设备上）────────────────────
-   鼠标在封面上时，封面朝鼠标那一侧往里倒（最多 8°），像拿在手里转向你的照片；
+   鼠标在封面上时，封面朝鼠标那一侧往里倒（最多 5°），像拿在手里转向你的照片；
    一道柔光跟着鼠标。离开时弹簧回正：每帧 v = (v + (目标 − 现在)·K)·阻尼。
    量位置用链接的盒子，不用封面自己的——封面歪了之后它的外框会跟着变，拿来量会自己抖起来。 */
 function tilt() {
   root.classList.add('fx-tilt');
-  const MAX = 8, K = 0.12, DAMP = 0.74;
+  const MAX = 5, K = 0.12, DAMP = 0.74;     // 最多 5°：2026-09-29 从 8° 收的（「动效要克制」）
   const live = new Set();
   let raf = 0;
 

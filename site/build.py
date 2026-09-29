@@ -90,13 +90,11 @@ LANGS = {
         "dir": "",
         "html_lang": "en",
         "photographs": "photographs",
-        "all_work": "All work",
         "scroll": "Scroll",
         "skip_photos": "Skip to the photographs",
         "skip_work": "Skip to the work",
         "skip_film": "Skip to the film",
         "series_count": "series",
-        "home_eyebrow": "Photographs",
         "switch_label": "中文",
         "switch_title": "Read in Chinese",
         "next_series": "Next series",
@@ -108,6 +106,22 @@ LANGS = {
         "cat_photos": "Photographs",
         "cat_films": "Films",
         "cat_notes": "Film Notes",
+        # 顶部导航（2026-09「放映厅」改版）
+        "cat_about": "About",
+        "nav_label": "Sections",
+        "nav_menu": "Menu",
+        "theme_to_light": "Switch to light mode",
+        "theme_to_dark": "Switch to dark mode",
+        # 第一屏（2026-09「放映厅」改版）
+        "now_showing": "Now showing",
+        "hero_pause": "Pause slideshow",
+        # 「关于」里的六个标签
+        "about_place": "Based in",
+        "about_gear": "Camera",
+        "about_work": "Work",
+        "about_years": "Years",
+        "about_awards": "Recognition",
+        "about_contact": "Contact",
         "notes_eyebrow": "Notes",
         # ⚠️ 不能写 "films"。首页那行是「7 series · 63 photographs · 3 films · N ___」，
         #    写 films 就成了「3 films · 62 films」，读者会以为站上有 65 部片子。
@@ -134,13 +148,11 @@ LANGS = {
         "dir": "zh",
         "html_lang": "zh-Hans",
         "photographs": "张",
-        "all_work": "全部作品",
         "scroll": "向下",
         "skip_photos": "跳到照片",
         "skip_work": "跳到作品",
         "skip_film": "跳到影片",
         "series_count": "组",
-        "home_eyebrow": "摄影",
         "switch_label": "EN",
         "switch_title": "Read in English",
         "next_series": "下一组",
@@ -152,6 +164,19 @@ LANGS = {
         "cat_photos": "照片",
         "cat_films": "影片",
         "cat_notes": "影评",
+        "cat_about": "关于",
+        "nav_label": "栏目",
+        "nav_menu": "菜单",
+        "theme_to_light": "切换到亮色",
+        "theme_to_dark": "切换到暗色",
+        "now_showing": "正在放映",
+        "hero_pause": "暂停轮播",
+        "about_place": "所在",
+        "about_gear": "器材",
+        "about_work": "作品",
+        "about_years": "年份",
+        "about_awards": "获奖",
+        "about_contact": "联系",
         "notes_eyebrow": "影评",
         # 同上：跟前面的「3 部影片」并排，写「62 部」会读成 62 部片子
         "notes_count": "篇影评",
@@ -199,24 +224,40 @@ INDEX_COVER_H = "clamp(220px, 15vw + 84px, 300px)"
 INDEX_STACK_PX = 900
 INDEX_STACK_VH = 52
 
-# ── 页面主题 ────────────────────────────────────────────────────
-# 首页是亮的（渐变底），其余 22 页是深的。**一套 CSS**：只有首页的 <html>
-# 多一个 theme-home 类，颜色变量在它下面换值，内页一行不改。
-# 见 首页改版设计.md 第四节。
+# ── 页面主题（2026-09-29「放映厅」改版）──────────────────────────
+# 默认**全站暗色**，读者可以切到亮色（<html data-theme="light">，记在 localStorage）。
+# 一套 CSS：:root 是暗色那套变量，:root[data-theme="light"] 换成亮色那套。
+# theme-home 类留着，但只表示「这是首页」，不再表示颜色。见 放映厅改版设计.md 第四节。
 #
-# ⚠️ HOME_THEME_COLOR 必须等于 style.css 里渐变最上面那一站，
-#    DARK_THEME_COLOR 必须等于 :root 的 --bg。手机地址栏的颜色靠它。
-HOME_THEME_COLOR = "#f3e4dc"
+# ⚠️ 这三个颜色各有一个 CSS 里的对应：
+#    DARK_THEME_COLOR  ↔ :root 的 --bg（默认，全站）
+#    HOME_THEME_COLOR  ↔ 亮色首页渐变的第一站、.theme-home[data-theme="light"] 的 --bg
+#    PAPER_THEME_COLOR ↔ :root[data-theme="light"] 的 --bg（亮色内页）
+#    手机地址栏的颜色靠它们；亮色的两个由 base.html 头部脚本和 motion.js 的切换按钮写进 meta。
 DARK_THEME_COLOR = "#0d0e11"
+HOME_THEME_COLOR = "#f3e4dc"
+PAPER_THEME_COLOR = "#f2efe9"
+
+# 亮暗切换按钮的两个图标：暗色时显示太阳（点了变亮），亮色时显示月亮（style.css 切换）
+THEME_ICONS = (
+    '<svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/>'
+    '<path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5'
+    'M5.4 18.6l1.5-1.5M17.1 6.9l1.5-1.5"/></svg>'
+    '<svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true">'
+    '<path d="M20 14.8A8.2 8.2 0 1 1 9.2 4a6.5 6.5 0 0 0 10.8 10.8z"/></svg>'
+)
 
 
 def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
     """base.html 里跟主题和脚本有关的槽。首页传 home=True，其余不传。
 
+    颜色不再按页面分：默认全站暗色（见上面的「页面主题」）。
+    light_theme_color 是这一页在亮色模式下的 theme-color，给 base.html 头部那段脚本用。
+
     html_class 带前导空格，因为模板里写的是 class="no-js{{ html_class }}"——
     内页的值是空串，不能留一个尾随空格。body_attrs 同理。
 
-    scripts：motion.js 全站都有；lens.js（3D 镜头）**只在首页**。
+    scripts：motion.js 全站都有；hero.js（第一屏轮播）**只在首页**。
     两个都是 type="module"：老浏览器不认识 module，会整个跳过——
     它们拿到的就是静态版，这正是想要的渐进增强。module 天然是 defer 的。
 
@@ -225,11 +266,13 @@ def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
     """
     scripts = [f'<script type="module" src="{root}/static/motion.js"></script>']
     if home:
-        scripts.append(f'<script type="module" src="{root}/static/lens.js"></script>')
+        scripts.append(f'<script type="module" src="{root}/static/hero.js"></script>')
     return {
         "html_class": " theme-home" if home else "",
-        "color_scheme": "light" if home else "dark",
-        "theme_color": HOME_THEME_COLOR if home else DARK_THEME_COLOR,
+        # 默认暗色；读者选了亮色时，base.html 头部脚本在样式表之前把这两个 meta 改掉
+        "color_scheme": "dark",
+        "theme_color": DARK_THEME_COLOR,
+        "light_theme_color": HOME_THEME_COLOR if home else PAPER_THEME_COLOR,
         "scripts": "\n".join(scripts),
         "body_attrs": f' style="{palette_vars(palette, "c")}"' if palette else "",
     }
@@ -1293,9 +1336,7 @@ def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
         **nextup_values(s, nxt, lang, root),
         scroll=esc(L["scroll"]),
         skip=esc(L["skip_photos"]),
-        switch_href=switch_href(lang, s["slug"]),
-        switch_label=esc(L["switch_label"]),
-        switch_title=esc(L["switch_title"]),
+        sitenav=sitenav(lang, "series", site, s["slug"]),
         viewer_label=esc(L["viewer_label"]),
         close_label=esc(L["close"]),
         prev_label=esc(L["prev"]),
@@ -1341,11 +1382,10 @@ def nextup_values(s: dict, nxt: dict, lang: str, root: str) -> dict:
         ),
         # 悬停时带上**下一组**的颜色：标题变成它的 w1（浅色，深底上 ≥ 14:1），
         # 上沿那条线变成它 c1→c3 的渐变。c 色不能直接当字——深底上最低只有 2.9:1。
-        nextup_vars=(f"--nw: {nxt['palette']['w1']}; "
+        # 亮色模式下标题用 --nd（下一组的 d1，深色）：浅色的 w1 在纸色上看不清
+        nextup_vars=(f"--nw: {nxt['palette']['w1']}; --nd: {nxt['palette']['d1']}; "
                      + palette_vars({k.replace("c", "n"): v for k, v in nxt["palette"].items()
                                      if k[0] == "c"}, "n")),
-        back_href=f"{root}/",
-        back_label=esc(L["all_work"]),
     )
 
 
@@ -1408,9 +1448,7 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
         author=esc(author),
         scroll=esc(L["scroll"]),
         skip=esc(L["skip_film"]),
-        switch_href=switch_href(lang, s["slug"]),
-        switch_label=esc(L["switch_label"]),
-        switch_title=esc(L["switch_title"]),
+        sitenav=sitenav(lang, "film", site, s["slug"]),
         **nextup_values(s, nxt, lang, root),
     )
 
@@ -1430,32 +1468,49 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
     out.write_text(page, encoding="utf-8")
 
 
-def catnav(lang: str, here: str) -> str:
-    """三大类别导航。here ∈ {"home", "notes"}。
+def sitenav(lang: str, here: str, site: dict, slug: str = "") -> str:
+    """每一页顶上那条导航（2026-09-29「放映厅」改版）。here ∈ {"home", "series", "film", "notes"}。
 
-    ⚠️ 相对链接必须落在**本语言**那一层。中文影评页 /zh/film-notes/
-       回中文首页是 `../`，写成 `../../` 会掉进英文站——读者读着中文
-       突然进了英文页。这个坑「下一组」踩过一次。
-       查法：new URL(href, location.href).pathname，看落点在不在同一语言下。
+    左边名字回首页；中间四项链到首页的四个区；右边是工具：手机上的「菜单」、亮暗切换、语言切换。
+    亮暗切换按钮默认 hidden——它只在有 JS 时有用，motion.js 把它放出来。
+    内页上所属的那一类标 aria-current="true"（构建时写死）。
+    它接手了原来首页和影评页的分类导航、内页左上角的「全部作品」。
+    原来内页不放导航，理由是「安静的阅读页，一条导航会把注意力从照片上拉走」——
+    这条现在由「往下读时收起」守着（motion.js 的 nav()），看照片时它不在屏幕上。
 
-    只放在首页和影评页。系列页、影片页不加——那些是安静的阅读页，
-    已经有「全部作品」和「下一组」，再压一条导航会把注意力从照片上拉走。
+    ⚠️ 相对链接必须落在**本语言**那一层：首页上是 #top、#photographs；
+       内页（系列、影片、影评页）一律 ../ 开头——中英文的内页都只比自己的首页深一层。
+       原来内页左上角的「全部作品」写的是 {root}/，中文页上是 ../../ = **英文首页**，
+       读者读着中文突然掉进英文站（2026-09-29 才发现：verify 以前只查了英文页）。
+       查法：new URL(href, location.href).pathname。
+
+    手机上四项收进原生 popover（零 JS）；不支持 popover 的老浏览器会把四项直接排在条上。
     """
     L = LANGS[lang]
-    up = "" if here == "home" else "../"
-    items = [
-        ("home", f"{up}#photographs", L["cat_photos"]),
-        ("home", f"{up}#films", L["cat_films"]),
-        ("notes", "" if here == "notes" else "./film-notes/", L["cat_notes"]),
-    ]
-    out = []
-    for owner, href, label in items:
-        if owner == here and not href:
-            out.append(f'    <span class="catnav__item" aria-current="page">'
-                       f'{esc(label)}</span>')
-        else:
-            out.append(f'    <a class="catnav__item" href="{href}">{esc(label)}</a>')
-    return "\n".join(out)
+    home = here == "home"
+    up = "" if home else "../"
+    current = {"series": "photographs", "film": "films", "notes": "film-notes"}.get(here)
+    links = "\n".join(
+        f'    <a class="sitenav__link" href="{up}#{anchor}"'
+        + (' aria-current="true"' if anchor == current else "")
+        + f">{esc(L[key])}</a>"
+        for anchor, key in (("photographs", "cat_photos"), ("films", "cat_films"),
+                            ("film-notes", "cat_notes"), ("about", "cat_about"))
+    )
+    return f"""<header class="sitenav">
+  <a class="sitenav__name" href="{'#top' if home else '../'}">{esc(text_of(site, lang, 'name'))}</a>
+  <nav class="sitenav__links" id="sitenav-links" aria-label="{esc(L['nav_label'])}" popover>
+{links}
+  </nav>
+  <div class="sitenav__tools">
+    <button class="sitenav__menu" type="button" popovertarget="sitenav-links">{esc(L['nav_menu'])}</button>
+    <button class="sitenav__theme" type="button" hidden
+            aria-label="{esc(L['theme_to_light'])}" title="{esc(L['theme_to_light'])}"
+            data-to-light="{esc(L['theme_to_light'])}" data-to-dark="{esc(L['theme_to_dark'])}"
+            data-dark="{DARK_THEME_COLOR}" data-light="{HOME_THEME_COLOR if home else PAPER_THEME_COLOR}">{THEME_ICONS}</button>
+    <a class="langswitch" href="{switch_href(lang, slug)}" title="{esc(L['switch_title'])}">{esc(L['switch_label'])}</a>
+  </div>
+</header>"""
 
 
 def poster_html(entry: dict, prefix: str, lang: str, px: int, klass: str) -> str:
@@ -1528,16 +1583,13 @@ def render_notes(s: dict, lang: str, site: dict) -> None:
         title=esc(title),
         eyebrow=esc(L["notes_eyebrow"]),
         meta=meta,
-        catnav=catnav(lang, "notes"),
         statement=paragraphs(text_of(cfg, lang, "statement")),
         entries="\n".join(note_html(e, lang, prefix) for e in entries),
         credit=esc(L["poster_credit"]),
         name=esc(name),
         scroll=esc(L["scroll"]),
         skip=esc(L["skip_notes"]),
-        switch_href=switch_href(lang, s["slug"]),
-        switch_label=esc(L["switch_label"]),
-        switch_title=esc(L["switch_title"]),
+        sitenav=sitenav(lang, "notes", site, s["slug"]),
     )
     page = render(
         (TEMPLATES / "base.html").read_text(encoding="utf-8"),
@@ -1682,26 +1734,114 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
       </li>"""
 
 
-def lens_data(photo_sets: list[dict], works: list[dict], prefix: str) -> str:
-    """首页 3D 镜头要的数据：光圈里轮流显示的封面，和映在金属上的颜色。
+# ── 第一屏（2026-09-29「放映厅」改版）──────────────────────────────
+# 七组照片的封面轮流全屏：每张停 6 秒、淡入淡出 1.6 秒，缓慢推近（HERO_ZOOM），
+# 同时顺着被裁掉的方向平移（hero.js 算）。它替掉了「透过镜头」那个 3D 镜头。
+# 见 放映厅改版设计.md 第五节。
+#
+# ⚠️ 三处必须同步（CLAUDE.md 第三节第 2 条那一类）：
+#    HERO_ZOOM / hero_sizes()  ↔  style.css 的 .hero__slide img 尺寸公式（铺满一屏 = max(宽, 高 × 宽高比)）
+#                              ↔  style.css 的 @keyframes hero-drift 终点的 scale(1.06)
+#    对不上不会变形，但会下错档：要么糊，要么白下载大图。
+HERO_ZOOM = 1.06
 
-    封面用 900px 那档 WebP：光圈最大时也就占屏幕一半，900 够了；
-    WebP 是所有能跑 WebGL2 的浏览器都认的格式，不用再判断 AVIF。
-    颜色用每件作品的 c1、c2——镜头叶片上映出来的，就是他作品里的颜色。
 
-    ⚠️ 这段 JSON 放在 <script type="application/json"> 里。URL 和颜色里
-       不会出现 "</"，所以 json.dumps 的结果可以直接放；以后往里加别的字段时要留意。
+def hero_sizes(photo: Photo) -> str:
+    """铺满一屏（object-fit: cover 的算法）再推近 HERO_ZOOM。竖片在宽屏上由宽度决定，横片在手机上由高度决定。"""
+    return f"calc({HERO_ZOOM} * max(100vw, {photo.aspect * 100:.1f}vh))"
+
+
+def hero_focus(cfg: dict) -> tuple[float, float]:
+    """toml 里可选的 hero_focus = "50% 30%"：画面重心。推近和平移都围着它；不写就是正中。"""
+    raw = str(cfg.get("hero_focus", "50% 50%")).replace("%", " ").split()
+    try:
+        fx, fy = (float(v) for v in raw)
+    except ValueError:
+        sys.exit(f"{cfg['title']} 的 hero_focus 要写成 \"50% 30%\"，现在是 {cfg.get('hero_focus')!r}")
+    return fx, fy
+
+
+def hero_slides(photo_sets: list[dict], lang: str, prefix: str) -> list[dict]:
+    """第一屏每一张的数据，顺序同系列顺序。第一张同时写进 HTML（关掉 JS 时就是它）。"""
+    out = []
+    for s in photo_sets:
+        c = s["cover"]
+        fx, fy = hero_focus(s["cfg"])
+        out.append({
+            "href": f"./{s['slug']}/",
+            "label": f"{eyebrow_for(s, lang)} · {text_of(s['cfg'], lang, 'title')}",
+            "ar": round(c.aspect, 4),
+            "fx": fx,
+            "fy": fy,
+            "alt": c.alt,
+            "avif": srcset(c.variants.get("avif", []), prefix),
+            "webp": srcset(c.variants.get("webp", []), prefix),
+            "jpg": srcset(c.variants["jpg"], prefix),
+            "src": prefix + c.variants["jpg"][-1][1],
+            "sizes": hero_sizes(c),
+            "lqip": c.lqip,
+        })
+    return out
+
+
+def hero_html(slide: dict) -> str:
+    """第一张：写在 HTML 里、fetchpriority=high、带模糊缩图垫底。其余六张由 hero.js 按 #hero-data 建。"""
+    sources = "".join(
+        f'\n          <source type="{mime}" srcset="{slide[ext]}" sizes="{slide["sizes"]}">'
+        for ext, mime in (("avif", "image/avif"), ("webp", "image/webp")) if slide[ext]
+    )
+    return f"""<figure class="hero__slide is-on" data-i="0"
+              style="--ar: {slide['ar']}; --fx: {slide['fx']:g}; --fy: {slide['fy']:g}; background-image: url(data:image/jpeg;base64,{slide['lqip']})">
+        <picture>{sources}
+          <img src="{slide['src']}" srcset="{slide['jpg']}" sizes="{slide['sizes']}"
+               alt="{esc(slide['alt'])}" fetchpriority="high" decoding="async">
+        </picture>
+      </figure>"""
+
+
+def work_counts(photo_sets: list[dict], films: list[dict], n_notes: int, lang: str) -> list[str]:
+    """「7 组 · 63 张 · 3 部影片 · 62 篇影评」——第一屏那行和「关于」里的「作品」共用，构建时数，不会过期。
+
+    影片不算进「N 组 · M 张」——它既不是一组照片，里面也没有"张"。有影片时单列一项，没有就不出现。
     """
-    shown = [s for s in photo_sets if s["cover"].variants.get("webp")]
-    return json.dumps({
-        "covers": [prefix + s["cover"].variants["webp"][0][1] for s in shown],
-        # 光圈里换到哪一组，就发一个 lens:cover 事件带上它的 slug——
-        # motion.js 按 slug 找到首页那张卡，把第一屏的环境光换成那一组的颜色
-        "slugs": [s["slug"] for s in shown],
-        # 每张封面自己的强调色：光圈里换到哪一组，镜筒上那圈色环就变成那一组的颜色
-        "accents": [s["palette"]["c1"] for s in shown],
-        "colors": [s["palette"][k] for s in works for k in ("c1", "c2")],
-    }, ensure_ascii=False)
+    L = LANGS[lang]
+    return [x for x in (
+        f"{len(photo_sets)} {L['series_count']}",
+        f"{sum(s['count'] for s in photo_sets)} {L['photographs']}",
+        # 英文要区分单复数：1 film / 2 films。中文两者相同。
+        f"{len(films)} {L['films_count' if len(films) > 1 else 'film_count']}" if films else "",
+        f"{n_notes} {L['notes_count']}" if n_notes else "",
+    ) if x]
+
+
+def about_html(site: dict, lang: str, ordered: list[dict], counts: list[str], series: list[dict]) -> str:
+    """「关于」（2026-09-29「放映厅」改版）：左边开场白两段，右边几行事实——**全部来自网站上已有的内容**。
+
+    所在、器材、邮箱是 _site.toml 手写的；作品数、年份、获奖构建时从各作品里收，不会过期。
+    获奖 = 每件作品 toml 里的 award 原文 + 片名。邮箱空着就整行不出。
+    """
+    L = LANGS[lang]
+    email = site.get("email", "").strip()
+    awards = [(text_of(s["cfg"], lang, "award"), text_of(s["cfg"], lang, "title"))
+              for s in ordered if text_of(s["cfg"], lang, "award")]
+    rows = [
+        (L["about_place"], esc(text_of(site, lang, "place"))),
+        (L["about_gear"], esc(text_of(site, lang, "gear"))),
+        (L["about_work"], " ".join(f"<span>{esc(x)}</span>" for x in counts)),
+        (L["about_years"], esc(year_span(series, lang))),
+        (L["about_awards"], "<br>".join(
+            esc(f"{a}——《{t}》" if lang == "zh" else f"{a} — {t}") for a, t in awards)),
+        (L["about_contact"], f'<a href="mailto:{esc(email)}">{esc(email)}</a>' if email else ""),
+    ]
+    facts = "\n".join(f"        <div><dt>{esc(k)}</dt><dd>{v}</dd></div>" for k, v in rows if v)
+    return f"""<div class="about">
+      <div class="about__text statement">
+          {paragraphs(text_of(site, lang, "intro"))}
+      </div>
+      <dl class="about__facts">
+{facts}
+      </dl>
+    </div>"""
 
 
 def posterwall_html(notes: dict, lang: str, prefix: str) -> str:
@@ -1747,46 +1887,50 @@ def write_index(series: list[dict], site: dict, lang: str,
 
     ordered = sorted(series, key=lambda s: (s["order"], text_of(s["cfg"], lang, "title")))
 
-    # 影片不算进「N 组 · M 张」——它既不是一组照片，里面也没有"张"。
-    # 有影片时在后面单列一项，没有就整条不出现。
+    # 照片和影片分开：第一屏只放照片的封面；「7 组 · 63 张」也只数照片（见 work_counts）
     photo_sets = [s for s in ordered if s["kind"] == "series"]
     films = [s for s in ordered if s["kind"] == "film"]
     n_notes = len(notes["entries"]) if notes else 0
-    meta = " ".join(
-        f"<span>{esc(x)}</span>" for x in (
-            f"{len(photo_sets)} {L['series_count']}",
-            f"{sum(s['count'] for s in photo_sets)} {L['photographs']}",
-            # 英文要区分单复数：1 film / 2 films。中文两者相同。
-            f"{len(films)} {L['films_count' if len(films) > 1 else 'film_count']}" if films else "",
-            f"{n_notes} {L['notes_count']}" if notes else "",
-        ) if x
-    )
+    counts = work_counts(photo_sets, films, n_notes, lang)
+    meta = " ".join(f"<span>{esc(x)}</span>" for x in counts)
+    slides = hero_slides(photo_sets, lang, prefix)
+    # 第一屏那句话：开场白的第一段（他的原话）。完整两段在「关于」里。
+    tagline = re.split(r"\n\s*\n", text_of(site, lang, "intro").strip())[0]
 
     body = render(
         (TEMPLATES / "index.html").read_text(encoding="utf-8"),
         name=esc(name),
-        home_eyebrow=esc(L["home_eyebrow"]),
-        intro=paragraphs(text_of(site, lang, "intro")),
-        catnav=catnav(lang, "home"),
+        tagline=esc(typography(tagline)),
+        hero_slide=hero_html(slides[0]),
+        # 放在 <script type="application/json"> 里：把 "</" 拆开，免得 alt 里万一有它提前结束脚本
+        hero_data=json.dumps(slides, ensure_ascii=False).replace("</", "<\\/"),
+        now_showing=esc(L["now_showing"]),
+        now_href=slides[0]["href"],
+        now_label=esc(slides[0]["label"]),
+        hero_pause=esc(L["hero_pause"]),
         cat_photos=esc(L["cat_photos"]),
         cat_films=esc(L["cat_films"]),
         cat_notes=esc(L["cat_notes"]),
         photo_works="\n".join(work_card(s, lang, prefix) for s in photo_sets),
         film_works="\n".join(work_card(s, lang, prefix) for s in films),
         posterwall=posterwall_html(notes, lang, prefix) if notes else "",
-        lens_data=lens_data(photo_sets, photo_sets + films, prefix),
         # 三个区各自的默认颜色：环境光离开作品后回到它，区标题的渐变字用它的 --d
-        photos_vars=palette_vars(section_palette([s["palette"] for s in photo_sets]), "wd"),
-        films_vars=palette_vars(section_palette([s["palette"] for s in films]), "wd"),
-        notes_vars=palette_vars(notes["palette"], "wd") if notes else "",
+        # 暗色时环境光用 --c，所以三种都要写（style.css 的 --amb 按模式挑）
+        photos_vars=palette_vars(section_palette([s["palette"] for s in photo_sets]), "cwd"),
+        films_vars=palette_vars(section_palette([s["palette"] for s in films]), "cwd"),
+        notes_vars=palette_vars(notes["palette"], "cwd") if notes else "",
         notes_href=f"./{notes['slug']}/" if notes else "",
         meta=meta,
-        footer=esc(text_of(site, lang, "footer")),
+        footer=esc(text_of(site, lang, "place")) + (
+            f' · <a href="mailto:{esc(site["email"].strip())}">{esc(site["email"].strip())}</a>'
+            if site.get("email", "").strip() else ""),
+        cat_about=esc(L["cat_about"]),
+        about=about_html(site, lang, ordered, counts, series),
+        # 「关于」这一区的颜色：从全部作品里挑三个色相最散开的
+        about_vars=palette_vars(section_palette([s["palette"] for s in photo_sets + films]), "cwd"),
         scroll=esc(L["scroll"]),
         skip=esc(L["skip_work"]),
-        switch_href=switch_href(lang),
-        switch_label=esc(L["switch_label"]),
-        switch_title=esc(L["switch_title"]),
+        sitenav=sitenav(lang, "home", site),
     )
     page = render(
         (TEMPLATES / "base.html").read_text(encoding="utf-8"),

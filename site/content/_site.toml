@@ -31,8 +31,16 @@ This is my album. What it holds is memory — the kind I can only keep by photog
 The camera is my brush and my way of looking. I use it to set down the world as it appears to me, and the countless small moments that ordinary life is made of.
 """
 
-# 页脚。想留联系方式就写在这里，不想留就留空。
-footer = "Beijing"
+# ─────────────────────────────────────────────────────────────────
+#  「关于」那一区（2026-09「放映厅」改版）。
+#  左边是上面那两段开场白；右边几行事实。下面这三项是手写的，
+#  其余（作品数、年份、获奖）构建时自动算，不会过期。
+# ─────────────────────────────────────────────────────────────────
+place = "Beijing"                                    # 所在。原来叫 footer，页脚也用它
+gear = "Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art"   # 器材，原样抄自各组的署名
+# 联系邮箱。空着就不显示「联系」那一行，页脚也不写。填了之后跑 build.py。
+# ⚠️ 网站是公开的，谁都看得到——公开的邮箱会收到垃圾邮件。
+email = ""
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -41,7 +49,8 @@ footer = "Beijing"
 [zh]
 name = "刘延奥"
 description = "{years} 年拍下的几组照片。"
-footer = "北京"
+place = "北京"
+gear = "索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"
 
 intro = """
 这是我的相册，里面装的是记忆——有些东西，只有拍下来才留得住。

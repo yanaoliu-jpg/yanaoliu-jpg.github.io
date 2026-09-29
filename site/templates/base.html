@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
-  首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  它只表示「这是首页」；颜色见下面那段主题脚本和 style.css 的 data-theme（放映厅改版设计.md 第四节）。
   body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="{{ html_lang }}" class="no-js{{ html_class }}">
@@ -78,6 +78,21 @@ document.documentElement.classList.remove('no-js');
 <meta name="description" content="{{ description }}">
 <meta name="color-scheme" content="{{ color_scheme }}">
 <meta name="theme-color" content="{{ theme_color }}">
+<script>
+/*
+  亮暗模式（2026-09-29「放映厅」改版）：默认暗色；读者点过切换、选了亮色，就记在 localStorage 的 theme 里。
+  必须写在样式表之前：先把 data-theme 设好再画第一帧，换页才不会先闪一下暗色。
+  隐私模式下 localStorage 会抛错——拿不到就当暗色。亮色的 theme-color 由 build.py 按页面写进来。
+*/
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('theme'); } catch (e) {}
+  if (t !== 'light') return;
+  document.documentElement.setAttribute('data-theme', 'light');
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', '{{ light_theme_color }}');
+  document.querySelector('meta[name="color-scheme"]').setAttribute('content', 'light');
+})();
+</script>
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ title }}">

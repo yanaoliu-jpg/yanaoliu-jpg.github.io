@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   html_class 只有首页是 " theme-home"（带前导空格），其余页面是空串。
-  首页亮底、内页深色，全靠这一个类：见 首页改版设计.md 第四节。
+  它只表示「这是首页」；颜色见下面那段主题脚本和 style.css 的 data-theme（放映厅改版设计.md 第四节）。
   body_attrs 同理：内页是 ' style="--c1: …"'（本页的颜色，光晕和进度条用），首页是空串。
 -->
 <html lang="zh-Hans" class="no-js theme-home">
@@ -76,8 +76,23 @@ document.documentElement.classList.remove('no-js');
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>刘延奥</title>
 <meta name="description" content="2023 至 2026 年拍下的几组照片。">
-<meta name="color-scheme" content="light">
-<meta name="theme-color" content="#f3e4dc">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0e11">
+<script>
+/*
+  亮暗模式（2026-09-29「放映厅」改版）：默认暗色；读者点过切换、选了亮色，就记在 localStorage 的 theme 里。
+  必须写在样式表之前：先把 data-theme 设好再画第一帧，换页才不会先闪一下暗色。
+  隐私模式下 localStorage 会抛错——拿不到就当暗色。亮色的 theme-color 由 build.py 按页面写进来。
+*/
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('theme'); } catch (e) {}
+  if (t !== 'light') return;
+  document.documentElement.setAttribute('data-theme', 'light');
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f3e4dc');
+  document.querySelector('meta[name="color-scheme"]').setAttribute('content', 'light');
+})();
+</script>
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="刘延奥">
@@ -98,49 +113,69 @@ document.documentElement.classList.remove('no-js');
 <body>
 <a class="skip" href="#photographs">跳到作品</a>
 
-<a class="langswitch" href="../" title="Read in English">EN</a>
+<header class="sitenav">
+  <a class="sitenav__name" href="#top">刘延奥</a>
+  <nav class="sitenav__links" id="sitenav-links" aria-label="栏目" popover>
+    <a class="sitenav__link" href="#photographs">照片</a>
+    <a class="sitenav__link" href="#films">影片</a>
+    <a class="sitenav__link" href="#film-notes">影评</a>
+    <a class="sitenav__link" href="#about">关于</a>
+  </nav>
+  <div class="sitenav__tools">
+    <button class="sitenav__menu" type="button" popovertarget="sitenav-links">菜单</button>
+    <button class="sitenav__theme" type="button" hidden
+            aria-label="切换到亮色" title="切换到亮色"
+            data-to-light="切换到亮色" data-to-dark="切换到暗色"
+            data-dark="#0d0e11" data-light="#f3e4dc"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M5.4 18.6l1.5-1.5M17.1 6.9l1.5-1.5"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.8A8.2 8.2 0 1 1 9.2 4a6.5 6.5 0 0 0 10.8 10.8z"/></svg></button>
+    <a class="langswitch" href="../" title="Read in English">EN</a>
+  </div>
+</header>
 
 <!--
   环境光（motion.js）：三团很大的柔光固定在最底层，颜色是 --a1..3。
-  第一屏跟着镜头里那一组照片走；鼠标停在哪件作品上就换成它的 --w；离开后回到所在区的默认色。
-  --w 的亮度都 ≥ 0.745（build.py 钳住的），深色小字压在上面仍然 ≥ 4.5:1。
-  关掉 JS 时 display: none，页面跟改版前一样。
+  motion.js 按视口正中落在哪一区、鼠标停在哪件作品上换色；
+  颜色从 --amb 取：暗色是各作品的 --c、很淡，亮色是 --w（style.css 映射）。
+  关掉 JS 时 display: none。
 -->
 <div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
 
-<!--
-  3D 镜头的挂载点（lens.js）。纯装饰：对读屏软件隐藏，关掉 JS 时整个不显示——
-  CSS 里 .lens 默认 display: none，只有 lens.js 成功建好场景后才加 .lens--on。
-  lens-data 是构建时写进来的：七组照片封面的 900px WebP，和作品取出来的颜色。
--->
-<div class="lens" id="lens" aria-hidden="true">
-  <canvas class="lens__canvas"></canvas>
-  <span class="lens__f">ƒ/16</span>
-</div>
-<script type="application/json" id="lens-data">{"covers": ["../img/good-night/DSC05547-900.webp", "../img/goodbye-renfen/00650c89435290da7420ad155eff930-900.webp", "../img/the-old-days/DSC09243-900.webp", "../img/night-wind/DSC00692-900.webp", "../img/keep-going-back/20250801-DSC08901-900.webp", "../img/looking-forward/DSC00195-900.webp", "../img/sea-and-light/DSC005751-900.webp"], "slugs": ["good-night", "goodbye-renfen", "the-old-days", "night-wind", "keep-going-back", "looking-forward", "sea-and-light"], "accents": ["#9b3b4c", "#729b3b", "#c49f63", "#3b989b", "#3a819d", "#3b9b7b", "#28ae90"], "colors": ["#9b3b4c", "#9b5b3b", "#729b3b", "#ca7c72", "#c49f63", "#589b3b", "#3b989b", "#3b649b", "#3a819d", "#3b9b88", "#3b9b7b", "#609b3b", "#28ae90", "#2885ae", "#b97d46", "#b7b946", "#254ab1", "#be7c53", "#3b719b", "#3b9b6f"]}</script>
-
 <main class="page">
 
-  <header class="masthead">
-    <div class="masthead__card">
-      <p class="masthead__eyebrow">摄影</p>
-      <h1 class="masthead__title">刘延奥</h1>
-      <p class="masthead__meta"><span>7 组</span> <span>63 张</span> <span>3 部影片</span> <span>62 篇影评</span></p>
+  <!--
+    第一屏（hero.js，2026-09-29「放映厅」改版）：七组照片的封面轮流全屏。
+    只有第一张写在这里——关掉 JS、减少动态效果、省流量时就是它，静止。
+    其余六张在页尾的 #hero-data 里，轮到它之前 2 秒才由 hero.js 建、才下载。
+    字压在 .hero__shade 那层渐黑上；对比度由 verify.js 的像素探针七张逐张量（起点和终点）。
+    见 放映厅改版设计.md 第五节。
+  -->
+  <section class="hero" id="top">
+    <div class="hero__reel">
+      <figure class="hero__slide is-on" data-i="0"
+              style="--ar: 1.5; --fx: 50; --fy: 50; background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAMEBv/EAB0QAAICAgMBAAAAAAAAAAAAAAERAAIDMQQSUcH/xAAUAQEAAAAAAAAAAAAAAAAAAAAB/8QAFREBAQAAAAAAAAAAAAAAAAAAABH/2gAMAwEAAhEDEQA/AOU42OhNQUXK5cVWSAN6mCuS1UilqVtybktowNLYx2PwRI9z7EQ//9k=)">
+        <picture>
+          <source type="image/avif" srcset="../img/good-night/DSC05547-900.avif 900w, ../img/good-night/DSC05547-1600.avif 1600w, ../img/good-night/DSC05547-2400.avif 2400w" sizes="calc(1.06 * max(100vw, 150.0vh))">
+          <source type="image/webp" srcset="../img/good-night/DSC05547-900.webp 900w, ../img/good-night/DSC05547-1600.webp 1600w, ../img/good-night/DSC05547-2400.webp 2400w" sizes="calc(1.06 * max(100vw, 150.0vh))">
+          <img src="../img/good-night/DSC05547-1600.jpg" srcset="../img/good-night/DSC05547-900.jpg 900w, ../img/good-night/DSC05547-1600.jpg 1600w" sizes="calc(1.06 * max(100vw, 150.0vh))"
+               alt="A wall of residential towers at night, hundreds of windows lit in warm and cool tones above bare winter trees." fetchpriority="high" decoding="async">
+        </picture>
+      </figure>
     </div>
-
-    <nav class="catnav" aria-label="摄影">
-    <a class="catnav__item" href="#photographs">照片</a>
-    <a class="catnav__item" href="#films">影片</a>
-    <a class="catnav__item" href="./film-notes/">影评</a>
-    </nav>
-
-    <div class="statement">
-      <p>这是我的相册，里面装的是记忆——有些东西，只有拍下来才留得住。</p>
-          <p>相机是我的画笔，也是我看世界的方式。我用它记下眼里的世界，记下人间烟火里那些数不清的细小瞬间。</p>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="hero__text">
+      <h1 class="hero__name">刘延奥</h1>
+      <p class="hero__line">这是我的相册，里面装的是记忆——有些东西，只有拍下来才留得住。</p>
+      <p class="hero__meta"><span>7 组</span> <span>63 张</span> <span>3 部影片</span> <span>62 篇影评</span></p>
+      <p class="hero__scroll" aria-hidden="true">向下</p>
     </div>
-
-    <p class="masthead__scroll" aria-hidden="true">向下</p>
-  </header>
+    <div class="hero__now">
+      <a class="hero__caption" href="./good-night/"><span class="hero__label">正在放映</span>
+        <span class="hero__work">第一组 · 晚安</span></a>
+      <button class="hero__pause" type="button" hidden aria-pressed="false" aria-label="暂停轮播" title="暂停轮播">
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5v11M15 6.5v11"/></svg>
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 6.2v11.6l9.2-5.8z"/></svg>
+      </button>
+    </div>
+  </section>
 
   <!--
     三大类别。照片在前 —— 招生官点开链接第一眼看到的必须是作品本身。
@@ -149,10 +184,11 @@ document.documentElement.classList.remove('no-js');
   -->
   <!--
     每个区的 style 是它的默认颜色（build.py 的 section_palette / mosaic_palette）：
-    --d 给区标题的渐变字，--w 给环境光。cat__label 包一层是为了让渐变只铺在字上，
-    不铺满整个 h2 的宽度——不然「Photographs」只分到渐变最左边那一截。
+    --d / --w 给区标题的渐变字（按模式挑，style.css 的 --g），--c / --w 给环境光（--amb）。
+    cat__label 包一层是为了让渐变只铺在字上，不铺满整个 h2 的宽度——
+    不然「Photographs」只分到渐变最左边那一截。
   -->
-  <section class="cat" id="photographs" style="--w1: #f1dbdf; --d1: #c9455d; --w2: #aeecde; --d2: #1e836c; --w3: #d5e6be; --d3: #597f25">
+  <section class="cat" id="photographs" style="--c1: #9b3b4c; --w1: #f1dbdf; --d1: #c9455d; --c2: #28ae90; --w2: #aeecde; --d2: #1e836c; --c3: #729b3b; --w3: #d5e6be; --d3: #597f25">
     <h2 class="cat__title"><span class="cat__label">照片</span></h2>
     <ul class="works">
 
@@ -319,7 +355,7 @@ document.documentElement.classList.remove('no-js');
     </ul>
   </section>
 
-  <section class="cat" id="films" style="--w1: #eddecf; --d1: #a2662f; --w2: #d3e2ee; --d2: #3379b0; --w3: #d8e0f7; --d3: #486ed9">
+  <section class="cat" id="films" style="--c1: #b97d46; --w1: #eddecf; --d1: #a2662f; --c2: #3b719b; --w2: #d3e2ee; --d2: #3379b0; --c3: #254ab1; --w3: #d8e0f7; --d3: #486ed9">
     <h2 class="cat__title"><span class="cat__label">影片</span></h2>
     <ul class="works">
 
@@ -394,7 +430,7 @@ document.documentElement.classList.remove('no-js');
     </ul>
   </section>
 
-  <section class="cat" id="film-notes" style="--w1: #eeddd2; --d1: #ac6132; --w2: #c6e6e9; --d2: #277f88; --w3: #d8e0f0; --d3: #4672c9">
+  <section class="cat" id="film-notes" style="--c1: #bb764a; --w1: #eeddd2; --d1: #ac6132; --c2: #3b939b; --w2: #c6e6e9; --d2: #277f88; --c3: #3b5b9b; --w3: #d8e0f0; --d3: #4672c9">
     <h2 class="cat__title"><a class="cat__label" href="./film-notes/">影评</a></h2>
     <ul class="posterwall">
       <li class="posterwall__item">
@@ -1018,6 +1054,24 @@ document.documentElement.classList.remove('no-js');
     </ul>
   </section>
 
+  <!-- 关于：开场白两段 + 几行事实（build.py 的 about_html，全部来自网站上已有的内容） -->
+  <section class="cat" id="about" style="--c1: #9b3b4c; --w1: #f1dbdf; --d1: #c9455d; --c2: #28ae90; --w2: #aeecde; --d2: #1e836c; --c3: #729b3b; --w3: #d5e6be; --d3: #597f25">
+    <h2 class="cat__title"><span class="cat__label">关于</span></h2>
+    <div class="about">
+      <div class="about__text statement">
+          <p>这是我的相册，里面装的是记忆——有些东西，只有拍下来才留得住。</p>
+          <p>相机是我的画笔，也是我看世界的方式。我用它记下眼里的世界，记下人间烟火里那些数不清的细小瞬间。</p>
+      </div>
+      <dl class="about__facts">
+        <div><dt>所在</dt><dd>北京</dd></div>
+        <div><dt>器材</dt><dd>索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art</dd></div>
+        <div><dt>作品</dt><dd><span>7 组</span> <span>63 张</span> <span>3 部影片</span> <span>62 篇影评</span></dd></div>
+        <div><dt>年份</dt><dd>2023 至 2026</dd></div>
+        <div><dt>获奖</dt><dd>国家级卓越奖 · 公益广告 · 2026 HOSA 生物与健康未来领袖挑战——《停止滑动，面对生活》</dd></div>
+      </dl>
+    </div>
+  </section>
+
   <footer class="colophon">
     <p class="colophon__gear">北京</p>
     <p class="colophon__name">刘延奥</p>
@@ -1025,8 +1079,10 @@ document.documentElement.classList.remove('no-js');
 
 </main>
 
+<script type="application/json" id="hero-data">[{"href": "./good-night/", "label": "第一组 · 晚安", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A wall of residential towers at night, hundreds of windows lit in warm and cool tones above bare winter trees.", "avif": "../img/good-night/DSC05547-900.avif 900w, ../img/good-night/DSC05547-1600.avif 1600w, ../img/good-night/DSC05547-2400.avif 2400w", "webp": "../img/good-night/DSC05547-900.webp 900w, ../img/good-night/DSC05547-1600.webp 1600w, ../img/good-night/DSC05547-2400.webp 2400w", "jpg": "../img/good-night/DSC05547-900.jpg 900w, ../img/good-night/DSC05547-1600.jpg 1600w", "src": "../img/good-night/DSC05547-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAMEBv/EAB0QAAICAgMBAAAAAAAAAAAAAAERAAIDMQQSUcH/xAAUAQEAAAAAAAAAAAAAAAAAAAAB/8QAFREBAQAAAAAAAAAAAAAAAAAAABH/2gAMAwEAAhEDEQA/AOU42OhNQUXK5cVWSAN6mCuS1UilqVtybktowNLYx2PwRI9z7EQ//9k="}, {"href": "./goodbye-renfen/", "label": "第二组 · 再见，人分", "ar": 0.8, "fx": 50.0, "fy": 50.0, "alt": "A school corridor in the afternoon, lit only by a bank of windows at the far end; a yellow wet-floor sign stands in the right foreground.", "avif": "../img/goodbye-renfen/00650c89435290da7420ad155eff930-900.avif 900w, ../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.avif 1600w, ../img/goodbye-renfen/00650c89435290da7420ad155eff930-2400.avif 2400w", "webp": "../img/goodbye-renfen/00650c89435290da7420ad155eff930-900.webp 900w, ../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.webp 1600w, ../img/goodbye-renfen/00650c89435290da7420ad155eff930-2400.webp 2400w", "jpg": "../img/goodbye-renfen/00650c89435290da7420ad155eff930-900.jpg 900w, ../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.jpg 1600w", "src": "../img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.jpg", "sizes": "calc(1.06 * max(100vw, 80.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUABADASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAgP/xAAjEAACAQQBAwUAAAAAAAAAAAABAgMABAURIRIxQRQyQrHh/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAEC/8QAFREBAQAAAAAAAAAAAAAAAAAAAEH/2gAMAwEAAhEDEQA/AE8IDXCqVLDyNVeRB6llVCo7657UY+5mjySvFGZCB7R54rW7upXyJkmhMbEaKftZDDDooy6AAa6B9VGfVTkmGvhuiikV/9k="}, {"href": "./the-old-days/", "label": "第三组 · 旧时光", "ar": 0.6667, "fx": 50.0, "fy": 50.0, "alt": "Late sun breaking through the leaves of a tree and throwing long shadows across an empty running track.", "avif": "../img/the-old-days/DSC09243-900.avif 900w, ../img/the-old-days/DSC09243-1600.avif 1600w, ../img/the-old-days/DSC09243-2400.avif 2400w", "webp": "../img/the-old-days/DSC09243-900.webp 900w, ../img/the-old-days/DSC09243-1600.webp 1600w, ../img/the-old-days/DSC09243-2400.webp 2400w", "jpg": "../img/the-old-days/DSC09243-900.jpg 900w, ../img/the-old-days/DSC09243-1600.jpg 1600w", "src": "../img/the-old-days/DSC09243-1600.jpg", "sizes": "calc(1.06 * max(100vw, 66.7vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUAA0DASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAMEAf/EACEQAAEEAgICAwAAAAAAAAAAAAECAwQRAAUSIRMiMUGB/8QAFgEBAQEAAAAAAAAAAAAAAAAAAgED/8QAGBEAAwEBAAAAAAAAAAAAAAAAAAERIQL/2gAMAwEAAhEDEQA/AM1M1UXWeB18N0u01ZNfeQuSZE6Q6sqCkg+pWe6xmp1aXkOOPyUIoAAKySZHkLdrkF8RXR6zKxjXFGMSnW2wEkfoyeTJc8lEih8dYYY0tK3h/9k="}, {"href": "./night-wind/", "label": "第四组 · 夜风沉醉的旅程", "ar": 0.6667, "fx": 50.0, "fy": 50.0, "alt": "A teal concrete building at night with WHARF FISHMARKET lit above the entrance; people sit on the steps below.", "avif": "../img/night-wind/DSC00692-900.avif 900w, ../img/night-wind/DSC00692-1600.avif 1600w, ../img/night-wind/DSC00692-2400.avif 2400w", "webp": "../img/night-wind/DSC00692-900.webp 900w, ../img/night-wind/DSC00692-1600.webp 1600w, ../img/night-wind/DSC00692-2400.webp 2400w", "jpg": "../img/night-wind/DSC00692-900.jpg 900w, ../img/night-wind/DSC00692-1600.jpg 1600w", "src": "../img/night-wind/DSC00692-1600.jpg", "sizes": "calc(1.06 * max(100vw, 66.7vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUAA0DASIAAhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAAQCAwUG/8QAIRAAAgMAAQMFAAAAAAAAAAAAAQIAAxEFITFBBBITUWH/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAv/EABYRAQEBAAAAAAAAAAAAAAAAAAABIf/aAAwDAQACEQMRAD8A5j4GcA50+xKXrZDhE2q+NU1UGj1Aax6w5BwAfkW5RSLkDhQc6+0ZsJ2E1sZU8HO2+JB7XbNO52hCB//Z"}, {"href": "./keep-going-back/", "label": "第五组 · 我总是回到那几天", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A dim room at night where someone sits on the floor playing a guitar to a screen of song lyrics, surrounded by about twenty people, most holding up their phones.", "avif": "../img/keep-going-back/20250801-DSC08901-900.avif 900w, ../img/keep-going-back/20250801-DSC08901-1600.avif 1600w, ../img/keep-going-back/20250801-DSC08901-2400.avif 2400w", "webp": "../img/keep-going-back/20250801-DSC08901-900.webp 900w, ../img/keep-going-back/20250801-DSC08901-1600.webp 1600w, ../img/keep-going-back/20250801-DSC08901-2400.webp 2400w", "jpg": "../img/keep-going-back/20250801-DSC08901-900.jpg 900w, ../img/keep-going-back/20250801-DSC08901-1600.jpg 1600w", "src": "../img/keep-going-back/20250801-DSC08901-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAwACBf/EACEQAAEDBAIDAQAAAAAAAAAAAAEAAgMEERIxBSIjQWGS/8QAFQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAWEQEBAQAAAAAAAAAAAAAAAAAAEQH/2gAMAwEAAhEDEQA/AOTR8lVzytia6MZaLm3Q8tDKyUOndG9zhfr8Q08YlmEYAFwDfaxk0g9N396TUTaNtTNiPK/9KRk5bAUgv//Z"}, {"href": "./looking-forward/", "label": "第六组 · 留给日后", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A lit Thai restaurant front at dusk with green neon lettering; a small child in a white helmet rides a bicycle alone across the paving outside.", "avif": "../img/looking-forward/DSC00195-900.avif 900w, ../img/looking-forward/DSC00195-1600.avif 1600w, ../img/looking-forward/DSC00195-2400.avif 2400w", "webp": "../img/looking-forward/DSC00195-900.webp 900w, ../img/looking-forward/DSC00195-1600.webp 1600w, ../img/looking-forward/DSC00195-2400.webp 2400w", "jpg": "../img/looking-forward/DSC00195-900.jpg 900w, ../img/looking-forward/DSC00195-1600.jpg 1600w", "src": "../img/looking-forward/DSC00195-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAMBAgb/xAAfEAACAwABBQEAAAAAAAAAAAABAgADEQQSISJRYaH/xAAWAQEBAQAAAAAAAAAAAAAAAAABAAL/xAAXEQEBAQEAAAAAAAAAAAAAAAAAAREh/9oADAMBAAIRAxEAPwDNcfiG1SV6fmtkH4z1HzH7K11K1YJLe82TemKMZu406YZWdhT0sHIO6IRTDGI0wj1P/9k="}, {"href": "./sea-and-light/", "label": "第七组 · 海与光的诗", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A wide aquarium window glowing in a dark room, tall kelp and fish inside it, a single figure standing in silhouette against the glass.", "avif": "../img/sea-and-light/DSC005751-900.avif 900w, ../img/sea-and-light/DSC005751-1600.avif 1600w, ../img/sea-and-light/DSC005751-2400.avif 2400w", "webp": "../img/sea-and-light/DSC005751-900.webp 900w, ../img/sea-and-light/DSC005751-1600.webp 1600w, ../img/sea-and-light/DSC005751-2400.webp 2400w", "jpg": "../img/sea-and-light/DSC005751-900.jpg 900w, ../img/sea-and-light/DSC005751-1600.jpg 1600w", "src": "../img/sea-and-light/DSC005751-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAQFAQL/xAAiEAABBAAGAwEAAAAAAAAAAAABAAIDEQQFEhQhMVFhYuH/xAAXAQADAQAAAAAAAAAAAAAAAAAAAQID/8QAFREBAQAAAAAAAAAAAAAAAAAAACH/2gAMAwEAAhEDEQA/AIGUQ4N/OLjL/V0np4cr27xHhqfXB1/qiQTiNoBYXV9Uutw3W4lhN/XSbKl3gB5A6tCxxtxPlCFv/9k="}]</script>
+
 <script src="../static/gallery.js" defer></script>
 <script type="module" src="../static/motion.js"></script>
-<script type="module" src="../static/lens.js"></script>
+<script type="module" src="../static/hero.js"></script>
 </body>
 </html>
