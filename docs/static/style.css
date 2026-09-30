@@ -42,11 +42,12 @@
 }
 
 /* 暗色（默认，全站）。⚠️ 这一块只放颜色。
-   灯箱（.viewer）和首页第一屏（.hero）**永远是暗的**，所以它们也套这一块——
+   灯箱（.viewer）、首页第一屏（.hero）、影片播放器（.screen）**永远是暗的**，所以它们也套这一块——
    亮色模式下 :root 换了值，它们自己身上这份不变，里面的字就不会跟着变成深色、融进暗底。 */
 :root,
 .viewer,
-.hero {
+.hero,
+.screen {
   --bg: #0d0e11;
   --bg-lift: #14161a;
   /*
@@ -67,7 +68,8 @@
   --rule-soft: #1c1f25;
 }
 .viewer,
-.hero { color-scheme: dark; }
+.hero,
+.screen { color-scheme: dark; }
 
 :root {
   /* DM Sans 在前、中文黑体在后：拉丁字母走 DM Sans，
@@ -373,8 +375,9 @@
    motion.js 只读 --amb，不管现在是哪个模式。⚠️ 暗色下这层光会抬高字底下的亮度，
    不透明度的上限由像素探针定（verify.js 第 21 节），别凭眼睛调亮。 */
 .work,
+.film-card,
 .cat { --amb1: var(--c1); --amb2: var(--c2); --amb3: var(--c3); }
-[data-theme="light"] :is(.work, .cat) { --amb1: var(--w1); --amb2: var(--w2); --amb3: var(--w3); }
+[data-theme="light"] :is(.work, .film-card, .cat) { --amb1: var(--w1); --amb2: var(--w2); --amb3: var(--w3); }
 [data-theme="light"] .ambient i { opacity: 0.9; }
 /* 手机上不漂：三块 74vmax 的层在 3 倍屏上要占 40 MB 显存，漂得又慢，看不出来，只费电 */
 @media (max-width: 900px) {
@@ -744,6 +747,19 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 .masthead__meta span { white-space: nowrap; }
+
+/* 影片页的奖项（2026-09-29）：标题下面单独一行，两侧月桂叶，跟首页影片卡片一个样子 */
+.masthead__award {
+  margin: 1.1rem 0 0;
+  line-height: 2.3;             /* 同 .film-card__award */
+  text-wrap: balance;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+:lang(zh-Hans) .masthead__award { letter-spacing: 0.06em; text-transform: none; }
 /* 同 .work__detail：分隔点跟在前一段后面，换行时不会甩到行首 */
 .masthead__meta span:not(:last-child)::after {
   content: '·';
@@ -959,15 +975,71 @@ img { display: block; max-width: 100%; height: auto; }
   min-width: 0;
 }
 
-/*
-  2026-09 起影片跟照片并排，按宽高比占位（16:9 在 300 高就是 533 宽）。
-  原来每部独占一行当头题——三部就是 2.3 屏，比七组照片占的还多，
-  是「滚动太多」的大头。头题的活由顶部的分类导航接手了（见 CLAUDE.md 第一节）。
-  .work--film 现在只剩下面那个 ▶ 角标。
-*/
+/* ── 首页影片区：竖版海报卡（2026-09-29「放映厅」第二步）──────────
+   像电影节手册里的一张卡：上面是完整的 16:9 画面（不裁——两部片子的封面是两人并排，
+   裁成 2:3 会切掉人），下面片名、时长 · 类型、一句话、署名、奖项（build.py 的 film_card）。
+   鼠标停上去（或键盘聚焦）画面淡入一段无声预览，点了在本页弹出播放器（films.js）。
+   原来影片跟照片一样是定高封面（.work--film），2026-09-29 换成这个。
+   ⚠️ 网格 ↔ build.py 的 FILM_CARD_SIZES：列数、容器 1500px、左右留白、列距，改一处要改两处。 */
+.films {
+  max-width: 1500px;
+  margin: clamp(1.2rem, 2.8vh, 2.1rem) auto 0;        /* ↔ .cat__title + .works */
+  padding: 0 clamp(1.5rem, 3.5vw, 6rem);              /* ↔ FILM_PAD */
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.25rem, 2.4vw, 2.75rem);                /* ↔ FILM_GAP */
+}
+@media (max-width: 1100px) { .films { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .films { grid-template-columns: minmax(0, 1fr); } }
 
-/* 封面正中一个 ▶：不用读文字也知道这是一段影片，不是照片 */
-.work--film .work__frame::after {
+.film-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--bg-lift);
+  /* 暗色：这部片子自己 --c1 的光（跟照片封面同一个意思）；亮色：投影，见下 */
+  box-shadow: 0 18px 50px -26px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 18px 54px -28px color-mix(in srgb, var(--c1) 55%, transparent);
+  /* 悬停抬起用 translate，不用 transform——进场动画（.js-reveal）占着 transform */
+  transition: translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+}
+[data-theme="light"] .film-card {
+  box-shadow: 0 22px 44px -26px rgba(20, 30, 40, 0.45), 0 2px 6px rgba(20, 30, 40, 0.06);
+}
+@media (hover: hover) {
+  .film-card:hover { translate: 0 -3px; border-color: var(--rule-strong); }
+}
+/* 焦点框画在整张卡上（链接自己只包着片名，框它就太小了） */
+.film-card:has(.film-card__link:focus-visible) { outline: 2px solid var(--focus); outline-offset: 4px; }
+.film-card__link:focus-visible { outline: none; }
+
+.film-card__frame {
+  position: relative;
+  display: block;
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+.film-card__frame img,
+.film-card__preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* 预览的 <video> 是 films.js 建的，放起来才淡入（关掉 JS 时根本没有这个元素） */
+.film-card__preview { opacity: 0; transition: opacity 0.5s ease; }
+.film-card.is-previewing .film-card__preview { opacity: 1; }
+
+/* 画面正中一个 ▶：不用读文字也知道这是一段影片。白底深字——半透明黑在亮底上会发灰。
+   预览放起来就淡掉，不挡画面 */
+.film-card__frame::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -976,19 +1048,90 @@ img { display: block; max-width: 100%; height: auto; }
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  /* 白底深字：原来是给深底设计的半透明黑，亮底上会发灰 */
-  border: 0;
   background: rgba(255, 255, 255, 0.9)
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6.5v11l9-5.5z' fill='%231a1917'/%3E%3C/svg%3E")
     center / 38% no-repeat;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  transition: background-color 0.25s;
+  transition: background-color 0.25s, opacity 0.35s ease;
 }
+.film-card.is-previewing .film-card__frame::after { opacity: 0; }
 @media (hover: hover) {
-  .work--film .work__link:hover .work__frame::after {
-    background-color: #fff;
-  }
+  .film-card:hover .film-card__frame::after { background-color: #fff; }
 }
+
+.film-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.15rem 1.35rem 1.4rem;
+}
+.film-card__eyebrow,
+.film-card__detail,
+.film-card__credits,
+.film-card__award {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+:lang(zh-Hans) :is(.film-card__eyebrow, .film-card__detail, .film-card__credits, .film-card__award) {
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+.film-card__title {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.35rem, 1.1rem + 0.6vw, 1.7rem);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 36;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+:lang(zh-Hans) .film-card__title { letter-spacing: 0.02em; }
+.film-card__link { color: var(--ink); text-decoration: none; }
+/* 整张卡可点：链接的伪元素铺满卡片（链接本身只包片名，读屏软件只念片名） */
+.film-card__link::after { content: ''; position: absolute; inset: 0; z-index: 2; }
+.film-card__detail { margin-top: 0.6rem; }
+.film-card__detail span { white-space: nowrap; }
+.film-card__detail span:not(:last-child)::after { content: '·'; margin: 0 0.1em 0 0.45em; color: var(--ink-faint); }
+.film-card__line {
+  margin: 0.95rem 0 1.2rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--ink-text);
+}
+/* 署名沉到卡片底部、上面一道细线——像海报下面那一行演职员表 */
+.film-card__credits {
+  margin-top: auto;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--rule);
+  line-height: 1.75;
+}
+.film-card__award {
+  margin-top: 0.85rem;
+  color: var(--ink-dim);
+  line-height: 2.3;             /* ≈ 叶子的高度：折成两行时叶子不压到上下那行的字 */
+  text-wrap: balance;
+}
+/* 月桂叶是装饰，不是字：暗色用琥珀（亮着的窗户的颜色），亮色用灰（琥珀在亮底上只能当线）。
+   首页卡片和影片页（.masthead__award）共用 */
+/* 月桂叶是行内的：窄屏上奖项折成两行时，两枝跟着头尾两个字走，不会一枝被甩到最右边
+   （原来是 flex 排的，一折行文字那一项就占满整行宽）。HTML 里叶子和字之间没有空白，所以不会在它们之间断行。
+   上下负外边距：叶子比字高，不让它把行距撑开 */
+.laurel {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0.8rem;
+  height: 1.6rem;
+  margin: -0.45rem 0;
+  fill: currentColor;
+  color: var(--amber);
+}
+.laurel:first-child { margin-right: 0.6em; }
+.laurel:last-child { margin-left: 0.6em; transform: scaleX(-1); }
+[data-theme="light"] .laurel { color: var(--ink-mute); }
 
 /* 窄屏放不下并排，改成竖向堆叠，回到原来那套左对齐清单 */
 @media (max-width: 900px) {
@@ -1162,6 +1305,14 @@ img { display: block; max-width: 100%; height: auto; }
   transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .js-reveal .work.is-in { opacity: 1; transform: none; }
+/* ⚠️ 这条的 transition 会盖掉 .film-card 自己那条，所以悬停要用的几项也写在这里 */
+.js-reveal .film-card {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+}
+.js-reveal .film-card.is-in { opacity: 1; transform: none; }
 
 /* ── 三大类别：区标题 ──────────────────────────────────────────
    （分类导航 Photographs · Films · Film Notes 2026-09-29 撤掉了，由顶部导航接手） */
@@ -1793,6 +1944,84 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
 
 body.is-locked { overflow: hidden; }
 
+/* ── 页内播放器（films.js，2026-09-29「放映厅」第二步）──────────────
+   点首页的影片卡片：画面从卡片的位置放大到这里、有声播放；下面是片名、署名、「关于这部片子 →」。
+   永远是暗的（顶部暗色块的选择器里有 .screen）。跟灯箱同一个做法：
+   尺寸写成「宽 = min(可用宽, 可用高 × 宽高比)」，视频还没加载，终点就定好了，放大动画才飞得过去。
+   关闭按钮借灯箱的样式（.viewer__close）。 */
+.screen {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #08090b;
+  color: var(--ink);
+  overflow: hidden;
+}
+.screen::backdrop { background: #08090b; }
+/* 飞行期间：页面还看得见（背景由 films.js 从透明渐变到黑），片名那几行和关闭按钮先藏着 */
+.screen.is-flipping::backdrop { background: transparent; }
+.screen.is-flipping .screen__caption,
+.screen.is-flipping .screen__close { opacity: 0; }
+.screen__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  height: 100%;
+  margin: 0;
+  padding: clamp(3.5rem, 7vh, 4.5rem) clamp(1rem, 6vw, 4.5rem) clamp(1rem, 4vh, 2rem);
+}
+.screen__video {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: min(100%, calc((100dvh - 12rem) * var(--ar, 1.7778)));
+  aspect-ratio: var(--ar, 16 / 9);
+  background: #000;
+}
+.screen__player { display: block; width: 100%; height: 100%; }
+.screen__caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.5rem 1.4rem;
+  max-width: 64rem;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+.screen__title { font-size: 1.2rem; color: var(--ink); }
+.screen__meta {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+:lang(zh-Hans) .screen__meta { letter-spacing: 0.06em; text-transform: none; }
+.screen__more {
+  font-size: 0.9rem;
+  color: var(--ink-dim);
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 0.2em;
+  transition: color 0.2s;
+}
+.screen__more:hover { color: var(--ink); }
+/* 放大 / 缩回时飞的那张（卡片上已经加载好的画面） */
+.screen__ghost {
+  position: fixed;
+  z-index: 3;
+  margin: 0;
+  object-fit: cover;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
 /* ── 跟随光标（motion.js，只在首页、只在有鼠标的设备上）──────────
    系统光标照旧显示，这个圆环只是跟在后面。difference 混合：浅底上是深环，照片上是反色环。
    停在带 data-cursor 的作品上时展开成实心圆片，写着「看 / 播放 / 阅读」——
@@ -1945,7 +2174,10 @@ body.is-locked { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .js-reveal .plate,
   .js-reveal .work,
+  .js-reveal .film-card,
   .js-reveal .note { opacity: 1; transform: none; transition: none; }
+  .film-card,
+  .film-card__preview { transition: none; }
   .js-reveal .plate__frame img,
   .js-reveal .work__frame img,
   .viewer__stage img { transition: none; opacity: 1; }

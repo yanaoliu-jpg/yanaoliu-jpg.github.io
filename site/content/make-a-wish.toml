@@ -25,6 +25,19 @@ h264_crf = 29   # 26 时 mp4 是 94.6 MiB，离 GitHub 单文件 100 MiB 硬限�
 # 第 537 秒：长椅上的双人镜头，阳光和绿植，**没有字幕**。
 # 这部片子几乎全程压着中文字幕，我写脚本扫了 47 帧的底部亮度才找出这一帧。
 poster_at = 537
+
+# ── 首页影片卡片（2026-09-29「放映厅」改版第二步）──────────────────
+# 类型：写在卡片上「时长 · 类型」那一行、影片页标题下那一行。他 2026-09-29 确认过这三部的叫法。
+# 悬停预览：从原片切一段无声的小片段（build.py 的 encode_preview，960×540，webm + mp4 各一份）。
+#   preview_at   起点（秒）；preview_len 长度（秒，不写就是 3.5）
+#   preview_crop 可选：只留画面上面这么多（比如 0.82），把底部那条字幕带裁掉，左右等比裁
+#   预览从**封面帧所在的镜头**里取：鼠标停上去，静止的封面像自己动了起来，不是跳到别处。
+#   改了这几个数，下次构建会自己重切（参数记在 docs/video/<slug>/<slug>-preview.json）
+genre = "Documentary short"
+# 长椅两人全景是 535.93–541.07 秒这个镜头，封面帧（537 秒）在里面；字幕在画面高约 88%，只留上面 82%
+preview_at = 536.0
+preview_len = 3.5
+preview_crop = 0.82
 poster_alt = "A still from the film: two people sit talking on a stone bench under a tree in a residential courtyard, one in a school shirt, the other in a pink work jacket."
 
 date = "2026-07"
@@ -64,6 +77,7 @@ colophon = "Camera: Yanao (Leo) Liu · Interview by a classmate"
 # ═══════════════════════════════════════════════════════════════════
 [zh]
 title = "都值得被听见"
+genre = "纪录短片"
 author = "刘延奥"
 description = "一部十分钟的短片，关于问一个人：你想要什么。2026 年 7 月。"
 colophon = "录制 刘延奥 · 采访由一位同学完成"

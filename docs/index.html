@@ -355,77 +355,82 @@ document.documentElement.classList.remove('no-js');
     </ul>
   </section>
 
+  <!--
+    影片：竖版海报卡（build.py 的 film_card，2026-09-29「放映厅」第二步）。
+    鼠标停上去播一段无声预览，点了在本页弹出下面那个播放器（films.js）；关掉 JS 就是去影片页的链接。
+  -->
   <section class="cat" id="films" style="--c1: #b97d46; --w1: #eddecf; --d1: #a2662f; --c2: #3b719b; --w2: #d3e2ee; --d2: #3379b0; --c3: #254ab1; --w3: #d8e0f7; --d3: #486ed9">
     <h2 class="cat__title"><span class="cat__label">Films</span></h2>
-    <ul class="works">
+    <ul class="films">
 
-      <li class="work work--film" data-slug="stop-scrolling"
+      <li class="film-card" data-slug="stop-scrolling" data-ar="1.7778" data-webm="video/stop-scrolling/stop-scrolling.webm" data-mp4="video/stop-scrolling/stop-scrolling.mp4" data-poster="img/stop-scrolling/stop-scrolling-poster-2400.webp" data-preview-webm="video/stop-scrolling/stop-scrolling-preview.webm" data-preview-mp4="video/stop-scrolling/stop-scrolling-preview.mp4"
           style="--ar: 1.7778; --c1: #b97d46; --w1: #eddecf; --d1: #a2662f; --c2: #b7b946; --w2: #e2e3b5; --d2: #777823; --c3: #9b463b; --w3: #f0dbd9; --d3: #c64c3c">
-        <a class="work__link" href="./stop-scrolling/"
-           data-cursor="Play">
-          <span class="work__frame"
-                style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAEEAwX/xAAfEAACAgICAwEAAAAAAAAAAAABAgADBBESMRMUYSH/xAAWAQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwDnYz1cNsNH7FTkDxH2uCsW0p1rYixCQw+ibZdSXVMLEVtdfkrKWxU5mEkLEHswgf/Z)">
-            <picture>
-              <source type="image/avif" srcset="img/stop-scrolling/stop-scrolling-poster-900.avif 900w, img/stop-scrolling/stop-scrolling-poster-1600.avif 1600w, img/stop-scrolling/stop-scrolling-poster-2400.avif 2400w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))">
-              <source type="image/webp" srcset="img/stop-scrolling/stop-scrolling-poster-900.webp 900w, img/stop-scrolling/stop-scrolling-poster-1600.webp 1600w, img/stop-scrolling/stop-scrolling-poster-2400.webp 2400w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))">
-              <img src="img/stop-scrolling/stop-scrolling-poster-1600.jpg"
-                   srcset="img/stop-scrolling/stop-scrolling-poster-900.jpg 900w, img/stop-scrolling/stop-scrolling-poster-1600.jpg 1600w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))"
-                   width="2560" height="1440"
-                   alt="A still from the film: a student sits alone at a desk in a bare room, looking down at a phone, an hourglass beside them." loading="lazy" decoding="async">
-            </picture>
-          </span>
-          <span class="work__meta">
-            <span class="work__eyebrow">Film · 2026</span>
-            <span class="work__title">Stop Scrolling, Stay Alive</span>
-            <span class="work__detail"><span>32 seconds</span> <span>March 2026</span></span>
-          </span>
-        </a>
+        <span class="film-card__frame"
+              style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAEEAwX/xAAfEAACAgICAwEAAAAAAAAAAAABAgADBBESMRMUYSH/xAAWAQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwDnYz1cNsNH7FTkDxH2uCsW0p1rYixCQw+ibZdSXVMLEVtdfkrKWxU5mEkLEHswgf/Z)">
+          <picture>
+            <source type="image/avif" srcset="img/stop-scrolling/stop-scrolling-poster-900.avif 900w, img/stop-scrolling/stop-scrolling-poster-1600.avif 1600w, img/stop-scrolling/stop-scrolling-poster-2400.avif 2400w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)">
+            <source type="image/webp" srcset="img/stop-scrolling/stop-scrolling-poster-900.webp 900w, img/stop-scrolling/stop-scrolling-poster-1600.webp 1600w, img/stop-scrolling/stop-scrolling-poster-2400.webp 2400w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)">
+            <img src="img/stop-scrolling/stop-scrolling-poster-1600.jpg"
+                 srcset="img/stop-scrolling/stop-scrolling-poster-900.jpg 900w, img/stop-scrolling/stop-scrolling-poster-1600.jpg 1600w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)"
+                 width="2560" height="1440"
+                 alt="A still from the film: a student sits alone at a desk in a bare room, looking down at a phone, an hourglass beside them." loading="lazy" decoding="async">
+          </picture>
+        </span>
+        <div class="film-card__body">
+          <p class="film-card__eyebrow">Film · 2026</p>
+          <h3 class="film-card__title"><a class="film-card__link" href="./stop-scrolling/"
+              data-cursor="Play">Stop Scrolling, Stay Alive</a></h3>
+          <p class="film-card__detail"><span>32 seconds</span> <span>Public service announcement</span></p>
+          <p class="film-card__line">Thirty seconds on what an algorithmic feed does to a teenager, and on getting out of it.</p>
+          <p class="film-card__credits">Directed by Alioth · Cinematography by Yanao (Leo) Liu</p>
+          <p class="film-card__award"><svg class="laurel" viewBox="0 0 16 32" aria-hidden="true"><path d="M12.5 31Q2.5 19 8 1.5" fill="none" stroke="currentColor" stroke-width="0.9"/><ellipse cx="8.4" cy="26.6" rx="3.2" ry="1.25" transform="rotate(-40 8.4 26.6)"/><ellipse cx="6.2" cy="20.6" rx="3.2" ry="1.25" transform="rotate(-60 6.2 20.6)"/><ellipse cx="5.4" cy="14.6" rx="3.2" ry="1.25" transform="rotate(-78 5.4 14.6)"/><ellipse cx="5.9" cy="8.8" rx="3.2" ry="1.25" transform="rotate(-98 5.9 8.8)"/><ellipse cx="7.9" cy="3.6" rx="3.2" ry="1.25" transform="rotate(-120 7.9 3.6)"/><ellipse cx="11.8" cy="23.8" rx="3.2" ry="1.25" transform="rotate(24 11.8 23.8)"/><ellipse cx="9.6" cy="17.6" rx="3.2" ry="1.25" transform="rotate(6 9.6 17.6)"/><ellipse cx="9.1" cy="11.4" rx="3.2" ry="1.25" transform="rotate(-12 9.1 11.4)"/></svg><span>National Outstanding Honor · HOSA 2026</span><svg class="laurel" viewBox="0 0 16 32" aria-hidden="true"><path d="M12.5 31Q2.5 19 8 1.5" fill="none" stroke="currentColor" stroke-width="0.9"/><ellipse cx="8.4" cy="26.6" rx="3.2" ry="1.25" transform="rotate(-40 8.4 26.6)"/><ellipse cx="6.2" cy="20.6" rx="3.2" ry="1.25" transform="rotate(-60 6.2 20.6)"/><ellipse cx="5.4" cy="14.6" rx="3.2" ry="1.25" transform="rotate(-78 5.4 14.6)"/><ellipse cx="5.9" cy="8.8" rx="3.2" ry="1.25" transform="rotate(-98 5.9 8.8)"/><ellipse cx="7.9" cy="3.6" rx="3.2" ry="1.25" transform="rotate(-120 7.9 3.6)"/><ellipse cx="11.8" cy="23.8" rx="3.2" ry="1.25" transform="rotate(24 11.8 23.8)"/><ellipse cx="9.6" cy="17.6" rx="3.2" ry="1.25" transform="rotate(6 9.6 17.6)"/><ellipse cx="9.1" cy="11.4" rx="3.2" ry="1.25" transform="rotate(-12 9.1 11.4)"/></svg></p>
+        </div>
       </li>
 
-      <li class="work work--film" data-slug="gratitude"
+      <li class="film-card" data-slug="gratitude" data-ar="1.7778" data-webm="video/gratitude/gratitude.webm" data-mp4="video/gratitude/gratitude.mp4" data-poster="img/gratitude/gratitude-poster-2400.webp" data-preview-webm="video/gratitude/gratitude-preview.webm" data-preview-mp4="video/gratitude/gratitude-preview.mp4"
           style="--ar: 1.7778; --c1: #254ab1; --w1: #d8e0f7; --d1: #486ed9; --c2: #be7c53; --w2: #eeddd2; --d2: #ac6032; --c3: #257db1; --w3: #c9e4f4; --d3: #247bae">
-        <a class="work__link" href="./gratitude/"
-           data-cursor="Play">
-          <span class="work__frame"
-                style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAIEBf/EACIQAAEEAgIBBQAAAAAAAAAAAAECAwQRABITIUEFIjFRYf/EABYBAQEBAAAAAAAAAAAAAAAAAAABAv/EABgRAQADAQAAAAAAAAAAAAAAAAEAAhED/9oADAMBAAIRAxEAPwCqHakLc1Bb3NKu+vwYs6Uy1CdDbpbXXWp83juHigDj9tWOsxPWm0CMysJAUokEj5Oa5lbWxi2hs12JLzsZlbbuuyAVUm+/OGTQ0BMRnWxaAeifrDIoMBP/2Q==)">
-            <picture>
-              <source type="image/avif" srcset="img/gratitude/gratitude-poster-900.avif 900w, img/gratitude/gratitude-poster-1600.avif 1600w, img/gratitude/gratitude-poster-2400.avif 2400w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))">
-              <source type="image/webp" srcset="img/gratitude/gratitude-poster-900.webp 900w, img/gratitude/gratitude-poster-1600.webp 1600w, img/gratitude/gratitude-poster-2400.webp 2400w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))">
-              <img src="img/gratitude/gratitude-poster-1600.jpg"
-                   srcset="img/gratitude/gratitude-poster-900.jpg 900w, img/gratitude/gratitude-poster-1600.jpg 1600w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))"
-                   width="2560" height="1440"
-                   alt="A still from the film: a student in a blue school tracksuit holds a microphone out to a canteen cook in a white hat and apron, in an empty dining hall." loading="lazy" decoding="async">
-            </picture>
-          </span>
-          <span class="work__meta">
-            <span class="work__eyebrow">Film · 2025</span>
-            <span class="work__title">Gratitude, Quietly</span>
-            <span class="work__detail"><span>5:21</span> <span>November 2025</span></span>
-          </span>
-        </a>
+        <span class="film-card__frame"
+              style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAIEBf/EACIQAAEEAgIBBQAAAAAAAAAAAAECAwQRABITIUEFIjFRYf/EABYBAQEBAAAAAAAAAAAAAAAAAAABAv/EABgRAQADAQAAAAAAAAAAAAAAAAEAAhED/9oADAMBAAIRAxEAPwCqHakLc1Bb3NKu+vwYs6Uy1CdDbpbXXWp83juHigDj9tWOsxPWm0CMysJAUokEj5Oa5lbWxi2hs12JLzsZlbbuuyAVUm+/OGTQ0BMRnWxaAeifrDIoMBP/2Q==)">
+          <picture>
+            <source type="image/avif" srcset="img/gratitude/gratitude-poster-900.avif 900w, img/gratitude/gratitude-poster-1600.avif 1600w, img/gratitude/gratitude-poster-2400.avif 2400w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)">
+            <source type="image/webp" srcset="img/gratitude/gratitude-poster-900.webp 900w, img/gratitude/gratitude-poster-1600.webp 1600w, img/gratitude/gratitude-poster-2400.webp 2400w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)">
+            <img src="img/gratitude/gratitude-poster-1600.jpg"
+                 srcset="img/gratitude/gratitude-poster-900.jpg 900w, img/gratitude/gratitude-poster-1600.jpg 1600w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)"
+                 width="2560" height="1440"
+                 alt="A still from the film: a student in a blue school tracksuit holds a microphone out to a canteen cook in a white hat and apron, in an empty dining hall." loading="lazy" decoding="async">
+          </picture>
+        </span>
+        <div class="film-card__body">
+          <p class="film-card__eyebrow">Film · 2025</p>
+          <h3 class="film-card__title"><a class="film-card__link" href="./gratitude/"
+              data-cursor="Play">Gratitude, Quietly</a></h3>
+          <p class="film-card__detail"><span>5:21</span> <span>Documentary short</span></p>
+          <p class="film-card__line">What gratitude actually means is buried somewhere in an ordinary day.</p>
+          <p class="film-card__credits">Camera: Yanao (Leo) Liu · Made by a team of eight students</p>
+        </div>
       </li>
 
-      <li class="work work--film" data-slug="make-a-wish"
+      <li class="film-card" data-slug="make-a-wish" data-ar="1.7778" data-webm="video/make-a-wish/make-a-wish.webm" data-mp4="video/make-a-wish/make-a-wish.mp4" data-poster="img/make-a-wish/make-a-wish-poster-2400.webp" data-preview-webm="video/make-a-wish/make-a-wish-preview.webm" data-preview-mp4="video/make-a-wish/make-a-wish-preview.mp4"
           style="--ar: 1.7778; --c1: #3b719b; --w1: #d3e2ee; --d1: #3379b0; --c2: #3b9b6f; --w2: #c3e8d8; --d2: #268359; --c3: #3f9b3b; --w3: #c7e9c5; --d3: #2b8527">
-        <a class="work__link" href="./make-a-wish/"
-           data-cursor="Play">
-          <span class="work__frame"
-                style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAGQAAAQUAAAAAAAAAAAAAAAAAAAEDBAUG/8QAHxAAAQQCAwEBAAAAAAAAAAAAAQACAxEEEgUhQSJR/8QAFgEBAQEAAAAAAAAAAAAAAAAAAQAC/8QAGBEBAAMBAAAAAAAAAAAAAAAAAAEREhP/2gAMAwEAAhEDEQA/ADgc3Hxo5Q3VrS8ho2okeEpZcrG3Y+YfUhdQ2KzRJbKQ0kWBddWrfGgjlhi3BPX6UYtm0iXO45sha5k1jo6GghPjj8UgXC0mvbQnnK0//9k=)">
-            <picture>
-              <source type="image/avif" srcset="img/make-a-wish/make-a-wish-poster-900.avif 900w, img/make-a-wish/make-a-wish-poster-1600.avif 1600w, img/make-a-wish/make-a-wish-poster-2400.avif 2400w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))">
-              <source type="image/webp" srcset="img/make-a-wish/make-a-wish-poster-900.webp 900w, img/make-a-wish/make-a-wish-poster-1600.webp 1600w, img/make-a-wish/make-a-wish-poster-2400.webp 2400w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))">
-              <img src="img/make-a-wish/make-a-wish-poster-1600.jpg"
-                   srcset="img/make-a-wish/make-a-wish-poster-900.jpg 900w, img/make-a-wish/make-a-wish-poster-1600.jpg 1600w" sizes="(max-width: 900px) min(100vw - 3rem, 92vh), calc(1.7778 * clamp(220px, 15vw + 84px, 300px))"
-                   width="2560" height="1440"
-                   alt="A still from the film: two people sit talking on a stone bench under a tree in a residential courtyard, one in a school shirt, the other in a pink work jacket." loading="lazy" decoding="async">
-            </picture>
-          </span>
-          <span class="work__meta">
-            <span class="work__eyebrow">Film · 2026</span>
-            <span class="work__title">Make a Wish</span>
-            <span class="work__detail"><span>10:11</span> <span>July 2026</span></span>
-          </span>
-        </a>
+        <span class="film-card__frame"
+              style="background-image: url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAALABQDASIAAhEBAxEB/8QAGQAAAQUAAAAAAAAAAAAAAAAAAAEDBAUG/8QAHxAAAQQCAwEBAAAAAAAAAAAAAQACAxEEEgUhQSJR/8QAFgEBAQEAAAAAAAAAAAAAAAAAAQAC/8QAGBEBAAMBAAAAAAAAAAAAAAAAAAEREhP/2gAMAwEAAhEDEQA/ADgc3Hxo5Q3VrS8ho2okeEpZcrG3Y+YfUhdQ2KzRJbKQ0kWBddWrfGgjlhi3BPX6UYtm0iXO45sha5k1jo6GghPjj8UgXC0mvbQnnK0//9k=)">
+          <picture>
+            <source type="image/avif" srcset="img/make-a-wish/make-a-wish-poster-900.avif 900w, img/make-a-wish/make-a-wish-poster-1600.avif 1600w, img/make-a-wish/make-a-wish-poster-2400.avif 2400w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)">
+            <source type="image/webp" srcset="img/make-a-wish/make-a-wish-poster-900.webp 900w, img/make-a-wish/make-a-wish-poster-1600.webp 1600w, img/make-a-wish/make-a-wish-poster-2400.webp 2400w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)">
+            <img src="img/make-a-wish/make-a-wish-poster-1600.jpg"
+                 srcset="img/make-a-wish/make-a-wish-poster-900.jpg 900w, img/make-a-wish/make-a-wish-poster-1600.jpg 1600w" sizes="(max-width: 640px) calc(100vw - 2 * clamp(1.5rem, 3.5vw, 6rem)), (max-width: 1100px) calc((100vw - 2 * clamp(1.5rem, 3.5vw, 6rem) - clamp(1.25rem, 2.4vw, 2.75rem)) / 2), calc((min(100vw, 1500px) - 2 * clamp(1.5rem, 3.5vw, 6rem) - 2 * clamp(1.25rem, 2.4vw, 2.75rem)) / 3)"
+                 width="2560" height="1440"
+                 alt="A still from the film: two people sit talking on a stone bench under a tree in a residential courtyard, one in a school shirt, the other in a pink work jacket." loading="lazy" decoding="async">
+          </picture>
+        </span>
+        <div class="film-card__body">
+          <p class="film-card__eyebrow">Film · 2026</p>
+          <h3 class="film-card__title"><a class="film-card__link" href="./make-a-wish/"
+              data-cursor="Play">Make a Wish</a></h3>
+          <p class="film-card__detail"><span>10:11</span> <span>Documentary short</span></p>
+          <p class="film-card__line">Everyone is carrying a wish somewhere — however small, however ordinary, it still deserves to be heard.</p>
+          <p class="film-card__credits">Camera: Yanao (Leo) Liu · Interview by a classmate</p>
+        </div>
       </li>
     </ul>
   </section>
@@ -1080,10 +1085,29 @@ document.documentElement.classList.remove('no-js');
 
 </main>
 
+<!--
+  页内播放器（films.js）：点首页的影片卡片，画面从卡片的位置放大到这里、有声播放。
+  平时关着；关掉 JS 时用不到。永远是暗的（style.css 顶部那个暗色块的选择器里有 .screen）。
+-->
+<dialog class="screen" id="screen" aria-label="Film player">
+  <button class="viewer__close screen__close" type="button" data-act="close" aria-label="Close">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+  </button>
+  <figure class="screen__stage">
+    <span class="screen__video"></span>
+    <figcaption class="screen__caption">
+      <span class="screen__title"></span>
+      <span class="screen__meta"></span>
+      <a class="screen__more" href="./">About this film <span aria-hidden="true">→</span></a>
+    </figcaption>
+  </figure>
+</dialog>
+
 <script type="application/json" id="hero-data">[{"href": "./good-night/", "label": "Series 01 · Good Night", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A wall of residential towers at night, hundreds of windows lit in warm and cool tones above bare winter trees.", "avif": "img/good-night/DSC05547-900.avif 900w, img/good-night/DSC05547-1600.avif 1600w, img/good-night/DSC05547-2400.avif 2400w", "webp": "img/good-night/DSC05547-900.webp 900w, img/good-night/DSC05547-1600.webp 1600w, img/good-night/DSC05547-2400.webp 2400w", "jpg": "img/good-night/DSC05547-900.jpg 900w, img/good-night/DSC05547-1600.jpg 1600w", "src": "img/good-night/DSC05547-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAMEBv/EAB0QAAICAgMBAAAAAAAAAAAAAAERAAIDMQQSUcH/xAAUAQEAAAAAAAAAAAAAAAAAAAAB/8QAFREBAQAAAAAAAAAAAAAAAAAAABH/2gAMAwEAAhEDEQA/AOU42OhNQUXK5cVWSAN6mCuS1UilqVtybktowNLYx2PwRI9z7EQ//9k="}, {"href": "./goodbye-renfen/", "label": "Series 02 · Goodbye, Renfen", "ar": 0.8, "fx": 50.0, "fy": 50.0, "alt": "A school corridor in the afternoon, lit only by a bank of windows at the far end; a yellow wet-floor sign stands in the right foreground.", "avif": "img/goodbye-renfen/00650c89435290da7420ad155eff930-900.avif 900w, img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.avif 1600w, img/goodbye-renfen/00650c89435290da7420ad155eff930-2400.avif 2400w", "webp": "img/goodbye-renfen/00650c89435290da7420ad155eff930-900.webp 900w, img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.webp 1600w, img/goodbye-renfen/00650c89435290da7420ad155eff930-2400.webp 2400w", "jpg": "img/goodbye-renfen/00650c89435290da7420ad155eff930-900.jpg 900w, img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.jpg 1600w", "src": "img/goodbye-renfen/00650c89435290da7420ad155eff930-1600.jpg", "sizes": "calc(1.06 * max(100vw, 80.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUABADASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAgP/xAAjEAACAQQBAwUAAAAAAAAAAAABAgMABAURIRIxQRQyQrHh/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAEC/8QAFREBAQAAAAAAAAAAAAAAAAAAAEH/2gAMAwEAAhEDEQA/AE8IDXCqVLDyNVeRB6llVCo7657UY+5mjySvFGZCB7R54rW7upXyJkmhMbEaKftZDDDooy6AAa6B9VGfVTkmGvhuiikV/9k="}, {"href": "./the-old-days/", "label": "Series 03 · The Old Days", "ar": 0.6667, "fx": 50.0, "fy": 50.0, "alt": "Late sun breaking through the leaves of a tree and throwing long shadows across an empty running track.", "avif": "img/the-old-days/DSC09243-900.avif 900w, img/the-old-days/DSC09243-1600.avif 1600w, img/the-old-days/DSC09243-2400.avif 2400w", "webp": "img/the-old-days/DSC09243-900.webp 900w, img/the-old-days/DSC09243-1600.webp 1600w, img/the-old-days/DSC09243-2400.webp 2400w", "jpg": "img/the-old-days/DSC09243-900.jpg 900w, img/the-old-days/DSC09243-1600.jpg 1600w", "src": "img/the-old-days/DSC09243-1600.jpg", "sizes": "calc(1.06 * max(100vw, 66.7vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUAA0DASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAMEAf/EACEQAAEEAgICAwAAAAAAAAAAAAECAwQRAAUSIRMiMUGB/8QAFgEBAQEAAAAAAAAAAAAAAAAAAgED/8QAGBEAAwEBAAAAAAAAAAAAAAAAAAERIQL/2gAMAwEAAhEDEQA/AM1M1UXWeB18N0u01ZNfeQuSZE6Q6sqCkg+pWe6xmp1aXkOOPyUIoAAKySZHkLdrkF8RXR6zKxjXFGMSnW2wEkfoyeTJc8lEih8dYYY0tK3h/9k="}, {"href": "./night-wind/", "label": "Series 04 · Drunk on the Night Wind", "ar": 0.6667, "fx": 50.0, "fy": 50.0, "alt": "A teal concrete building at night with WHARF FISHMARKET lit above the entrance; people sit on the steps below.", "avif": "img/night-wind/DSC00692-900.avif 900w, img/night-wind/DSC00692-1600.avif 1600w, img/night-wind/DSC00692-2400.avif 2400w", "webp": "img/night-wind/DSC00692-900.webp 900w, img/night-wind/DSC00692-1600.webp 1600w, img/night-wind/DSC00692-2400.webp 2400w", "jpg": "img/night-wind/DSC00692-900.jpg 900w, img/night-wind/DSC00692-1600.jpg 1600w", "src": "img/night-wind/DSC00692-1600.jpg", "sizes": "calc(1.06 * max(100vw, 66.7vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAAUAA0DASIAAhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAAQCAwUG/8QAIRAAAgMAAQMFAAAAAAAAAAAAAQIAAxEFITFBBBITUWH/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAv/EABYRAQEBAAAAAAAAAAAAAAAAAAABIf/aAAwDAQACEQMRAD8A5j4GcA50+xKXrZDhE2q+NU1UGj1Aax6w5BwAfkW5RSLkDhQc6+0ZsJ2E1sZU8HO2+JB7XbNO52hCB//Z"}, {"href": "./keep-going-back/", "label": "Series 05 · I Keep Going Back", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A dim room at night where someone sits on the floor playing a guitar to a screen of song lyrics, surrounded by about twenty people, most holding up their phones.", "avif": "img/keep-going-back/20250801-DSC08901-900.avif 900w, img/keep-going-back/20250801-DSC08901-1600.avif 1600w, img/keep-going-back/20250801-DSC08901-2400.avif 2400w", "webp": "img/keep-going-back/20250801-DSC08901-900.webp 900w, img/keep-going-back/20250801-DSC08901-1600.webp 1600w, img/keep-going-back/20250801-DSC08901-2400.webp 2400w", "jpg": "img/keep-going-back/20250801-DSC08901-900.jpg 900w, img/keep-going-back/20250801-DSC08901-1600.jpg 1600w", "src": "img/keep-going-back/20250801-DSC08901-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAwACBf/EACEQAAEDBAIDAQAAAAAAAAAAAAEAAgMEERIxBSIjQWGS/8QAFQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAWEQEBAQAAAAAAAAAAAAAAAAAAEQH/2gAMAwEAAhEDEQA/AOTR8lVzytia6MZaLm3Q8tDKyUOndG9zhfr8Q08YlmEYAFwDfaxk0g9N396TUTaNtTNiPK/9KRk5bAUgv//Z"}, {"href": "./looking-forward/", "label": "Series 06 · Looking Forward", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A lit Thai restaurant front at dusk with green neon lettering; a small child in a white helmet rides a bicycle alone across the paving outside.", "avif": "img/looking-forward/DSC00195-900.avif 900w, img/looking-forward/DSC00195-1600.avif 1600w, img/looking-forward/DSC00195-2400.avif 2400w", "webp": "img/looking-forward/DSC00195-900.webp 900w, img/looking-forward/DSC00195-1600.webp 1600w, img/looking-forward/DSC00195-2400.webp 2400w", "jpg": "img/looking-forward/DSC00195-900.jpg 900w, img/looking-forward/DSC00195-1600.jpg 1600w", "src": "img/looking-forward/DSC00195-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAMBAgb/xAAfEAACAwABBQEAAAAAAAAAAAABAgADEQQSISJRYaH/xAAWAQEBAQAAAAAAAAAAAAAAAAABAAL/xAAXEQEBAQEAAAAAAAAAAAAAAAAAAREh/9oADAMBAAIRAxEAPwDNcfiG1SV6fmtkH4z1HzH7K11K1YJLe82TemKMZu406YZWdhT0sHIO6IRTDGI0wj1P/9k="}, {"href": "./sea-and-light/", "label": "Series 07 · Sea and Light", "ar": 1.5, "fx": 50.0, "fy": 50.0, "alt": "A wide aquarium window glowing in a dark room, tall kelp and fish inside it, a single figure standing in silhouette against the glass.", "avif": "img/sea-and-light/DSC005751-900.avif 900w, img/sea-and-light/DSC005751-1600.avif 1600w, img/sea-and-light/DSC005751-2400.avif 2400w", "webp": "img/sea-and-light/DSC005751-900.webp 900w, img/sea-and-light/DSC005751-1600.webp 1600w, img/sea-and-light/DSC005751-2400.webp 2400w", "jpg": "img/sea-and-light/DSC005751-900.jpg 900w, img/sea-and-light/DSC005751-1600.jpg 1600w", "src": "img/sea-and-light/DSC005751-1600.jpg", "sizes": "calc(1.06 * max(100vw, 150.0vh))", "lqip": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIMDRANCxIQDhAUExIVGywdGxgYGzYnKSAsQDlEQz85Pj1HUGZXR0thTT0+WXlaYWltcnNyRVV9hnxvhWZwcm7/2wBDARMUFBsXGzQdHTRuST5Jbm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm7/wAARCAANABQDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAQFAQL/xAAiEAABBAAGAwEAAAAAAAAAAAABAAIDEQQFEhQhMVFhYuH/xAAXAQADAQAAAAAAAAAAAAAAAAAAAQID/8QAFREBAQAAAAAAAAAAAAAAAAAAACH/2gAMAwEAAhEDEQA/AIGUQ4N/OLjL/V0np4cr27xHhqfXB1/qiQTiNoBYXV9Uutw3W4lhN/XSbKl3gB5A6tCxxtxPlCFv/9k="}]</script>
 
 <script src="./static/gallery.js" defer></script>
 <script type="module" src="./static/motion.js"></script>
 <script type="module" src="./static/hero.js"></script>
+<script type="module" src="./static/films.js"></script>
 </body>
 </html>

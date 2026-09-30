@@ -45,7 +45,6 @@ const HOME_THEME = '#f3e4dc';          // ↔ build.py HOME_THEME_COLOR：亮色
 const PAPER_THEME = '#f2efe9';         // ↔ build.py PAPER_THEME_COLOR：亮色时的内页
 const DARKEST_STOP = '#dde3ee';        // 亮色首页渐变里最深的一站——深色字在它上面对比度最低
 const COVER_H_1440 = 300;              // ↔ --cover-h 在 1440 上的值
-const FILM_W_1440 = Math.round(300 * 16 / 9);   // 533
 // 整页高度的回归防线。规格里写的 5.5 是样稿阶段估的，没算区间距和说明文字；
 // 实测 6.05（间距已按封面比例收过 25%）。再往下只能压开头那一屏，那是他选定保留的。
 const MAX_SCREENS_1440 = 6.1;
@@ -123,13 +122,31 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
         // 跟随光标的圆片：截图时它被藏起来了，量到的是它底下的照片。它自带实心底色（--ink 上 --bg，13.8:1）
         if (el.closest('.cursor')) continue;
         // 被别的东西挡住的字（2026-09-29 起有了固定导航）：比如第一屏滚到导航底下时的「正在放映」——
-        // 读者看不见它，量它底下的颜色没有意义（量到的是磨砂导航）。看字框正中那一点最上面是谁
+        // 读者看不见它，量它底下的颜色没有意义（量到的是磨砂导航）。从字框正中那一点往下数，
+        // 数到这段字之前，有没有**画了东西**的元素压在上面。
+        // ⚠️ 只看最上面那一个不行：影片卡片整张盖着链接的透明伪元素（整卡可点），
+        // 最上面永远是那个链接——第二步第一次全跑时，卡片上片名以外的字全被当成「挡住了」跳过，一段都没量
         {
           const r0 = (() => { range.selectNodeContents(n); return range.getBoundingClientRect(); })();
           const cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
           if (cx >= 0 && cy >= 0 && cx < innerWidth && cy < innerHeight) {
-            const hit = document.elementFromPoint(cx, cy);
-            if (hit && !el.contains(hit) && !hit.contains(el)) continue;
+            const paints = (h) => {
+              if (/^(img|video|canvas|iframe|svg|picture)$/i.test(h.tagName)) return true;
+              for (const pseudo of [null, '::before', '::after']) {
+                const s = getComputedStyle(h, pseudo);
+                if (pseudo && s.content === 'none') continue;
+                const bg = s.backgroundColor.match(/[\d.]+/g);
+                if ((bg && (bg.length < 4 || +bg[3] > 0)) || s.backgroundImage !== 'none'
+                    || (s.backdropFilter && s.backdropFilter !== 'none')) return true;
+              }
+              return false;
+            };
+            let covered = false;
+            for (const h of document.elementsFromPoint(cx, cy)) {
+              if (el.contains(h) || h.contains(el)) break;
+              if (paints(h)) { covered = true; break; }
+            }
+            if (covered) continue;
           }
         }
         let op = 1; for (let a = el; a; a = a.parentElement) op *= parseFloat(getComputedStyle(a).opacity);
@@ -473,6 +490,156 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
     }
   }
 
+  /* ── films. 首页影片区（2026-09-29「放映厅」第二步）：竖版海报卡六行信息；预览文件都在；
+     悬停播无声预览（减少动态效果 / 触屏不播）；点了弹出播放器、Esc 关掉后停止下载、焦点回卡片；
+     ⌘ 点照常开影片页；关掉 JS 就是去影片页的链接；影片页标题下那行有类型 ── */
+  if (want('films')) {
+    const ORDER = ['stop-scrolling', 'gratitude', 'make-a-wish'];
+    const FILM = {
+      'stop-scrolling': {
+        '': { title: 'Stop Scrolling, Stay Alive', genre: 'Public service announcement', award: 'National Outstanding Honor · HOSA 2026',
+              line: 'Thirty seconds on what an algorithmic feed does to a teenager, and on getting out of it.' },
+        '/zh': { title: '停止滑动，面对生活', genre: '公益广告', award: '国家级卓越奖 · HOSA 2026',
+                 line: '三十秒，讲算法怎么一点点吃掉一个人的注意力，以及他怎么从里面走出来。' } },
+      'gratitude': {
+        '': { title: 'Gratitude, Quietly', genre: 'Documentary short', award: '',
+              line: 'What gratitude actually means is buried somewhere in an ordinary day.' },
+        '/zh': { title: '感恩悄然发生', genre: '纪录短片', award: '', line: '感恩的意义，藏在日常里。' } },
+      'make-a-wish': {
+        '': { title: 'Make a Wish', genre: 'Documentary short', award: '',
+              line: 'Everyone is carrying a wish somewhere — however small, however ordinary, it still deserves to be heard.' },
+        '/zh': { title: '都值得被听见', genre: '纪录短片', award: '',
+                 line: '每个人心里，或许都藏着一个愿望——不管它多小、多普通，都值得被听见。' } },
+    };
+    const NAME = { '': 'Yanao (Leo) Liu', '/zh': '刘延奥' };
+    const fctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+    const fp = await fctx.newPage();
+    for (const dir of ['', '/zh']) {
+      await go(fp, `${BASE}${dir}/`);
+      await fp.evaluate(() => document.getElementById('films').scrollIntoView());
+      await fp.waitForTimeout(1500);
+      const cards = await fp.evaluate(() => [...document.querySelectorAll('#films .film-card')].map((c) => {
+        const t = (s) => { const e = c.querySelector(s); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; };
+        const img = c.querySelector('.film-card__frame img');
+        const link = c.querySelector('.film-card__link');
+        return { slug: c.dataset.slug, title: t('.film-card__title'), detail: t('.film-card__detail'), line: t('.film-card__line'),
+                 credits: t('.film-card__credits'), award: t('.film-card__award'),
+                 href: link && new URL(link.getAttribute('href'), location.href).pathname,
+                 cursor: link && link.dataset.cursor,
+                 w: img.getBoundingClientRect().width, tier: +((img.currentSrc.match(/-(\d+)\.(avif|webp|jpg)/) || [])[1] || 0),
+                 sizes: img.getAttribute('sizes') };
+      }));
+      ok(JSON.stringify(cards.map((c) => c.slug)) === JSON.stringify(ORDER), `${dir}/ 影片卡片是 ${cards.map((c) => c.slug).join(',')}`);
+      for (const c of cards) {
+        const want = FILM[c.slug] && FILM[c.slug][dir];
+        if (!want) continue;
+        ok(c.title === want.title && c.href === `${dir}/${c.slug}/`, `${dir}/ ${c.slug} 片名 / 链接：${c.title} → ${c.href}`);
+        ok(c.detail.includes(want.genre), `${dir}/ ${c.slug} 那行没有类型「${want.genre}」：${c.detail}`);
+        ok(c.line === want.line, `${dir}/ ${c.slug} 一句话不对：${c.line}`);
+        ok(c.credits.includes(NAME[dir]), `${dir}/ ${c.slug} 署名里没有他的名字：${c.credits}`);
+        ok(c.award === want.award, `${dir}/ ${c.slug} 奖项是「${c.award}」，应该「${want.award}」`);
+        ok(!!c.cursor, `${dir}/ ${c.slug} 链接上没有 data-cursor`);
+        const need = c.w * 2;
+        const best = [900, 1600, 2400].find((x) => x >= need) || 2400;
+        ok(c.tier === best, `${dir}/ ${c.slug} @2x 显示 ${Math.round(c.w)}px 宽，取了 ${c.tier} 档，应该 ${best}（sizes：${c.sizes}）`);
+      }
+    }
+    // 预览文件：两份都在
+    for (const slug of ORDER) for (const ext of ['webm', 'mp4']) {
+      const r = await fp.evaluate(async (u) => (await fetch(u, { method: 'HEAD' })).status, `${BASE}/video/${slug}/${slug}-preview.${ext}`);
+      ok(r === 200, `预览 ${slug}-preview.${ext} 状态 ${r}`);
+    }
+    // 悬停：淡入无声预览；移开停下
+    await go(fp, `${BASE}/`);
+    await fp.evaluate(() => document.getElementById('films').scrollIntoView());
+    await fp.waitForTimeout(1200);
+    await fp.hover('.film-card[data-slug="gratitude"]');
+    await fp.waitForTimeout(2500);
+    let pv = await fp.evaluate(() => { const c = document.querySelector('.film-card[data-slug="gratitude"]'); const v = c.querySelector('video');
+      return { has: !!v, muted: v && v.muted, playing: v && !v.paused && v.currentTime > 0, on: c.classList.contains('is-previewing') }; });
+    ok(pv.has && pv.muted && pv.playing && pv.on, `悬停 gratitude 后应在播无声预览：${JSON.stringify(pv)}`);
+    await fp.mouse.move(1430, 890);
+    await fp.waitForTimeout(700);
+    pv = await fp.evaluate(() => { const c = document.querySelector('.film-card[data-slug="gratitude"]'); const v = c.querySelector('video');
+      return { paused: !v || v.paused, on: c.classList.contains('is-previewing') }; });
+    ok(pv.paused && !pv.on, `移开后预览应停下：${JSON.stringify(pv)}`);
+    // 点开播放器：有声播放、source 顺序对；Esc 关掉、停止下载、焦点回卡片
+    await fp.click('.film-card[data-slug="stop-scrolling"] .film-card__link');
+    await fp.waitForTimeout(2500);
+    let pl = await fp.evaluate(() => { const d = document.getElementById('screen'); const v = d && d.querySelector('video');
+      return { open: !!d && d.open, srcs: v ? [...v.querySelectorAll('source')].map((s) => s.src.split('.').pop()).join(',') : '',
+               playing: !!v && !v.paused && v.currentTime > 0, muted: v && v.muted, controls: v && v.controls,
+               title: d && d.querySelector('.screen__title').textContent.trim(),
+               more: d && new URL(d.querySelector('.screen__more').getAttribute('href'), location.href).pathname,
+               locked: document.body.classList.contains('is-locked'), path: location.pathname }; });
+    ok(pl.open && pl.srcs === 'webm,mp4' && pl.playing && !pl.muted && pl.controls && pl.locked && pl.path === '/',
+       `点影片卡片应在本页弹出播放器、有声在放：${JSON.stringify(pl)}`);
+    ok(pl.title === 'Stop Scrolling, Stay Alive' && pl.more === '/stop-scrolling/', `播放器的片名 / 「关于这部片子」：${pl.title} → ${pl.more}`);
+    await fp.keyboard.press('Escape');
+    await fp.waitForTimeout(1200);
+    pl = await fp.evaluate(() => { const d = document.getElementById('screen'); const v = d.querySelector('video');
+      return { open: d.open, loading: !!v && (!!v.currentSrc || v.querySelectorAll('source').length > 0), locked: document.body.classList.contains('is-locked'),
+               focus: document.activeElement && document.activeElement.closest('.film-card') && document.activeElement.closest('.film-card').dataset.slug }; });
+    ok(!pl.open && !pl.loading && !pl.locked && pl.focus === 'stop-scrolling', `Esc 关掉后：${JSON.stringify(pl)}（应关掉、卸掉视频、焦点回卡片）`);
+    // ⌘ 点：照常开影片页（新标签），不弹播放器
+    const [np] = await Promise.all([
+      fctx.waitForEvent('page', { timeout: 8000 }).catch(() => null),
+      fp.click('.film-card[data-slug="make-a-wish"] .film-card__link', { modifiers: ['Meta'] }),
+    ]);
+    if (np) await np.waitForLoadState('domcontentloaded').catch(() => {});
+    const mod = { tab: np ? new URL(np.url()).pathname : null, open: await fp.evaluate(() => document.getElementById('screen').open) };
+    ok(mod.tab === '/make-a-wish/' && !mod.open, `⌘ 点影片卡片应在新标签打开影片页、不弹播放器：${JSON.stringify(mod)}`);
+    if (np) await np.close();
+    // 影片页标题下那行有类型；奖项单独一行（短写法）；类型在整个标题区只出现一次
+    // （2026-09-29：奖项原文里本来就有「公益广告」这个组别，原来塞在同一行里，加了类型就重复了）
+    for (const [p, g, a] of [['/stop-scrolling/', 'Public service announcement', 'National Outstanding Honor · HOSA 2026'],
+                             ['/zh/stop-scrolling/', '公益广告', '国家级卓越奖 · HOSA 2026'],
+                             ['/zh/gratitude/', '纪录短片', '']]) {
+      await go(fp, BASE + p);
+      const d = await fp.evaluate(() => ({
+        meta: document.querySelector('.masthead__meta').textContent.replace(/\s+/g, ' ').trim(),
+        award: (document.querySelector('.masthead__award')?.textContent || '').replace(/\s+/g, ' ').trim(),
+        card: document.querySelector('.masthead__card').textContent.toLowerCase(),
+      }));
+      ok(d.meta.includes(g), `${p} 标题下那行没有类型「${g}」：${d.meta}`);
+      ok(d.award === a, `${p} 奖项那行是「${d.award}」，应该「${a}」`);
+      ok(d.card.split(g.toLowerCase()).length === 2, `${p} 标题区里「${g}」出现了不止一次`);
+    }
+    await fctx.close();
+
+    // 减少动态效果：悬停不建预览
+    const rctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+    const rp = await rctx.newPage();
+    await go(rp, `${BASE}/`);
+    await rp.evaluate(() => document.getElementById('films').scrollIntoView());
+    await rp.waitForTimeout(800);
+    await rp.hover('.film-card[data-slug="gratitude"]');
+    await rp.waitForTimeout(1500);
+    ok(!(await rp.evaluate(() => !!document.querySelector('.film-card video'))), '减少动态效果：悬停不该有预览');
+    await rctx.close();
+
+    // 触屏：点一下就是播放器，没有预览
+    const tctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+    const tp = await tctx.newPage();
+    await go(tp, `${BASE}/`);
+    await tp.evaluate(() => document.querySelector('.film-card[data-slug="gratitude"]').scrollIntoView({ block: 'center' }));
+    await tp.waitForTimeout(800);
+    await tp.tap('.film-card[data-slug="gratitude"] .film-card__title');
+    await tp.waitForTimeout(1500);
+    const tv = await tp.evaluate(() => ({ preview: !!document.querySelector('.film-card video'), open: document.getElementById('screen').open }));
+    ok(!tv.preview && tv.open, `触屏：点卡片应直接弹播放器、没有预览：${JSON.stringify(tv)}`);
+    await tctx.close();
+
+    // 关掉 JS：卡片就是去影片页的普通链接
+    const nctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
+    const nq = await nctx.newPage();
+    await go(nq, `${BASE}/zh/`);
+    await nq.click('.film-card[data-slug="gratitude"] .film-card__link');
+    await nq.waitForLoadState('domcontentloaded');
+    ok(new URL(nq.url()).pathname === '/zh/gratitude/', `关掉 JS 时点影片卡片应跳到影片页，现在在 ${nq.url()}`);
+    await nctx.close();
+  }
+
   /* ── 4. 「下一组」首尾相接、不跨语言 ── */
   if (want(4)) {
     for (const dir of ['', '/zh']) for (let i = 0; i < SLUGS.length; i++) {
@@ -531,19 +698,15 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
         await go(pg, `${BASE}${dir}/`);
         const d = await pg.evaluate(() => ({
           hs: [...document.querySelectorAll('#photographs .work__frame')].map(e => Math.round(e.getBoundingClientRect().height)),
-          filmW: Math.round(document.querySelector('.work--film .work__frame').getBoundingClientRect().width),
-          filmH: Math.round(document.querySelector('.work--film .work__frame').getBoundingClientRect().height),
           screens: document.documentElement.scrollHeight / 900,
           sizes: document.querySelector('#photographs img').getAttribute('sizes'),
           radius: getComputedStyle(document.querySelector('.work__frame')).borderRadius,
         }));
         ok(d.hs.length === 7 && new Set(d.hs).size === 1, `${dir}/ @${w}px 照片封面不等高：${d.hs.join(',')}`);
-        ok(d.filmH === d.hs[0], `${dir}/ @${w}px 影片封面高 ${d.filmH} ≠ 照片 ${d.hs[0]}`);
         ok(/15vw \+ 84px/.test(d.sizes), `${dir}/ @${w}px sizes 跟 --cover-h 对不上：${d.sizes}`);
         ok(d.radius === '10px', `${dir}/ @${w}px 封面圆角是 ${d.radius}`);
         if (w === 1440) {
           ok(d.hs[0] === COVER_H_1440, `${dir}/ @1440 封面高 ${d.hs[0]}，应该是 ${COVER_H_1440}`);
-          ok(Math.abs(d.filmW - FILM_W_1440) <= 3, `${dir}/ @1440 影片封面宽 ${d.filmW}，应 ≈ ${FILM_W_1440}（不再撑满一行）`);
           ok(d.screens <= MAX_SCREENS_1440, `${dir}/ @1440×900 整页 ${d.screens.toFixed(2)} 屏，超过 ${MAX_SCREENS_1440}`);
         }
       }
@@ -631,7 +794,7 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
     for (const p of ['/', '/zh/', `/${NOTES}/`, '/good-night/', '/stop-scrolling/']) {
       await go(np, BASE + p);
       const d = await np.evaluate(() => {
-        const all = [...document.querySelectorAll('.plate, .work, .note, .posterwall__item, .film__video, .hero__slide')];
+        const all = [...document.querySelectorAll('.plate, .work, .film-card, .note, .posterwall__item, .film__video, .hero__slide')];
         const shown = (s) => [...document.querySelectorAll(s)].some(e => getComputedStyle(e).display !== 'none');
         return { total: all.length, hidden: all.filter(e => getComputedStyle(e).opacity !== '1').length,
                  hasReveal: document.documentElement.classList.contains('js-reveal'),
@@ -677,7 +840,7 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
       await go(pg, `${BASE}${dir}/`);
       const d = await pg.evaluate(() => ({
         cats: document.querySelectorAll('.cat[style]').length,
-        pal: [...document.querySelectorAll('.work[data-slug], .cat[style]')].map(el => {
+        pal: [...document.querySelectorAll('.work[data-slug], .film-card[data-slug], .cat[style]')].map(el => {
           const cs = getComputedStyle(el);
           const v = (k) => [1, 2, 3].map(i => cs.getPropertyValue(`--${k}${i}`).trim());
           return { id: el.dataset.slug || el.id, w: v('w'), d: v('d') };
@@ -906,9 +1069,12 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
           await probe(pp, `${tag} #${id}`);
         }
         if (w > 900) for (const slug of SLUGS) {
-          await pp.evaluate((s) => document.querySelector(`.work[data-slug="${s}"]`).scrollIntoView({ block: 'center' }), slug);
+          // 影片是竖版海报卡（第二步起），照片是封面
+          const card = FILMS.has(slug) ? `.film-card[data-slug="${slug}"]` : `.work[data-slug="${slug}"]`;
+          await pp.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center' }), card);
           await pp.waitForTimeout(500);
-          await pp.hover(`.work[data-slug="${slug}"] .work__frame`);
+          // 影片卡片整张被链接的伪元素盖着（整卡可点），悬停卡片本身；照片悬停封面
+          await pp.hover(FILMS.has(slug) ? card : `${card} .work__frame`);
           await pp.waitForTimeout(500);
           await probe(pp, `${tag} 悬停 ${slug}`);
           await pp.mouse.move(w - 10, 10);

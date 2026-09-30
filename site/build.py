@@ -122,6 +122,9 @@ LANGS = {
         "about_years": "Years",
         "about_awards": "Recognition",
         "about_contact": "Contact",
+        # 首页影片卡片的页内播放器（2026-09-29「放映厅」第二步）
+        "about_film": "About this film",
+        "player_label": "Film player",
         "notes_eyebrow": "Notes",
         # ⚠️ 不能写 "films"。首页那行是「7 series · 63 photographs · 3 films · N ___」，
         #    写 films 就成了「3 films · 62 films」，读者会以为站上有 65 部片子。
@@ -177,6 +180,8 @@ LANGS = {
         "about_years": "年份",
         "about_awards": "获奖",
         "about_contact": "联系",
+        "about_film": "关于这部片子",
+        "player_label": "播放器",
         "notes_eyebrow": "影评",
         # 同上：跟前面的「3 部影片」并排，写「62 部」会读成 62 部片子
         "notes_count": "篇影评",
@@ -224,6 +229,30 @@ INDEX_COVER_H = "clamp(220px, 15vw + 84px, 300px)"
 INDEX_STACK_PX = 900
 INDEX_STACK_VH = 52
 
+# 首页影片区的竖版海报卡（2026-09-29「放映厅」第二步），卡片上面那张画面的宽度。
+# ⚠️ ↔ style.css 的 .films 网格：宽于 1100px 三列、641–1100px 两列、640px 及以下一列；
+#    容器 max-width 1500px、左右留白 FILM_PAD、列距 FILM_GAP。改了网格这里跟着改，
+#    不然 sizes 挑错档（跟 INDEX_COVER_H 同一类陷阱）。
+FILM_PAD = "clamp(1.5rem, 3.5vw, 6rem)"
+FILM_GAP = "clamp(1.25rem, 2.4vw, 2.75rem)"
+FILM_CARD_SIZES = (
+    f"(max-width: 640px) calc(100vw - 2 * {FILM_PAD}), "
+    f"(max-width: 1100px) calc((100vw - 2 * {FILM_PAD} - {FILM_GAP}) / 2), "
+    f"calc((min(100vw, 1500px) - 2 * {FILM_PAD} - 2 * {FILM_GAP}) / 3)"
+)
+
+# 奖项那行两侧的月桂叶（电影节海报上那种）。纯装饰；右边那枝由 CSS 镜像。首页影片卡片和影片页共用。
+LAUREL = (
+    '<svg class="laurel" viewBox="0 0 16 32" aria-hidden="true">'
+    '<path d="M12.5 31Q2.5 19 8 1.5" fill="none" stroke="currentColor" stroke-width="0.9"/>'
+    + "".join(
+        f'<ellipse cx="{x}" cy="{y}" rx="3.2" ry="1.25" transform="rotate({r} {x} {y})"/>'
+        for x, y, r in ((8.4, 26.6, -40), (6.2, 20.6, -60), (5.4, 14.6, -78), (5.9, 8.8, -98),
+                        (7.9, 3.6, -120), (11.8, 23.8, 24), (9.6, 17.6, 6), (9.1, 11.4, -12))
+    )
+    + '</svg>'
+)
+
 # ── 页面主题（2026-09-29「放映厅」改版）──────────────────────────
 # 默认**全站暗色**，读者可以切到亮色（<html data-theme="light">，记在 localStorage）。
 # 一套 CSS：:root 是暗色那套变量，:root[data-theme="light"] 换成亮色那套。
@@ -257,7 +286,7 @@ def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
     html_class 带前导空格，因为模板里写的是 class="no-js{{ html_class }}"——
     内页的值是空串，不能留一个尾随空格。body_attrs 同理。
 
-    scripts：motion.js 全站都有；hero.js（第一屏轮播）**只在首页**。
+    scripts：motion.js 全站都有；hero.js（第一屏轮播）、films.js（影片卡片的预览和播放器）**只在首页**。
     两个都是 type="module"：老浏览器不认识 module，会整个跳过——
     它们拿到的就是静态版，这正是想要的渐进增强。module 天然是 defer 的。
 
@@ -267,6 +296,7 @@ def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
     scripts = [f'<script type="module" src="{root}/static/motion.js"></script>']
     if home:
         scripts.append(f'<script type="module" src="{root}/static/hero.js"></script>')
+        scripts.append(f'<script type="module" src="{root}/static/films.js"></script>')
     return {
         "html_class": " theme-home" if home else "",
         # 默认暗色；读者选了亮色时，base.html 头部脚本在样式表之前把这两个 meta 改掉
@@ -287,6 +317,14 @@ def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
 VIDEO_HEIGHT = 1080
 VIDEO_AV1_CRF = 34
 VIDEO_H264_CRF = 21
+
+# 首页影片卡片的悬停预览（2026-09-29「放映厅」改版第二步）：从原片切一段 3–4 秒的无声小片段。
+# 960×540 够卡片用（卡片在 1440 @2x 上约 850px 宽）；实测 4.5 秒一段是 235 KB（webm）+ 330 KB（mp4）。
+# 在哪一段、要不要裁掉字幕带，写在各自 toml 的 preview_at / preview_len / preview_crop。
+PREVIEW_HEIGHT = 540
+PREVIEW_LEN = 3.5
+PREVIEW_AV1_CRF = 40
+PREVIEW_H264_CRF = 27
 
 # ── 影评的海报 ──────────────────────────────────────────────────
 # 海报是 2:3 竖幅，显示尺寸远小于照片：首页那面墙上每张约 96px 宽，
@@ -1093,6 +1131,54 @@ def encode_video(src: Path, out_dir: Path, slug: str, cfg: dict, force: bool) ->
     return total
 
 
+def encode_preview(src: Path, out_dir: Path, slug: str, cfg: dict, force: bool) -> dict | None:
+    """首页卡片的悬停预览：无声、960×540、webm（AV1）+ mp4（H.264）各一份。toml 里没写 preview_at 就不切。
+
+    跟正片不一样，这里**参数变了会自己重切**：切的时候把参数记在旁边的 <slug>-preview.json，
+    下次构建对不上（或者源文件更新了）就重切。正片那边改了 crf 要手动删文件（CLAUDE.md 第八节），
+    这个坑不在这里重复。
+
+    preview_crop：只留画面上面这么多（比如 0.82），把底部那条字幕带裁掉；左右等比裁，保持 16:9。
+    """
+    if "preview_at" not in cfg:
+        return None
+    params = {
+        "at": float(cfg["preview_at"]),
+        "len": float(cfg.get("preview_len", PREVIEW_LEN)),
+        "crop": float(cfg.get("preview_crop", 1.0)),
+        "height": PREVIEW_HEIGHT,
+        "av1_crf": PREVIEW_AV1_CRF,
+        "h264_crf": PREVIEW_H264_CRF,
+        "src_mtime": round(src.stat().st_mtime),
+    }
+    out_dir.mkdir(parents=True, exist_ok=True)
+    stamp = out_dir / f"{slug}-preview.json"
+    outs = {ext: out_dir / f"{slug}-preview.{ext}" for ext in ("webm", "mp4")}
+    fresh = (not force and stamp.exists() and all(o.exists() for o in outs.values())
+             and json.loads(stamp.read_text(encoding="utf-8")) == params)
+    if fresh:
+        print(f"  {slug}-preview  已是最新，跳过")
+    else:
+        c = params["crop"]
+        vf = (f"crop=trunc(iw*{c}/2)*2:trunc(ih*{c}/2)*2:(iw-iw*{c})/2:0," if c < 1 else "")
+        vf += f"scale=-2:{PREVIEW_HEIGHT}"
+        common = ["ffmpeg", "-v", "error", "-y", "-ss", str(params["at"]), "-t", str(params["len"]),
+                  "-i", str(src), "-an", "-vf", vf]
+        print(f"  {slug}-preview  切 {params['at']}–{params['at'] + params['len']:g} 秒"
+              + (f"，只留上面 {c:.0%}" if c < 1 else ""))
+        run(common + ["-c:v", "libsvtav1", "-crf", str(PREVIEW_AV1_CRF), "-preset", "6",
+                      "-pix_fmt", "yuv420p", str(outs["webm"])])
+        run(common + ["-c:v", "libx264", "-crf", str(PREVIEW_H264_CRF), "-preset", "slow",
+                      "-profile:v", "high", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+                      str(outs["mp4"])])
+        stamp.write_text(json.dumps(params, ensure_ascii=False, indent=2), encoding="utf-8")
+    return {
+        "webm": f"video/{slug}/{outs['webm'].name}",
+        "mp4": f"video/{slug}/{outs['mp4'].name}",
+        "bytes": sum(o.stat().st_size for o in outs.values()),
+    }
+
+
 def build_film(cfg: dict, force: bool) -> dict:
     """一部影片。返回的字典跟 build_series 形状一致，后面的代码不用分叉太多。"""
     require_ffmpeg()
@@ -1108,6 +1194,9 @@ def build_film(cfg: dict, force: bool) -> dict:
     print(f"  源 {w}×{h} / {duration:.1f} 秒 → 网页 {cfg.get('height', VIDEO_HEIGHT)}p")
 
     total_bytes = encode_video(src, DIST / "video" / slug, slug, cfg, force)
+    preview = encode_preview(src, DIST / "video" / slug, slug, cfg, force)
+    if preview:
+        total_bytes += preview["bytes"]
 
     # 封面帧走**图片流水线**，跟另外七个封面用同一套 AVIF/WebP/JPEG 四档，
     # 首页那张卡不需要任何特殊照顾。
@@ -1144,6 +1233,7 @@ def build_film(cfg: dict, force: bool) -> dict:
         "count": 0,
         "duration": duration,
         "aspect": w / h,
+        "preview": preview,
         "bytes": total_bytes,
         "cover": cover,
         "palette": cover_palette(cover),
@@ -1413,18 +1503,19 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
         f'        <source src="{base}.mp4" type="video/mp4">',
     ])
 
-    # 奖项名很长（「National Outstanding Honor · Public Service Announcement · HOSA 2026」），
-    # 而 .masthead__meta span 是 nowrap —— 整串塞进一个 span 会在手机上撑出
-    # 216px 的横向溢出（实测）。按分隔点拆开：每段仍然不折，段与段之间可以换行，
-    # 中间那个「·」由 CSS 的 ::after 补回来，读起来跟原来一模一样。
-    award = [x.strip() for x in text_of(cfg, lang, "award").split("·") if x.strip()]
     meta = " ".join(
         f"<span>{esc(x)}</span>" for x in (
             fmt_duration(s["duration"], lang),
-            *award,
+            text_of(cfg, lang, "genre"),          # 类型（2026-09-29 起），他确认过的叫法
             format_span(s, lang),
         ) if x
     )
+    # 奖项单独一行、两侧月桂叶，跟首页卡片同一个短写法（2026-09-29）。原来整串奖项原文塞在上面那行里，
+    # 加了类型之后「Public Service Announcement / 公益广告」连着出现两次——奖项原文里本来就有这个组别。
+    # 完整原文还在首页「关于」里。没写 award_short 的片子退回原文。
+    # 这一行不设 nowrap：手机上长奖项在行内折行，不会撑出横向溢出（原来塞在 meta 里时撑出过 216px）。
+    award = text_of(cfg, lang, "award_short") or text_of(cfg, lang, "award")
+    award_html = f'<p class="masthead__award">{LAUREL}<span>{esc(award)}</span>{LAUREL}</p>' if award else ""
 
     body = render(
         (TEMPLATES / "film.html").read_text(encoding="utf-8"),
@@ -1433,6 +1524,7 @@ def render_film(s: dict, lang: str, site: dict, nxt: dict) -> None:
         year=esc(str(text_of(cfg, lang, "year"))),
         statement=paragraphs(text_of(cfg, lang, "statement")),
         meta=meta,
+        award=award_html,
         aspect=f"{s['aspect']:.4f}",
         # poster 属性只能给一个 URL，没有 srcset 可用，所以要挑得准。
         # 用 WebP 的最大档：JPEG 从 2026-08 起封顶 1600px（见 JPEG_MAX_WIDTH），
@@ -1799,6 +1891,63 @@ def hero_html(slide: dict) -> str:
       </figure>"""
 
 
+def film_card(s: dict, lang: str, prefix: str) -> str:
+    """首页影片区的一张竖版海报卡（2026-09-29「放映厅」第二步）。
+
+    上面是完整的 16:9 画面（**不裁**：《感恩》《都值得被听见》的封面都是两人并排，裁成 2:3 会切掉人），
+    下面依次是 FILM · 年份、片名、时长 · 类型、一句话（自述第一段，他的原话，不加任何名目）、
+    署名（colophon，像海报底下那行演职员表）、奖项（有 award_short 才有，两侧月桂叶）。
+
+    链接**只包片名**；整张卡可点靠 .film-card__link::after 铺满——整张卡都包进 <a> 的话，
+    读屏软件会把一句话、署名、奖项全当成链接名念一遍。
+    data-*：films.js 的悬停预览和页内播放器要的地址。关掉 JS 时就是去影片页的普通链接。
+    data-slug：环境光按它换色；**不参与换页形变**（base.html 的配对脚本只认 .work，影片点了是弹播放器）。
+    """
+    cfg, cover, L = s["cfg"], s["cover"], LANGS[lang]
+    year = str(text_of(cfg, lang, "year"))
+    detail = " ".join(f"<span>{esc(x)}</span>" for x in (
+        fmt_duration(s["duration"], lang), text_of(cfg, lang, "genre")) if x)
+    line = re.split(r"\n\s*\n", text_of(cfg, lang, "statement").strip())[0]
+    award = text_of(cfg, lang, "award_short")
+    base = f"{prefix}video/{s['slug']}/{s['slug']}"
+    pv = s.get("preview") or {}
+    data = {
+        "slug": s["slug"],
+        "ar": f"{s['aspect']:.4f}",
+        "webm": f"{base}.webm",
+        "mp4": f"{base}.mp4",
+        # 播放器的封面帧：跟影片页一样用 WebP 最大档（见 render_film 里 poster 那段）
+        "poster": f"{prefix}{cover.variants['webp'][-1][1]}",
+        "preview-webm": f"{prefix}{pv['webm']}" if pv else "",
+        "preview-mp4": f"{prefix}{pv['mp4']}" if pv else "",
+    }
+    attrs = " ".join(f'data-{k}="{esc(v)}"' for k, v in data.items() if v)
+    award_html = (f'\n          <p class="film-card__award">{LAUREL}<span>{esc(award)}</span>{LAUREL}</p>'
+                  if award else "")
+    return f"""
+      <li class="film-card" {attrs}
+          style="--ar: {cover.aspect:.4f}; {palette_vars(s['palette'])}">
+        <span class="film-card__frame"
+              style="background-image: url(data:image/jpeg;base64,{cover.lqip})">
+          <picture>
+{picture_sources(cover, prefix, FILM_CARD_SIZES, " " * 12)}
+            <img src="{prefix}{cover.variants['jpg'][-1][1]}"
+                 srcset="{srcset(cover.variants['jpg'], prefix)}" sizes="{FILM_CARD_SIZES}"
+                 width="{cover.width}" height="{cover.height}"
+                 alt="{esc(cover.alt)}" loading="lazy" decoding="async">
+          </picture>
+        </span>
+        <div class="film-card__body">
+          <p class="film-card__eyebrow">{esc(eyebrow_for(s, lang))}{' · ' + esc(year) if year else ''}</p>
+          <h3 class="film-card__title"><a class="film-card__link" href="./{s['slug']}/"
+              data-cursor="{esc(L['cursor_play'])}">{esc(text_of(cfg, lang, 'title'))}</a></h3>
+          <p class="film-card__detail">{detail}</p>
+          <p class="film-card__line">{esc(typography(line))}</p>
+          <p class="film-card__credits">{esc(text_of(cfg, lang, 'colophon'))}</p>{award_html}
+        </div>
+      </li>"""
+
+
 def work_counts(photo_sets: list[dict], films: list[dict], n_notes: int, lang: str) -> list[str]:
     """「7 组 · 63 张 · 3 部影片 · 62 篇影评」——第一屏那行和「关于」里的「作品」共用，构建时数，不会过期。
 
@@ -1921,7 +2070,11 @@ def write_index(series: list[dict], site: dict, lang: str,
         cat_films=esc(L["cat_films"]),
         cat_notes=esc(L["cat_notes"]),
         photo_works="\n".join(work_card(s, lang, prefix) for s in photo_sets),
-        film_works="\n".join(work_card(s, lang, prefix) for s in films),
+        # 影片是竖版海报卡（第二步起），不再跟照片共用 work_card
+        film_works="\n".join(film_card(s, lang, prefix) for s in films),
+        player_label=esc(L["player_label"]),
+        close_label=esc(L["close"]),
+        about_film=esc(L["about_film"]),
         posterwall=posterwall_html(notes, lang, prefix) if notes else "",
         # 三个区各自的默认颜色：环境光离开作品后回到它，区标题的渐变字用它的 --d
         # 暗色时环境光用 --c，所以三种都要写（style.css 的 --amb 按模式挑）

@@ -111,7 +111,7 @@ function ambient() {
     const cs = getComputedStyle(el);
     return [1, 2, 3].map((i) => cs.getPropertyValue(`--amb${i}`).trim());
   };
-  const cards = [...document.querySelectorAll('.work[data-slug]')];
+  const cards = [...document.querySelectorAll('.work[data-slug], .film-card[data-slug]')];
   const zones = [...document.querySelectorAll('.cat')];
   let zone = zones[0] || null;
   let hovered = null;

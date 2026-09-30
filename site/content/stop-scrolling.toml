@@ -18,6 +18,18 @@ video = "第五版_副本.mov"          # 要转码的源文件（HEVC，浏览�
 order = 0
 
 poster_at = 8                   # 第 8 秒那一帧：空房间里对着手机的人，画面无字
+
+# ── 首页影片卡片（2026-09-29「放映厅」改版第二步）──────────────────
+# 类型：写在卡片上「时长 · 类型」那一行、影片页标题下那一行。他 2026-09-29 确认过这三部的叫法。
+# 悬停预览：从原片切一段无声的小片段（build.py 的 encode_preview，960×540，webm + mp4 各一份）。
+#   preview_at   起点（秒）；preview_len 长度（秒，不写就是 3.5）
+#   preview_crop 可选：只留画面上面这么多（比如 0.82），把底部那条字幕带裁掉，左右等比裁
+#   预览从**封面帧所在的镜头**里取：鼠标停上去，静止的封面像自己动了起来，不是跳到别处。
+#   改了这几个数，下次构建会自己重切（参数记在 docs/video/<slug>/<slug>-preview.json）
+genre = "Public service announcement"
+# 6.33 秒一刀、9.25 秒「Scenes pass」字幕进来——中间这段是全片唯一没字的镜头，封面帧（8 秒）在里面
+preview_at = 6.4
+preview_len = 2.75
 poster_alt = "A still from the film: a student sits alone at a desk in a bare room, looking down at a phone, an hourglass beside them."
 
 date = "2026-03"                # 片子完成于 2026 年 3 月，只标到月份
@@ -31,6 +43,8 @@ description = "A thirty-second public service film on algorithmic feeds and atte
 # ⚠️ 「生物与健康未来领袖挑战」的官方英文名他没有，所以英文这行只写 HOSA 2026——
 #    信息不缺，也不会写错。以后拿到官方英文名再补。
 award = "National Outstanding Honor · Public Service Announcement · HOSA 2026"
+# 卡片上那行带月桂叶的短写法（完整的奖项名在影片页和「关于」里）。他 2026-09-29 确认过
+award_short = "National Outstanding Honor · HOSA 2026"
 
 # ─────────────────────────────────────────────────────────────────
 #  自述：中文是原稿（按他给的素材润色），英文从中文转过来。
@@ -62,6 +76,8 @@ title = "停止滑动，面对生活"
 author = "刘延奥"
 description = "一支三十秒的公益短片，讲算法与注意力。2026 年。"
 award = "国家级卓越奖 · 公益广告 · 2026 HOSA 生物与健康未来领袖挑战"
+award_short = "国家级卓越奖 · HOSA 2026"
+genre = "公益广告"
 colophon = "导演 Alioth · 摄影 刘延奥"
 
 statement = """

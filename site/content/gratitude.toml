@@ -24,6 +24,19 @@ av1_crf = 36
 h264_crf = 26
 
 poster_at = 24                  # 第 24 秒：学生举话筒问食堂师傅，画面无字
+
+# ── 首页影片卡片（2026-09-29「放映厅」改版第二步）──────────────────
+# 类型：写在卡片上「时长 · 类型」那一行、影片页标题下那一行。他 2026-09-29 确认过这三部的叫法。
+# 悬停预览：从原片切一段无声的小片段（build.py 的 encode_preview，960×540，webm + mp4 各一份）。
+#   preview_at   起点（秒）；preview_len 长度（秒，不写就是 3.5）
+#   preview_crop 可选：只留画面上面这么多（比如 0.82），把底部那条字幕带裁掉，左右等比裁
+#   预览从**封面帧所在的镜头**里取：鼠标停上去，静止的封面像自己动了起来，不是跳到别处。
+#   改了这几个数，下次构建会自己重切（参数记在 docs/video/<slug>/<slug>-preview.json）
+genre = "Documentary short"
+# 18–32 秒是同一个镜头（食堂采访），封面帧就在开头；字幕在画面高 84–89%，只留上面 82%
+preview_at = 24.0
+preview_len = 3.5
+preview_crop = 0.82
 poster_alt = "A still from the film: a student in a blue school tracksuit holds a microphone out to a canteen cook in a white hat and apron, in an empty dining hall."
 
 date = "2025-11"                # 感恩节前后拍的（文件 12-31 导出，那是剪完的日子）
@@ -66,6 +79,7 @@ colophon = "Camera: Yanao (Leo) Liu · Made by a team of eight students"
 # ═══════════════════════════════════════════════════════════════════
 [zh]
 title = "感恩悄然发生"
+genre = "纪录短片"
 author = "刘延奥"
 description = "一部五分钟的短片，学生去问了把学校撑起来的那些人。2025 年 11 月。"
 colophon = "录制 刘延奥 · 八人学生团队共同完成"

@@ -58,9 +58,13 @@
     </ul>
   </section>
 
+  <!--
+    影片：竖版海报卡（build.py 的 film_card，2026-09-29「放映厅」第二步）。
+    鼠标停上去播一段无声预览，点了在本页弹出下面那个播放器（films.js）；关掉 JS 就是去影片页的链接。
+  -->
   <section class="cat" id="films" style="{{ films_vars }}">
     <h2 class="cat__title"><span class="cat__label">{{ cat_films }}</span></h2>
-    <ul class="works">
+    <ul class="films">
 {{ film_works }}
     </ul>
   </section>
@@ -84,5 +88,23 @@
   </footer>
 
 </main>
+
+<!--
+  页内播放器（films.js）：点首页的影片卡片，画面从卡片的位置放大到这里、有声播放。
+  平时关着；关掉 JS 时用不到。永远是暗的（style.css 顶部那个暗色块的选择器里有 .screen）。
+-->
+<dialog class="screen" id="screen" aria-label="{{ player_label }}">
+  <button class="viewer__close screen__close" type="button" data-act="close" aria-label="{{ close_label }}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+  </button>
+  <figure class="screen__stage">
+    <span class="screen__video"></span>
+    <figcaption class="screen__caption">
+      <span class="screen__title"></span>
+      <span class="screen__meta"></span>
+      <a class="screen__more" href="./">{{ about_film }} <span aria-hidden="true">→</span></a>
+    </figcaption>
+  </figure>
+</dialog>
 
 <script type="application/json" id="hero-data">{{ hero_data }}</script>

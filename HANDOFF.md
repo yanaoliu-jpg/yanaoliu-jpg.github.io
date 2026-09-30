@@ -1,6 +1,6 @@
 # 交接文档（HANDOFF）
 
-> 写于 **2026-09-29**（下午，「放映厅」第一步上线之后），给一个**完全不了解背景**的新会话。
+> 写于 **2026-09-29**（傍晚，「放映厅」第二步做完、等他推送），给一个**完全不了解背景**的新会话。
 >
 > **新会话怎么用这份文件：** 他开口第一句会是「先读取HANDOFF.md」。读完这份，再把
 > [CLAUDE.md](CLAUDE.md) 从头读一遍（新会话会自动加载它，但第五、七、八、十、十一节必须真的读过），
@@ -15,9 +15,9 @@
 
 - 这是**刘延奥（Yanao "Leo" Liu）的摄影作品集网站**，给美国大学招生官看。
   线上 <https://yanaoliu-jpg.github.io/>，仓库 `yanaoliu-jpg/yanaoliu-jpg.github.io`（**Public**）。
-- **进行中的任务：「放映厅」改版，分三步，第一步「地基」已上线**（`c2f0223`，2026-09-29 下午他推的）。
-  第二步「影片」、第三步「照片」**还没开始**，要等他说开始。
-- 本地验证 **1078 项全过**；公网 1077 / 1078，没过的那项是偶发、重跑两次都过（见第 2 节）。
+- **进行中的任务：「放映厅」改版，分三步。** 第一步「地基」已上线（`c2f0223`）；邮箱也上线了（`90ef617`）；
+  **第二步「影片」已做完、本地验证过，等他提交推送**（提交命令见第 5 节）；第三步「照片」还没开始。
+- 第二步本地全量验证 **1135 项全过**（见第 2 节）；第一步上线时公网 1077 / 1078，没过的那项是偶发、重跑两次都过。
 - 联系邮箱 `yanao_liu@jidjdfz.com` 他已经给了，已加进「关于」和页脚（源码里是字符编码，不露明文）。
 
 ---
@@ -46,11 +46,21 @@
 | 步 | 内容 | 状态 |
 |---|---|---|
 | 1 地基 | 顶部固定导航、默认暗色 + 亮色切换、首页第一屏换成七组封面全屏轮播（**3D 镜头撤了**）、首页末尾「关于」 | **已上线** `c2f0223`；本地 1078 项全过；公网 1077 / 1078——唯一那项是第 17 节「后退回首页，标题那一对没配上」，`ONLY=17` 对公网重跑两次都过，是偶发（公网慢，后退那一刻标题还没进视野） |
-| 2 影片 | 竖版海报卡、悬停播 3–4 秒无声片段（build.py 用 ffmpeg 切）、点了在本页弹出播放器、类型 | 没开始；计划还没写 |
-| 3 照片 | 系列页「逐张 · 网格」切换（等高行，不是瀑布流）、灯箱里加机身和镜头（只读每张自己的 EXIF） | 没开始；计划还没写 |
+| 2 影片 | 竖版海报卡、悬停播 3–4 秒无声片段（build.py 用 ffmpeg 切）、点了在本页弹出播放器、类型 | **做完，本地验证见下**；等他提交。他说「按你的想法来」，预览片段是我挑的（CLAUDE.md 第十一节有表） |
+| 3 照片 + 观感 | 系列页「逐张 · 网格」切换、灯箱里加机身和镜头（只读每张自己的 EXIF）；首页照片墙每行铺满、全站一个版心、手机上两个毛病（设计第十六节，他选了「每行铺满」） | 设计定了；计划还没写 |
 
-第一步之后还有一次小提交没做：`CLAUDE.md` 第八节的验证数字（1078 项、35–40 分钟、首页 6.01 屏）
-和这份 `HANDOFF.md`——**本地已改好，还没提交**（见第 5 节的命令）。
+第二步本地全量验证：**1135 项全过，0 失败**（19 分 48 秒）。之后发现像素探针把影片卡片上片名以外的字
+全当成「被挡住」跳过了（整卡可点的透明伪元素盖在上面）——**报全过但其实没量**。修了判断（CLAUDE.md 第十一节「验证」），
+第 21 节单独重跑：**191 项全过，探针量了 2900 段字**（修之前 2614）。首页整页 1440×900 关掉 JS **5.61 屏**（第一步是 6.01），开着 5.26 屏。
+提交前又修了一处（第二步自己带出来的）：影片页标题下那行「公益广告」出现两次——奖项挪到下面单独一行、两侧月桂叶、用短写法
+（CLAUDE.md 第十一节）。改完重跑 `films,1,11` 407 项、第 21 节 191 项，全过。
+
+⚠️ **桌面版会在一轮对话结束后把预览服务器停掉**（「was stopped by the app」，这次遇到两次），
+放在后台跑的 verify.js 会跟着崩在「page.goto: Timeout」——**不是网站的问题**。要么在同一轮里前台跑（分段，每段 ≤ 10 分钟），
+要么跑之前 `preview_start` 重新起一次。
+
+**第三步已设计、他拍板了**：放映厅改版设计.md 第十六节（首页照片墙每行铺满 4 + 3、全站一个版心、手机上两个毛病），
+加上第七节原来就定的网格视图和灯箱机身镜头。计划还没写。
 
 ---
 
@@ -66,6 +76,11 @@
    - 顺手修了一个线上 bug：**中文内页「← 全部作品」一直链到英文首页**（`../../`）。新导航接手之后没了
    - `verify.js` 加了 `ONLY=` 开关和 `nav` / `theme` / `hero` / `about` 四节；探针两种模式各跑一遍、第一屏七张逐张量、跳过被导航挡住的字
    - 检查查出来并修掉的：暂停键停不住推近（`animation` 简写把 play-state 重置了）；导航透明时跟第一屏大名字叠字；第一屏顶上的渐黑太淡（「旧时光」上方）
+6. **2026-09-29「放映厅」第二步**（这次，还没推）：
+   - 首页影片区换成三张竖版海报卡（画面不裁、FILM · 年份 / 片名 / 时长 · 类型 / 自述第一段 / 署名 / 月桂叶奖项）
+   - 悬停放 3–4 秒无声预览：`build.py` 的 `encode_preview()` 用 ffmpeg 切，参数变了自己重切；三段都取自**封面帧所在的镜头**，挑法和时间点见 CLAUDE.md 第十一节
+   - 点卡片在本页弹出播放器（`<dialog id="screen">`，永远暗、从卡片放大过去、有声、关掉就卸掉视频）；⌘ 点照常开影片页；关掉 JS 就是普通链接
+   - 影片页标题下那行加了类型；`verify.js` 加了 `films` 节；像素探针「被挡住」的判断修了（见上）
 
 ---
 
@@ -74,6 +89,9 @@
 1. **只在 Chrome 里测过。** Safari、Firefox、真 iPhone 都没测。这次新加的里面，Safari 要留意：
    `popover`（Safari 17+）、容器查询单位 `cqw/cqh`（16+）、滚动驱动动画（第一屏往下滚的视差，Safari 26 才有，没有就是普通滚走）。
    走马盘的 3D 在 Safari 上也一直没验证过。他用 Safari / iPhone 的话请他打开看一眼、截图发来。
+   第二步加的：播放器是 `<dialog>` + `showModal()`（Safari 15.4+，没有就退回普通链接）；卡片的焦点框靠 `:has()`（15.4+）；
+   卡片的彩色投影 `color-mix()`（16.2+，前面有一条普通黑影兜底）。预览和正片都是 webm（AV1）在前、mp4 在后——
+   没有 AV1 硬解的 Mac / iPhone 上应当自动退到 mp4，**没实测**。
 2. **缓存 10 分钟。** 每次推送后他自己的浏览器可能拿到「新 HTML + 旧 CSS」——提醒他 ⌘⇧R。
 3. ~~邮箱还没给~~ 已加（2026-09-29）。换邮箱：改 `_site.toml` 的 `email` 和 `verify.js` about 节的 `EMAIL`。
 4. **一个遗留文件**：根目录的 `影评栏目实现计划.md` 是 2026-08 就执行完的计划，一直没删。要不要删，**问他**。
@@ -84,25 +102,22 @@
 
 ## 5. 下一步怎么推进
 
-**先把那次小提交给他**（`CLAUDE.md` 验证数字 + 这份 HANDOFF，本地已改好）：
+**第二步的提交命令**（如果他还没推）：
 
 ```bash
-cd ~/Desktop/website && git add -A && git commit -m "Record part-1 verification numbers and update handoff notes" && git push
+cd ~/Desktop/website && git add -A && git commit -m "Screening-room redesign, part 2: poster cards for films with hover previews and an in-page player" && git push
 ```
 
-**然后问他要不要开始第二步「影片」。** 开始的话：
-
-1. 先抽帧给他看、定三段预览片段（《停止滑动》约 6.6–9.8 秒那段没字的；另外两部挑一段、裁掉底部字幕带约 15%）
-2. 按 `superpowers:writing-plans` 把第二步的计划接在 `放映厅实现计划.md` 后面写，再按计划做
-3. 设计里已定的：竖版卡（上面完整 16:9 画面，下面 FILM · 年份 / 片名 / 时长 · 类型 / 一句话 = 自述第一段 / 署名 / 有奖的那部带月桂叶的 `award_short`）；
-   链接只包片名（整卡可点用伪元素）；悬停或键盘聚焦播预览，触屏 / 减少动态效果 / 省流量不播；
-   点了从卡片放大进 `<dialog>` 播放器（有声、webm → mp4），关掉卸 `src`、焦点回卡片；⌘ 点照常开影片页；
-   播放器加进 style.css 顶部那个「永远暗」的选择器；预览参数变了要自动重切（写一个参数小文件）
+推完之后照老流程查公网（第 5 节末尾），然后**问他要不要开始第三步「照片」**：
+系列页「逐张 · 网格」切换（每行等高，不是瀑布流；切换时照片滑到新位置，用同一页的 View Transition，先加 `.vt-local`）、
+灯箱里加机身和镜头（只读每张自己的 EXIF：`Model` / `LensModel`，对照表 `ILCE-7M4` → 索尼 α7 IV、
+`24-70mm F2.8 DG DN | Art 019` → 适马 24-70mm F2.8 DG DN Art；没有记录的三组不显示，不拿页脚的器材去填）。
+计划接在 `放映厅实现计划.md` 后面写。三步都做完之后删掉这份计划。
 
 **做完任何改动之后的固定流程：**
 
 1. `python3 site/build.py`（改了中文还要走字体流程，见第 6 节 C）
-2. 本地验证：相关的几节先用 `ONLY=` 跑，最后全跑一遍（**35–40 分钟，放后台**）
+2. 本地验证：相关的几节先用 `ONLY=` 跑，最后全跑一遍（**约 20 分钟，放后台**）
 3. **把提交命令给他，他自己跑**（`git add -A && git commit … && git push`），我不 commit、不 push
 4. 他说「推完了」之后查公网：先比对 `git rev-parse HEAD` 和 `git ls-remote origin main`，
    再用带重试的 curl 看新内容上没上线（**先看字节数不为 0**），最后 `verify.js` 对公网跑一遍
@@ -135,11 +150,12 @@ cd ~/Desktop/website && git add -A && git commit -m "Record part-1 verification 
 
 ### D. 前端（细节在 CLAUDE.md 第十、十一节）
 
-- **关掉 JS 要一切可见**：会藏东西的 CSS 挂在 JS 加的类下面（`.js-reveal`、`.fx`、`.fx-tilt`、`.is-zoetrope`、`.hero--live`、`.is-away`、`.is-over-hero`）。
-- 颜色按模式映射：`--amb`（环境光）、`--g`（区标题）、`--focus`；**永远暗的**块是 `:root, .viewer, .hero`（第二步的播放器也要加进去）。
+- **关掉 JS 要一切可见**：会藏东西的 CSS 挂在 JS 加的类下面（`.js-reveal`、`.fx`、`.fx-tilt`、`.is-zoetrope`、`.hero--live`、`.is-away`、`.is-over-hero`、`.is-previewing`）。
+- 颜色按模式映射：`--amb`（环境光）、`--g`（区标题）、`--focus`；**永远暗的**块是 `:root, .viewer, .hero, .screen`（`.screen` 是第二步的影片播放器）。
 - **CSS `animation` 简写会重置 `animation-play-state`**：暂停规则要比它更具体。
 - 导航的相对链接**必须落在本语言**（内页一律 `../`）；verify 的 `nav` 节中英两边都查。
-- 首页整页高度（1440×900、关掉 JS）必须 **≤ 6.1 屏**，现在 **6.01**——再加东西先量（第二步的竖版卡片会变高，要量）。
+- 首页整页高度（1440×900、关掉 JS）必须 **≤ 6.1 屏**，第二步做完是 **5.61**（影片区一行三张卡，比原来矮半屏）——再加东西先量。
+- 影片卡片整张可点靠链接的伪元素铺满（`.film-card__link::after`）：playwright 要悬停**卡片本身**，悬停卡片里的画面会超时。
 - 同一页的 View Transition（亮暗切换、以后的逐张 ↔ 网格）先给 `<html>` 加 `.vt-local`，不然会放换页的光圈。
 
 ### E. 验证
@@ -147,8 +163,9 @@ cd ~/Desktop/website && git add -A && git commit -m "Record part-1 verification 
 - **浏览器面板的截图会骗人**（视口比面板大、标签不在前台时截出空白）。给他看的图用 playwright 截（scratchpad 里写过一个 `snap.js`，会话结束就没了，照 CLAUDE.md 第八节重写就行）。
 - 写判据先想清楚：大写是 CSS 转的；首页封面等高只在 >900px；相对链接算到 `pathname`；
   **CSS 变量读出来多半已经是 `#rrggbb`**，别当 `rgb()` 拆；关掉灯箱会把页面往下滚、导航就收起了，接着点导航要先滚回顶上。
-- 像素探针会跳过：被 `clip-path` 裁掉的字、跟随光标、**被别的元素挡住的字**（第一屏滚到导航底下时）。
-- `verify.js` 全跑本地 35–40 分钟、公网更久——**放后台跑**，用 Monitor 等结束（等「exit」行），别在前台 sleep。
+- 像素探针会跳过：被 `clip-path` 裁掉的字、跟随光标、**被画了东西的元素挡住的字**（第一屏滚到导航底下时）。
+  **探针段数掉了要先问为什么**——第二步就是段数从 2690 掉到 2614 才发现影片卡片的字一段都没量。
+- `verify.js` 全跑本地约 20 分钟、公网更久——**放后台跑**，用 Monitor 等结束（等「exit」行），别在前台 sleep。
 
 ### F. 网络和发布
 
@@ -173,12 +190,12 @@ python3 site/tools/check_font.py            # 中文字体缺不缺字（不联�
 
 ```bash
 mkdir -p /tmp/pw && cd /tmp/pw && npm install playwright-core
-cd ~/Desktop/website && ONLY=nav,theme,hero,about NODE_PATH=/tmp/pw/node_modules node site/tools/verify.js http://localhost:8412
+cd ~/Desktop/website && ONLY=nav,theme,hero,about,films NODE_PATH=/tmp/pw/node_modules node site/tools/verify.js http://localhost:8412
 cd ~/Desktop/website && NODE_PATH=/tmp/pw/node_modules node site/tools/verify.js http://localhost:8412
 cd ~/Desktop/website && NODE_PATH=/tmp/pw/node_modules node site/tools/verify.js https://yanaoliu-jpg.github.io
 ```
 
-期望结果：**1078 项通过，0 项失败**（改了东西数字会变，只要 0 失败）。末尾再给一个 png 路径会存首页整页截图。
+期望结果：**1135 项通过，0 项失败**（改了东西数字会变，只要 0 失败）。末尾再给一个 png 路径会存首页整页截图。
 
 **查推送和公网**：
 
@@ -199,8 +216,9 @@ curl -s --compressed -o /dev/null -w "%{http_code}\n" https://yanaoliu-jpg.githu
 | 顶部导航的 HTML | `site/build.py` 的 `sitenav()` |
 | 导航收起 / 透明、亮暗切换、环境光、倾斜、光标、走马盘、进度条兜底 | `site/static/motion.js` |
 | 首页第一屏轮播 | `site/static/hero.js`；数据在 `build.py` 的 `hero_slides()` / `hero_html()` |
+| 首页影片卡片、悬停预览、页内播放器 | 卡片 HTML：`build.py` 的 `film_card()`；预览切片：`encode_preview()`；交互：`site/static/films.js`；播放器的 HTML：`templates/index.html` 末尾的 `<dialog id="screen">` |
 | 「关于」 | `build.py` 的 `about_html()` / `work_counts()` |
 | 进场动画、全屏看照片 | `site/static/gallery.js`（普通脚本，要在最老的浏览器上也能跑） |
 | 亮暗模式的头部脚本、换页动画的配对脚本 | `site/templates/base.html` 的 `<head>` |
 | 取色 | `site/build.py` 的 `palette_for` / `section_palette` / `mosaic_palette` |
-| 验证 | `site/tools/verify.js`（`ONLY=` 开关；`nav` / `theme` / `hero` / `about` 是这次加的） |
+| 验证 | `site/tools/verify.js`（`ONLY=` 开关；`nav` / `theme` / `hero` / `about` 是第一步加的，`films` 是第二步） |
