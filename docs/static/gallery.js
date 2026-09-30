@@ -141,7 +141,8 @@
 
     elCount.textContent = pad(current + 1) + ' / ' + pad(photos.length);
     elDate.textContent = photo.date + (photo.time ? ' · ' + photo.time : '');
-    elExif.textContent = photo.exif;
+    // 第二行：机身 · 镜头 · 焦距 · 光圈 · 快门 · ISO（机身镜头 2026-09-30 起，只有 EXIF 里有记录的照片才有）
+    elExif.textContent = [photo.gear, photo.exif].filter(Boolean).join(' · ');
 
     preload(current + 1);
     preload(current - 1);

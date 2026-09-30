@@ -138,6 +138,10 @@ LANGS = {
         "download_video": "Download the film (MP4)",
         "open_full": "Open photograph {n} of {total} full screen",
         "viewer_label": "Full screen photograph",
+        # 系列页「逐张 · 网格」切换（rows.js，2026-09-30）
+        "view_label": "View",
+        "view_one": "One by one",
+        "view_grid": "Grid",
         "close": "Close",
         "prev": "Previous photograph",
         "next": "Next photograph",
@@ -194,6 +198,9 @@ LANGS = {
         "download_video": "下载影片（MP4）",
         "open_full": "放大查看第 {n} 张，共 {total} 张",
         "viewer_label": "全屏查看",
+        "view_label": "查看方式",
+        "view_one": "逐张",
+        "view_grid": "网格",
         "close": "关闭",
         "prev": "上一张",
         "next": "下一张",
@@ -205,17 +212,30 @@ LANGS = {
 
 ZH_MONTHS = {m: f"{m} 月" for m in range(1, 13)}
 
+# 灯箱第二行开头的机身和镜头（2026-09-30「放映厅」第三步）：EXIF 原文 → 署名里的写法。
+# 只从每张照片自己的 EXIF 读（Model、LensModel）；七组里只有四组有记录（晚安、旧时光、留给日后、海与光的诗），
+# 另外三组导出时被抹掉了——那就不显示，**不拿页脚的器材去填**。
+# 表里没有的型号原样显示，构建时提示加一行（换了相机或镜头时会遇到）。
+GEAR_NAMES = {
+    "ILCE-7M4": {"en": "Sony α7 IV", "zh": "索尼 α7 IV"},
+    "24-70mm F2.8 DG DN | Art 019": {"en": "Sigma 24-70mm F2.8 DG DN Art", "zh": "适马 24-70mm F2.8 DG DN Art"},
+}
+_GEAR_WARNED: set[str] = set()
+
 # 「第五组」里的那个「五」。到 99 组够用了，超过了他也早就该精选而不是堆量。
 CN_DIGITS = "〇一二三四五六七八九"
 
-# 版面：照片高度上限 72vh，宽度上限 min(92vw, 1400px)。
+# 版面：照片高度上限 72vh，宽度上限 min(版心宽, 1400px)（版心宽 = 100vw − 2 × GUTTER；2026-09-30 前是 92vw，手机上偏右）。
 #
 # ⚠️ 这三个数字必须跟 style.css 里的 --plate-vh 和 .plate 的 width 完全一致。
 # 它们被写进 <img sizes="..."> ——浏览器靠它决定下载哪个分辨率。
 # 对不上的话画面不会变形（CSS 说了算），但会下错档：要么糊，要么白下载大图。
 MAX_VH = 72
-MAX_VW = 92
 MAX_PX = 1400
+
+# 页面左右留白，↔ style.css 的 --gutter。一个版心（2026-09-30）之后首页各区、影片卡片也用它
+# （原来首页各区是 clamp(1.5rem, 3.5vw, 6rem)），写进 sizes 的几处都从这里取。
+GUTTER = "clamp(1.5rem, 6vw, 6rem)"
 
 # 目录页封面的版面，同样必须跟 style.css 对上（见 .works / .work）：
 #   INDEX_COVER_H  ↔  .works 的 --cover-h        并排时每张封面的高度
@@ -231,14 +251,14 @@ INDEX_STACK_VH = 52
 
 # 首页影片区的竖版海报卡（2026-09-29「放映厅」第二步），卡片上面那张画面的宽度。
 # ⚠️ ↔ style.css 的 .films 网格：宽于 1100px 三列、641–1100px 两列、640px 及以下一列；
-#    容器 max-width 1500px、左右留白 FILM_PAD、列距 FILM_GAP。改了网格这里跟着改，
+#    内容最宽 1500px（容器是 1500 + 两边 FILM_PAD）、左右留白 FILM_PAD、列距 FILM_GAP。改了网格这里跟着改，
 #    不然 sizes 挑错档（跟 INDEX_COVER_H 同一类陷阱）。
-FILM_PAD = "clamp(1.5rem, 3.5vw, 6rem)"
+FILM_PAD = GUTTER     # 2026-09-30 起跟全站一个版心（原来 3.5vw）
 FILM_GAP = "clamp(1.25rem, 2.4vw, 2.75rem)"
 FILM_CARD_SIZES = (
     f"(max-width: 640px) calc(100vw - 2 * {FILM_PAD}), "
     f"(max-width: 1100px) calc((100vw - 2 * {FILM_PAD} - {FILM_GAP}) / 2), "
-    f"calc((min(100vw, 1500px) - 2 * {FILM_PAD} - 2 * {FILM_GAP}) / 3)"
+    f"calc((min(100vw - 2 * {FILM_PAD}, 1500px) - 2 * {FILM_GAP}) / 3)"
 )
 
 # 奖项那行两侧的月桂叶（电影节海报上那种）。纯装饰；右边那枝由 CSS 镜像。首页影片卡片和影片页共用。
@@ -277,7 +297,7 @@ THEME_ICONS = (
 )
 
 
-def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
+def shell(root: str, home: bool = False, palette: dict | None = None, rows: bool = False) -> dict:
     """base.html 里跟主题和脚本有关的槽。首页传 home=True，其余不传。
 
     颜色不再按页面分：默认全站暗色（见上面的「页面主题」）。
@@ -286,7 +306,8 @@ def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
     html_class 带前导空格，因为模板里写的是 class="no-js{{ html_class }}"——
     内页的值是空串，不能留一个尾随空格。body_attrs 同理。
 
-    scripts：motion.js 全站都有；hero.js（第一屏轮播）、films.js（影片卡片的预览和播放器）**只在首页**。
+    scripts：motion.js 全站都有；hero.js（第一屏轮播）、films.js（影片卡片的预览和播放器）**只在首页**；
+    rows.js（每行铺满：首页照片墙、系列页网格，2026-09-30）在首页和系列页（rows=True）。
     两个都是 type="module"：老浏览器不认识 module，会整个跳过——
     它们拿到的就是静态版，这正是想要的渐进增强。module 天然是 defer 的。
 
@@ -297,6 +318,8 @@ def shell(root: str, home: bool = False, palette: dict | None = None) -> dict:
     if home:
         scripts.append(f'<script type="module" src="{root}/static/hero.js"></script>')
         scripts.append(f'<script type="module" src="{root}/static/films.js"></script>')
+    if home or rows:
+        scripts.append(f'<script type="module" src="{root}/static/rows.js"></script>')
     return {
         "html_class": " theme-home" if home else "",
         # 默认暗色；读者选了亮色时，base.html 头部脚本在样式表之前把这两个 meta 改掉
@@ -631,6 +654,8 @@ class Photo:
     aperture: float | None = None
     shutter: str | None = None
     focal: int | None = None
+    camera: str = ""   # EXIF 的 Model 原文（比如 ILCE-7M4），显示时查 GEAR_NAMES
+    lens: str = ""     # EXIF 的 LensModel 原文
     alt: str = ""
     lqip: str = ""
     variants: dict = field(default_factory=dict)
@@ -678,6 +703,19 @@ class Photo:
             bits.append(f"ISO {self.iso}")
         return " · ".join(bits)
 
+    def gear_label(self, lang: str) -> str:
+        """灯箱第二行开头：「Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art」。一项都没有就是空串。
+        系列页每张照片下面那行**不加**这个：63 张的器材都一样，每张写一遍是噪音，页脚写着。"""
+        out = []
+        for raw in (self.camera, self.lens):
+            if not raw:
+                continue
+            if raw not in GEAR_NAMES and raw not in _GEAR_WARNED:
+                _GEAR_WARNED.add(raw)
+                print(f"  ⚠ 机身 / 镜头对照表里没有「{raw}」，灯箱里会原样显示——在 build.py 的 GEAR_NAMES 加一行")
+            out.append(GEAR_NAMES.get(raw, {}).get(lang, raw))
+        return " · ".join(out)
+
 
 def read_photo(path: Path) -> Photo:
     with Image.open(path) as im:
@@ -710,6 +748,9 @@ def read_photo(path: Path) -> Photo:
 
     focal = sub.get("FocalLength")
     aperture = sub.get("FNumber")
+    # 机身、镜头：有的导出会在字符串末尾留 \x00
+    camera = str(base.get("Model") or "").strip().strip("\x00").strip()
+    lens = str(sub.get("LensModel") or "").strip().strip("\x00").strip()
     iso = sub.get("ISOSpeedRatings")
     if isinstance(iso, (tuple, list)):
         iso = iso[0]
@@ -725,6 +766,8 @@ def read_photo(path: Path) -> Photo:
         aperture=float(aperture) if aperture else None,
         shutter=fmt_shutter(sub.get("ExposureTime")),
         focal=round(float(focal)) if focal else None,
+        camera=camera,
+        lens=lens,
     )
 
 
@@ -947,7 +990,7 @@ def picture_sources(photo: Photo, prefix: str, sizes: str, indent: str) -> str:
 
 def sizes_attr(photo: Photo) -> str:
     """跟 CSS 里 .plate__frame 的宽度算法保持一致，浏览器才能挑对尺寸。"""
-    return f"min({MAX_VW}vw, {MAX_PX}px, {MAX_VH * photo.aspect:.0f}vh)"
+    return f"min(100vw - 2 * {GUTTER}, {MAX_PX}px, {MAX_VH * photo.aspect:.0f}vh)"
 
 
 def plate_html(photo: Photo, index: int, total: int, prefix: str, L: dict) -> str:
@@ -984,8 +1027,9 @@ def plate_html(photo: Photo, index: int, total: int, prefix: str, L: dict) -> st
         </figure>"""
 
 
-def photo_data(photos: list[Photo], prefix: str) -> str:
-    """给全屏浏览用的数据。手写 JSON，避免为一点点数据引入依赖。"""
+def photo_data(photos: list[Photo], prefix: str, lang: str) -> str:
+    """给全屏浏览用的数据。手写 JSON，避免为一点点数据引入依赖。
+    gear（2026-09-30）：机身和镜头按语言换写法，所以这份数据中英各一份。"""
     import json
 
     return json.dumps(
@@ -1001,6 +1045,7 @@ def photo_data(photos: list[Photo], prefix: str) -> str:
                 "date": p.date_label,
                 "time": p.time_label,
                 "exif": p.exif_label,
+                "gear": p.gear_label(lang),
             }
             for p in photos
         ],
@@ -1422,7 +1467,7 @@ def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
         ),
         colophon=esc(text_of(cfg, lang, "colophon")),
         author=esc(author),
-        photo_data=photo_data(photos, prefix),
+        photo_data=photo_data(photos, prefix, lang),
         **nextup_values(s, nxt, lang, root),
         scroll=esc(L["scroll"]),
         skip=esc(L["skip_photos"]),
@@ -1431,6 +1476,9 @@ def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
         close_label=esc(L["close"]),
         prev_label=esc(L["prev"]),
         next_label=esc(L["next"]),
+        view_label=esc(L["view_label"]),
+        view_one=esc(L["view_one"]),
+        view_grid=esc(L["view_grid"]),
     )
 
     page = render(
@@ -1441,7 +1489,7 @@ def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
         root=root,
         alternates=alternate_links(s["slug"]),
         body=body,
-        **shell(root, palette=s["palette"]),
+        **shell(root, palette=s["palette"], rows=True),
     )
 
     out = DIST / L["dir"] / s["slug"] / "index.html" if L["dir"] else DIST / s["slug"] / "index.html"
@@ -1783,7 +1831,7 @@ def work_card(s: dict, lang: str, prefix: str) -> str:
     #   ≤ 900px  堆叠：宽度 = min(容器宽, 52vh × 宽高比)，容器宽 = 100vw 减左右留白
     sizes = (
         f"(max-width: {INDEX_STACK_PX}px)"
-        f" min(100vw - 3rem, {INDEX_STACK_VH * cover.aspect:.0f}vh),"
+        f" min(100vw - 2 * {GUTTER}, {INDEX_STACK_VH * cover.aspect:.0f}vh),"
         f" calc({cover.aspect:.4f} * {INDEX_COVER_H})"
     )
     # 每段各自成块，段与段之间留一个空格。

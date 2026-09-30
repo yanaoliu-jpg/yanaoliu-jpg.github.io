@@ -25,6 +25,16 @@
     <p class="masthead__scroll" aria-hidden="true">{{ scroll }}</p>
   </header>
 
+  <!--
+    逐张 · 网格（rows.js，2026-09-30「放映厅」第三步）：默认逐张——一屏一张，认真看作品的看法；
+    网格是一组九张一眼看全，每行铺满、同一行等高。平时 hidden，rows.js 放出来；关掉 JS 时只有逐张。
+    每次打开都是逐张，不记忆。见 放映厅改版设计.md 第七节。
+  -->
+  <div class="viewmode" role="group" aria-label="{{ view_label }}" hidden>
+    <button class="viewmode__btn" type="button" data-mode="one" aria-pressed="true">{{ view_one }}</button>
+    <button class="viewmode__btn" type="button" data-mode="grid" aria-pressed="false">{{ view_grid }}</button>
+  </div>
+
   <section class="plates" id="plates">
 {{ plates }}
   </section>

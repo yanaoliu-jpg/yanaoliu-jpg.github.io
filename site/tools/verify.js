@@ -44,7 +44,7 @@ const DARK_THEME = '#0d0e11';          // ↔ build.py DARK_THEME_COLOR：默认
 const HOME_THEME = '#f3e4dc';          // ↔ build.py HOME_THEME_COLOR：亮色时的首页
 const PAPER_THEME = '#f2efe9';         // ↔ build.py PAPER_THEME_COLOR：亮色时的内页
 const DARKEST_STOP = '#dde3ee';        // 亮色首页渐变里最深的一站——深色字在它上面对比度最低
-const COVER_H_1440 = 300;              // ↔ --cover-h 在 1440 上的值
+const COVER_H_1440 = 300;              // ↔ --cover-h 在 1440 上的值（2026-09-30 起只在关掉 JS 时是定高；开着 JS 每行铺满）
 // 整页高度的回归防线。规格里写的 5.5 是样稿阶段估的，没算区间距和说明文字；
 // 实测 6.05（间距已按封面比例收过 25%）。再往下只能压开头那一屏，那是他选定保留的。
 const MAX_SCREENS_1440 = 6.1;
@@ -103,11 +103,20 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
       text-shadow: none !important; text-decoration-color: transparent !important;
       transition: none !important; }
     html.probe .cat__label { background-image: none !important; }
-    html.probe .cursor { display: none !important; }`;
+    html.probe .cursor { display: none !important; }
+    html.probe-hit * { pointer-events: auto !important; }`;
   const probeFails = [];
   let probeRuns = 0;
   async function probe(page, label) {
+    // 判断「被挡住」要用 elementsFromPoint，而它看不见 pointer-events: none 的元素——
+    // 网格里的日期浮层就是这样（2026-09-30），不临时打开的话浮层上的字会被当成「被下面的照片挡住」、一段都不量
+    await page.evaluate((css) => {
+      if (!document.getElementById('probe-css')) {
+        const s = document.createElement('style'); s.id = 'probe-css'; s.textContent = css; document.head.append(s);
+      }
+    }, PROBE_CSS);
     const runs = await page.evaluate(() => {
+      document.documentElement.classList.add('probe-hit');
       const out = [];
       const range = document.createRange();
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -167,6 +176,7 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
           grad, size: parseFloat(cs.fontSize), weight: parseFloat(cs.fontWeight), rects,
         });
       }
+      document.documentElement.classList.remove('probe-hit');
       return out;
     });
     await page.evaluate((css) => {
@@ -640,6 +650,162 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
     await nctx.close();
   }
 
+  /* ── frame. 一个版心（2026-09-30「放映厅」第三步）：导航、第一屏、四个区、页脚、内页标题，左边缘落在同一条线上 ──
+     线在 max(--gutter, (宽 − 1500) / 2)：1440 上 86.4px（6vw），1920 上 210px。原来首页四个区自己用 3.5vw（1440 上 50px） */
+  if (want('frame')) {
+    for (const [w, h] of [[1440, 900], [1920, 1080]]) {
+      const fctx = await browser.newContext({ viewport: { width: w, height: h } });
+      const fp = await fctx.newPage();
+      const lefts = (sels) => fp.evaluate((ss) => ss.flatMap((s) => [...document.querySelectorAll(s)]
+        .map((e) => [s, +e.getBoundingClientRect().left.toFixed(1)])), sels);
+      await go(fp, `${BASE}/`);
+      const home = await lefts(['.sitenav__name', '.hero__name', '.cat__label', '.colophon__gear']);
+      await go(fp, `${BASE}/good-night/`);
+      const inner = await lefts(['.sitenav__name', '.masthead__eyebrow', '.masthead__title', '.masthead .statement', '.nextup__link', '.colophon__gear']);
+      const line = Math.max(Math.min(Math.max(24, 0.06 * w), 96), (w - 1500) / 2);
+      const off = [...home, ...inner].filter(([, x]) => Math.abs(x - line) > 1);
+      ok(home.length === 7 && inner.length === 6 && off.length === 0,
+        `@${w} 左边缘应都在 ${line.toFixed(1)}px，不在的：${JSON.stringify(off)}`);
+      await fctx.close();
+    }
+  }
+
+  /* ── mobile. 手机、平板（2026-09-30「放映厅」第三步）：
+     系列页照片、影片页播放器左右留白相等（原来宽度按 92vw 算、没扣两边留白，390 上左 24px 右 7px）；
+     首页英文作品标题是设计的字号、下面不空一行（窄屏那段规则原来写在基本规则前面，被盖掉了）；
+     系列页照片 @2x 取的档位够用 ── */
+  if (want('mobile')) {
+    for (const [w, h] of [[390, 844], [768, 1024]]) {
+      const mctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+      const mp = await mctx.newPage();
+      for (const p of ['/good-night/', '/zh/the-old-days/', '/stop-scrolling/']) {
+        await go(mp, BASE + p);
+        await scrollThrough(mp);
+        const d = await mp.evaluate(() => {
+          const vw = document.documentElement.clientWidth;
+          return {
+            gaps: [...document.querySelectorAll('.plate__frame, .film__video')].map((e) => {
+              const r = e.getBoundingClientRect(); return +(r.left - (vw - r.right)).toFixed(1);
+            }),
+            tiers: [...document.querySelectorAll('.plate__frame img')].map((img) => ({
+              w: img.getBoundingClientRect().width, tier: +((img.currentSrc.match(/-(\d+)\.(avif|webp|jpg)/) || [])[1] || 0),
+            })),
+          };
+        });
+        ok(d.gaps.length > 0 && d.gaps.every((g) => Math.abs(g) <= 1), `${p} @${w} 照片 / 播放器左右留白不等（左 − 右，px）：${d.gaps.join(',')}`);
+        const bad = d.tiers.filter((t) => t.tier !== ([900, 1600, 2400].find((x) => x >= t.w * 2) || 2400));
+        ok(bad.length === 0, `${p} @${w}×2 照片档位不对：${JSON.stringify(bad)}`);
+      }
+      await mctx.close();
+    }
+    const tctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+    const tp = await tctx.newPage();
+    await go(tp, `${BASE}/`);
+    const t = await tp.evaluate(() => {
+      const cs = getComputedStyle(document.querySelector('#photographs .work__title'));
+      return { size: cs.fontSize, minH: cs.minHeight };
+    });
+    ok(t.size === '28.8px' && (t.minH === '0px' || t.minH === 'auto'), `390 上英文首页作品标题是 ${JSON.stringify(t)}，应是 28.8px（clamp(1.8rem, 6vw, 2.6rem)）、不预留两行`);
+    await tctx.close();
+  }
+
+  /* ── grid. 系列页「逐张 · 网格」（2026-09-30「放映厅」第三步，rows.js）──
+     关掉 JS 时没有切换；点「网格」后每行铺满版心、同一行等高、档位够用、aria-pressed 对、大约一屏；
+     网格里点第 5 张，灯箱打开第 5 张；点「逐张」回去照片宽度和 sizes 都还原；切完不挂 view-transition-name ── */
+  if (want('grid')) {
+    const gctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+    const gp = await gctx.newPage();
+    const clickMode = async (m) => {
+      await gp.evaluate(() => document.querySelector('.viewmode').scrollIntoView({ block: 'center' }));
+      await gp.click(`.viewmode__btn[data-mode="${m}"]`);
+      await gp.waitForTimeout(1500);
+    };
+    const snap = () => gp.evaluate(() => ({
+      isGrid: document.querySelector('.plates').classList.contains('is-grid'),
+      pressed: [...document.querySelectorAll('.viewmode__btn')].map((b) => [b.textContent.trim(), b.getAttribute('aria-pressed')]),
+      widths: [...document.querySelectorAll('.plate__frame')].map((f) => Math.round(f.getBoundingClientRect().width)),
+      sizes: [...document.querySelectorAll('.plate img')].map((i) => i.getAttribute('sizes')),
+      vt: [...document.querySelectorAll('*')].map((e) => getComputedStyle(e).viewTransitionName)
+        .filter((n) => n && n !== 'none' && n !== 'root' && n !== 'sitenav'),
+    }));
+    for (const [p, one, grid] of [['/good-night/', 'One by one', 'Grid'], ['/zh/the-old-days/', '逐张', '网格']]) {
+      await go(gp, BASE + p);
+      const before = await snap();
+      const bar = await gp.evaluate(() => !document.querySelector('.viewmode').hidden);
+      ok(bar && JSON.stringify(before.pressed) === JSON.stringify([[one, 'true'], [grid, 'false']]) && !before.isGrid,
+        `${p} 切换按钮：${JSON.stringify({ bar, pressed: before.pressed, isGrid: before.isGrid })}`);
+      await clickMode('grid');
+      const g = await gp.evaluate(() => {
+        const list = document.querySelector('.plates'); const cs = getComputedStyle(list); const box = list.getBoundingClientRect();
+        const rows = [];
+        for (const pl of list.querySelectorAll('.plate')) {
+          const f = pl.querySelector('.plate__frame').getBoundingClientRect(); const img = pl.querySelector('img');
+          const it = { l: f.left, r: f.right, w: f.width, h: f.height, sizes: img.getAttribute('sizes'),
+                       tier: +((img.currentSrc.match(/-(\d+)\.(avif|webp|jpg)/) || [])[1] || 0) };
+          const row = rows.find((x) => Math.abs(x.top - f.top) < 2);
+          if (row) row.items.push(it); else rows.push({ top: f.top, items: [it] });
+        }
+        return { L: box.left + parseFloat(cs.paddingLeft), R: box.right - parseFloat(cs.paddingRight),
+                 rows: rows.map((x) => x.items), height: box.height };
+      });
+      const s = await snap();
+      ok(s.isGrid && s.pressed.map((x) => x[1]).join() === 'false,true', `${p} 点「网格」后：${JSON.stringify({ isGrid: s.isGrid, pressed: s.pressed })}`);
+      ok(g.rows.reduce((a, r) => a + r.length, 0) === 9, `${p} 网格里不是 9 张：${g.rows.map((r) => r.length)}`);
+      g.rows.forEach((r, k) => {
+        const hs = r.map((x) => x.h);
+        ok(Math.max(...hs) - Math.min(...hs) <= 1, `${p} 网格第 ${k + 1} 行不等高：${hs.map(Math.round)}`);
+        ok(Math.abs(r[0].l - g.L) <= 1 && Math.abs(r[r.length - 1].r - g.R) <= 1,
+          `${p} 网格第 ${k + 1} 行没铺满版心：${r[0].l.toFixed(1)}–${r[r.length - 1].r.toFixed(1)}，版心 ${g.L.toFixed(1)}–${g.R.toFixed(1)}`);
+        const off = r.filter((x) => !/^\d+px$/.test(x.sizes) || Math.abs(parseFloat(x.sizes) - x.w) > 1.5
+          || x.tier < ([900, 1600, 2400].find((t) => t >= x.w * 2) || 2400));
+        ok(off.length === 0, `${p} 网格第 ${k + 1} 行 sizes / 档位不对：${JSON.stringify(off.map((x) => [Math.round(x.w), x.sizes, x.tier]))}`);
+      });
+      ok(g.height <= 1.3 * 900, `${p} 网格一共 ${Math.round(g.height)}px 高，应该在一屏上下`);
+      ok(s.vt.length === 0, `${p} 切到网格之后还挂着 view-transition-name：${s.vt.join(',')}`);
+      await gp.click('#plate-5 .plate__open');
+      await gp.waitForTimeout(900);
+      const v = await gp.evaluate(() => ({ open: document.getElementById('viewer').open, count: document.querySelector('.viewer__count').textContent }));
+      ok(v.open && v.count.startsWith('05'), `${p} 网格里点第 5 张，灯箱：${JSON.stringify(v)}`);
+      await gp.keyboard.press('Escape');
+      await gp.waitForTimeout(900);
+      await clickMode('one');
+      const after = await snap();
+      ok(!after.isGrid && JSON.stringify(after.widths) === JSON.stringify(before.widths) && JSON.stringify(after.sizes) === JSON.stringify(before.sizes),
+        `${p} 切回逐张没还原：${JSON.stringify({ widths: [before.widths, after.widths], sizes: before.sizes[0] + ' → ' + after.sizes[0] })}`);
+      ok(after.vt.length === 0, `${p} 切回逐张之后还挂着 view-transition-name：${after.vt.join(',')}`);
+    }
+    await gctx.close();
+    const nctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
+    const np = await nctx.newPage();
+    await go(np, `${BASE}/good-night/`);
+    ok(await np.evaluate(() => { const v = document.querySelector('.viewmode'); return !!v && v.hidden && getComputedStyle(v).display === 'none'; }),
+      '关掉 JS 时「逐张 · 网格」切换应藏着');
+    await nctx.close();
+  }
+
+  /* ── gear. 灯箱里的机身和镜头（2026-09-30「放映厅」第三步）：只从每张照片自己的 EXIF 读、按对照表换成署名里的写法，
+     在说明的第二行（参数前面）；没有记录的三组（再见人分、夜风、我总是回到那几天）不出现，也不拿页脚的器材去填 ── */
+  if (want('gear')) {
+    const gctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const gp = await gctx.newPage();
+    const GEAR = { '': 'Sony α7 IV · Sigma 24-70mm F2.8 DG DN Art', '/zh': '索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art' };
+    const WITH = new Set(['good-night', 'the-old-days', 'looking-forward', 'sea-and-light']);
+    for (const dir of ['', '/zh']) for (const slug of SLUGS.filter((s) => !FILMS.has(s))) {
+      await go(gp, `${BASE}${dir}/${slug}/`);
+      await gp.evaluate(() => document.querySelector('#plate-1 .plate__open').click());
+      await gp.waitForTimeout(800);
+      const d = await gp.evaluate(() => {
+        const e = document.querySelector('.viewer__exif'), c = document.querySelector('.viewer__count');
+        return { text: e.textContent.trim(), below: e.getBoundingClientRect().top >= c.getBoundingClientRect().bottom - 1 };
+      });
+      ok(WITH.has(slug) ? d.text.startsWith(GEAR[dir]) && d.below : !/Sony|Sigma|索尼|适马/.test(d.text),
+        `${dir}/${slug}/ 灯箱第二行是「${d.text}」${WITH.has(slug) && !d.below ? '（没有另起一行）' : ''}`);
+      await gp.keyboard.press('Escape');
+      await gp.waitForTimeout(400);
+    }
+    await gctx.close();
+  }
+
   /* ── 4. 「下一组」首尾相接、不跨语言 ── */
   if (want(4)) {
     for (const dir of ['', '/zh']) for (let i = 0; i < SLUGS.length; i++) {
@@ -690,28 +856,62 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
     await lctx.close();
   }
 
-  /* ── 7. 首页封面：等高 300、影片并排、整页高度、sizes 同步 ── */
+  /* ── 7. 首页照片墙（2026-09-30 起每行铺满，rows.js）：同一行等高、每一行左右贴着版心；1440 上两行 4 + 3；
+          sizes 是实际显示宽度、@2x 档位够用（不低于该取的那档——第一屏下过同一张封面的大档时，浏览器会直接用缓存里的）；关掉 JS 时退回定高换行（1440 上 300px、sizes 里是 --cover-h 的公式）；整页高度 ── */
   if (want(7)) {
+    const tierFor = (w) => [900, 1600, 2400].find((x) => x >= w * 2) || 2400;
     for (const w of WIDTHS.filter(x => x > 900)) {
       await pg.setViewportSize({ width: w, height: 900 });
       for (const dir of ['', '/zh']) {
         await go(pg, `${BASE}${dir}/`);
-        const d = await pg.evaluate(() => ({
-          hs: [...document.querySelectorAll('#photographs .work__frame')].map(e => Math.round(e.getBoundingClientRect().height)),
-          screens: document.documentElement.scrollHeight / 900,
-          sizes: document.querySelector('#photographs img').getAttribute('sizes'),
-          radius: getComputedStyle(document.querySelector('.work__frame')).borderRadius,
-        }));
-        ok(d.hs.length === 7 && new Set(d.hs).size === 1, `${dir}/ @${w}px 照片封面不等高：${d.hs.join(',')}`);
-        ok(/15vw \+ 84px/.test(d.sizes), `${dir}/ @${w}px sizes 跟 --cover-h 对不上：${d.sizes}`);
+        await pg.evaluate(() => document.getElementById('photographs').scrollIntoView());
+        await pg.waitForTimeout(1500);
+        const d = await pg.evaluate(() => {
+          const list = document.querySelector('#photographs .works');
+          const cs = getComputedStyle(list);
+          const box = list.getBoundingClientRect();
+          const rows = [];
+          for (const li of list.querySelectorAll('.work')) {
+            const f = li.querySelector('.work__frame').getBoundingClientRect();
+            const img = li.querySelector('img');
+            const it = { l: f.left, r: f.right, w: f.width, h: f.height, sizes: img.getAttribute('sizes'),
+                         tier: +((img.currentSrc.match(/-(\d+)\.(avif|webp|jpg)/) || [])[1] || 0) };
+            const row = rows.find((x) => Math.abs(x.top - f.top) < 2);
+            if (row) row.items.push(it); else rows.push({ top: f.top, items: [it] });
+          }
+          return { L: box.left + parseFloat(cs.paddingLeft), R: box.right - parseFloat(cs.paddingRight),
+                   rows: rows.map((x) => x.items), screens: document.documentElement.scrollHeight / innerHeight,
+                   radius: getComputedStyle(document.querySelector('.work__frame')).borderRadius };
+        });
+        const shape = d.rows.map((r) => r.length);
+        ok(shape.reduce((a, b) => a + b, 0) === 7, `${dir}/ @${w} 照片墙不是 7 张：${shape.join(' + ')}`);
+        if (w === 1440) ok(shape.join('+') === '4+3', `${dir}/ @1440 照片墙应排成 4 + 3，现在是 ${shape.join(' + ')}`);
+        d.rows.forEach((r, k) => {
+          const hs = r.map((x) => x.h);
+          ok(Math.max(...hs) - Math.min(...hs) <= 1, `${dir}/ @${w} 第 ${k + 1} 行不等高：${hs.map(Math.round).join(',')}`);
+          ok(Math.abs(r[0].l - d.L) <= 1 && Math.abs(r[r.length - 1].r - d.R) <= 1,
+            `${dir}/ @${w} 第 ${k + 1} 行没铺满版心：${r[0].l.toFixed(1)}–${r[r.length - 1].r.toFixed(1)}，版心 ${d.L.toFixed(1)}–${d.R.toFixed(1)}`);
+          const off = r.filter((x) => !/^\d+px$/.test(x.sizes) || Math.abs(parseFloat(x.sizes) - x.w) > 1.5 || x.tier < tierFor(x.w));
+          ok(off.length === 0, `${dir}/ @${w} 第 ${k + 1} 行 sizes / 档位不对：${JSON.stringify(off.map((x) => [Math.round(x.w), x.sizes, x.tier]))}`);
+        });
         ok(d.radius === '10px', `${dir}/ @${w}px 封面圆角是 ${d.radius}`);
-        if (w === 1440) {
-          ok(d.hs[0] === COVER_H_1440, `${dir}/ @1440 封面高 ${d.hs[0]}，应该是 ${COVER_H_1440}`);
-          ok(d.screens <= MAX_SCREENS_1440, `${dir}/ @1440×900 整页 ${d.screens.toFixed(2)} 屏，超过 ${MAX_SCREENS_1440}`);
-        }
+        if (w === 1440) ok(d.screens <= MAX_SCREENS_1440, `${dir}/ @1440×900 整页 ${d.screens.toFixed(2)} 屏，超过 ${MAX_SCREENS_1440}`);
       }
     }
     await pg.setViewportSize({ width: 1440, height: 900 });
+    // 关掉 JS：退回原来的定高换行
+    const nctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
+    const np = await nctx.newPage();
+    for (const dir of ['', '/zh']) {
+      await go(np, `${BASE}${dir}/`);
+      const d = await np.evaluate(() => ({
+        hs: [...document.querySelectorAll('#photographs .work__frame')].map((e) => Math.round(e.getBoundingClientRect().height)),
+        sizes: document.querySelector('#photographs img').getAttribute('sizes'),
+      }));
+      ok(d.hs.length === 7 && d.hs.every((x) => x === COVER_H_1440), `${dir}/ 关掉 JS 时封面应都是 ${COVER_H_1440}px：${d.hs.join(',')}`);
+      ok(/15vw \+ 84px/.test(d.sizes), `${dir}/ 关掉 JS 时 sizes 跟 --cover-h 对不上：${d.sizes}`);
+    }
+    await nctx.close();
   }
 
   /* ── 8. 影评页：62 条、锚点、海报、课堂笔记、署名 ── */
@@ -1121,6 +1321,19 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
         await pp.waitForTimeout(600);
         await probe(pp, `${p} ${theme} 悬停「下一组」`);
       }
+      // 系列页网格（2026-09-30）：悬停一张亮照片时浮层上的编号和日期；灯箱里两行说明
+      await go(pp, BASE + '/the-old-days/');
+      await pp.evaluate(() => document.querySelector('.viewmode').scrollIntoView({ block: 'center' }));
+      await pp.click('.viewmode__btn[data-mode="grid"]');
+      await pp.waitForTimeout(1500);
+      await pp.hover('#plate-2 .plate__frame');
+      await pp.waitForTimeout(600);
+      await probe(pp, `/the-old-days/ ${theme} 网格悬停第 2 张`);
+      await pp.click('#plate-2 .plate__open');
+      await pp.waitForTimeout(1300);
+      await probe(pp, `/the-old-days/ ${theme} 灯箱`);
+      await pp.keyboard.press('Escape');
+      await pp.waitForTimeout(600);
       await pctx.close();
     }
     if (probeRuns) console.log(`对比度探针量了 ${probeRuns} 段字`);
