@@ -137,7 +137,13 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
         // 最上面永远是那个链接——第二步第一次全跑时，卡片上片名以外的字全被当成「挡住了」跳过，一段都没量
         {
           const r0 = (() => { range.selectNodeContents(n); return range.getBoundingClientRect(); })();
-          const cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
+          // 取**露在屏幕里那一截**的正中，不是整段字框的正中（2026-10-01）：一段字上半截已经滚出屏幕时，
+          // 整段的正中在屏幕外，那一点量不出挡没挡住——「旧时光」的自述换成 Garamond 变高之后，
+          // 灯箱压在上面的那一截被当成「没挡住」去量，报了 1.25:1
+          const vl = Math.max(0, r0.left), vr = Math.min(innerWidth, r0.right);
+          const vt = Math.max(0, r0.top), vb = Math.min(innerHeight, r0.bottom);
+          if (vr - vl <= 2 || vb - vt <= 2) continue;          // 整段都在屏幕外
+          const cx = (vl + vr) / 2, cy = (vt + vb) / 2;
           if (cx >= 0 && cy >= 0 && cx < innerWidth && cy < innerHeight) {
             const paints = (h) => {
               if (/^(img|video|canvas|iframe|svg|picture)$/i.test(h.tagName)) return true;
@@ -165,7 +171,10 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
         if (m.length > 3 && m[3] < 0.98 && !(cs.webkitBackgroundClip === 'text')) continue;
         range.selectNodeContents(n);
         const rects = [...range.getClientRects()]
-          .map(r => [Math.max(0, r.left), Math.max(0, r.top), Math.min(innerWidth, r.right), Math.min(innerHeight, r.bottom)])
+          // 被屏幕上下边缘切掉一截的那一行不量（2026-10-01）：它正滚出去，读不了；
+          // 贴着上边的是导航和 2px 的阅读进度条，量到的是它们的颜色（「旧时光」网格那次报了 1.86:1）
+          .filter(r => r.top >= 0 && r.bottom <= innerHeight)
+          .map(r => [Math.max(0, r.left), r.top, Math.min(innerWidth, r.right), r.bottom])
           .filter(([l, t, r, b]) => r - l > 2 && b - t > 2);
         if (!rects.length) continue;
         const grad = cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text';
@@ -241,8 +250,10 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
           themeColor: document.querySelector('meta[name=theme-color]').content,
           colorScheme: document.querySelector('meta[name=color-scheme]').content,
           // fonts.check 在没有匹配的 @font-face 时也返回 true，所以要看真正加载了的
-          dmLoaded: [...document.fonts].some(f => f.family === 'DM Sans' && f.status === 'loaded'),
-          anyNewsreader: [...document.fonts].some(f => /Newsreader|Noto Serif/.test(f.family)),
+          // 2026-10-01 起是 EB Garamond（正体 + 斜体）+ 思源宋体；斜体只在英文作品名上，用到才会去取
+          ebLoaded: [...document.fonts].some(f => f.family === 'EB Garamond' && f.style === 'normal' && f.status === 'loaded'),
+          ebItalic: [...document.fonts].some(f => f.family === 'EB Garamond' && f.style === 'italic' && f.status === 'loaded'),
+          oldFonts: [...document.fonts].filter(f => /Newsreader|DM Sans|Noto Sans SC/.test(f.family)).map(f => f.family),
           h1Face: getComputedStyle(document.querySelector('h1')).fontFamily,
           // 3D 镜头 2026-09-29 撤掉了：Three.js 和 lens.js 哪一页都不该再取
           legacy: performance.getEntriesByType('resource').filter((r) => /vendor\/three\/|\/lens\.js/.test(r.name)).length,
@@ -262,9 +273,14 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
       ok(d.themeHome === isHome(p), `${p} theme-home 类${d.themeHome ? '不该有' : '缺了'}`);
       ok(d.themeColor === DARK_THEME, `${p} theme-color 是 ${d.themeColor}，默认应是 ${DARK_THEME}`);
       ok(d.colorScheme === 'dark', `${p} color-scheme 是 ${d.colorScheme}`);
-      ok(d.dmLoaded, `${p} DM Sans 没加载`);
-      ok(!d.anyNewsreader, `${p} 还声明着旧字体`);
-      ok(/DM Sans/.test(d.h1Face), `${p} h1 用的不是 DM Sans：${d.h1Face}`);
+      ok(d.ebLoaded, `${p} EB Garamond 没加载`);
+      ok(d.oldFonts.length === 0, `${p} 还声明着旧字体：${d.oldFonts.join(', ')}`);
+      ok(/EB Garamond/.test(d.h1Face), `${p} h1 用的不是 EB Garamond：${d.h1Face}`);
+      // 英文首页（照片墙的作品名）和英文系列页（「下一组」）上有斜体的作品名；中文没有斜体
+      const slug = p.split('/').filter(Boolean).pop();
+      if (!p.startsWith('/zh') && (isHome(p) || (SLUGS.includes(slug) && !FILMS.has(slug)))) {
+        ok(d.ebItalic, `${p} 作品名的 EB Garamond 斜体没加载`);
+      }
     }
   }
 
@@ -972,17 +988,17 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
     await pg.setViewportSize({ width: 1440, height: 900 });
   }
 
-  /* ── 10. 中文零缺字形（Noto Sans SC）── */
+  /* ── 10. 中文零缺字形（Noto Serif SC，2026-10-01 起；之前是 Noto Sans SC）── */
   if (want(10)) {
     for (const p of ['/zh/', `/zh/${NOTES}/`, '/zh/good-night/']) {
       await go(pg, BASE + p);
       const d = await pg.evaluate(async () => {
         await document.fonts.ready;
         const uniq = [...new Set(document.body.innerText.match(/[一-鿿　-〿＀-￯]/g) || [])].join('');
-        return { loaded: [...document.fonts].some(f => f.family === 'Noto Sans SC' && f.status === 'loaded'),
-                 covered: document.fonts.check('16px "Noto Sans SC"', uniq), n: uniq.length };
+        return { loaded: [...document.fonts].some(f => f.family === 'Noto Serif SC' && f.status === 'loaded'),
+                 covered: document.fonts.check('16px "Noto Serif SC"', uniq), n: uniq.length };
       });
-      ok(d.loaded, `${p} Noto Sans SC 没加载`);
+      ok(d.loaded, `${p} Noto Serif SC 没加载`);
       ok(d.covered, `${p} 中文缺字形（用到 ${d.n} 个字）`);
     }
   }

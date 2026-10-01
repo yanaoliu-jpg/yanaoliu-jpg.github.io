@@ -13,28 +13,36 @@
    ════════════════════════════════════════════════════════════════ */
 
 /*
-  DM Sans：人文无衬线，变量字体（字重轴 + 光学尺寸轴 9–40）。
-  2026-09 从 Newsreader 换过来的，为了配首页的渐变底和圆角封面（见 首页改版设计.md）。
-  文件由 tools/fetch_latin_font.py 从 Google Fonts 取的拉丁子集，61 KB，自托管。
-  光学尺寸轴让大标题和 10px 的小说明各用各的形——font-optical-sizing 默认就是 auto。
+  EB Garamond：经典书籍衬线，变量字体（字重轴 400–800，Garamond 最细就是 400），正体、斜体各一份。
+  2026-10-01 从 DM Sans 换过来的——他要「字体再艺术一点」，参考的是纪实摄影集和 Magnum 摄影师网站
+  （见 摄影集改版设计.md）。再往前是 Newsreader（2026-09-21 换成 DM Sans，见 首页改版设计.md）。
+  文件由 tools/fetch_latin_font.py 从 Google Fonts 取的拉丁子集，正体 43 KB、斜体 47 KB，自托管。
+  斜体只用在英文作品名上（摄影集里提到作品名的习惯写法），不预加载。
 */
 @font-face {
-  font-family: 'DM Sans';
-  src: url('fonts/dm-sans-latin.woff2') format('woff2-variations');
-  font-weight: 300 600;
+  font-family: 'EB Garamond';
+  src: url('fonts/eb-garamond-latin.woff2') format('woff2-variations');
+  font-weight: 400 800;
   font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('fonts/eb-garamond-italic-latin.woff2') format('woff2-variations');
+  font-weight: 400 800;
+  font-style: italic;
   font-display: swap;
 }
 
 /*
-  中文黑体，按页面实际用到的字裁过（完整思源黑体有 18MB，裁完约 400KB）。
-  unicode-range 限定它只对中日韩字符生效，拉丁字母仍然走 DM Sans——
+  中文宋体，按页面实际用到的字裁过（完整思源宋体有 25MB，裁完约 530KB）。
+  unicode-range 限定它只对中日韩字符生效，拉丁字母仍然走 EB Garamond——
   两种字体各管各的，混排时不会互相抢。
 */
 @font-face {
-  font-family: 'Noto Sans SC';
-  src: url('fonts/noto-sans-sc-subset.woff2') format('woff2');
-  font-weight: 300 600;
+  font-family: 'Noto Serif SC';
+  src: url('fonts/noto-serif-sc-subset.woff2') format('woff2');
+  font-weight: 200 900;
   font-style: normal;
   font-display: swap;
   unicode-range: U+2014-2015, U+2018-201D, U+2026, U+3001-303F, U+4E00-9FFF,
@@ -72,12 +80,24 @@
 .screen { color-scheme: dark; }
 
 :root {
-  /* DM Sans 在前、中文黑体在后：拉丁字母走 DM Sans，
-     它没有的中文字符自动落到思源黑体。系统字体只是最后的保险。
-     ⚠️ 这个变量以前叫 --serif。2026-09 换成无衬线之后改名——
-        一个叫「衬线」的变量装着无衬线字体，三年后维护的人会被它骗。 */
-  --face: 'DM Sans', 'Noto Sans SC', -apple-system, 'Helvetica Neue',
-          'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  /* EB Garamond 在前、中文宋体在后：拉丁字母走 EB Garamond，
+     它没有的中文字符自动落到思源宋体。系统字体只是最后的保险，也挑衬线的——
+     字体还没下完的那一瞬间，落回的也是衬线。
+     ⚠️ 这个变量以前叫 --serif，2026-09 换成无衬线时改名 --face；2026-10 又换回衬线，名字不再改——
+        --face 不说是衬线还是无衬线，以后再换字体也不会骗人。 */
+  --face: 'EB Garamond', 'Noto Serif SC', Georgia, 'Songti SC', 'STSong',
+          'Noto Serif CJK SC', serif;
+  /*
+    英文正文的放大系数（2026-10-01）。EB Garamond 的小写字母比 DM Sans 矮
+    （x 高 0.400 对 0.526），同样字号看着小一号，所以字号在 1.3rem 以下的英文正文都乘上 --x；
+    全大写的小字看的是大写的高度（0.650 对 0.700），乘 --caps。标题不乘：大字看的是大写和升部。
+    中文规则（:lang(zh-Hans)）不乘——汉字的大小跟拉丁字体无关。
+    1.18 不是把 x 高补齐（那要 1.32，正文会大得像童书），是样稿里比出来的（摄影集改版设计.md 第四节）。
+    用到的地方：.hero__line、.sitenav__name / __link / __menu、.statement、.about__facts dd、
+    .film-card__line、.screen__more、.note__body p、.note__year、.note__tag。
+  */
+  --x: 1.18;
+  --caps: 1.08;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
           'PingFang SC', 'Hiragino Sans GB', monospace;
 
@@ -99,6 +119,8 @@
   --frame: 1500px;
   --nav-h: 3.75rem;      /* 顶部导航的高度 */
 }
+/* 中文页不放大（--x 那段注释）：同一条规则里写的 calc(var(--x) * …) 到这里就是原值 */
+:lang(zh-Hans) { --x: 1; --caps: 1; }
 
 /* 暗色首页：环境光会把字底下的亮度抬高一点，最淡那档灰 #7a7d85 只有 4.7:1，一点光都加不得。
    首页上提一档（5.9:1）。亮色的 :root[data-theme="light"] 优先级更高，会盖过它。 */
@@ -218,21 +240,21 @@
 .hero__name {
   margin: 0;
   font-size: clamp(3rem, 9.5vw, 7.5rem);
-  font-weight: 300;
-  font-variation-settings: 'opsz' 40;
-  line-height: 0.95;
-  letter-spacing: -0.025em;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.005em;
   text-wrap: balance;
   color: var(--ink);
 }
-:lang(zh-Hans) .hero__name { letter-spacing: 0.02em; }
+:lang(zh-Hans) .hero__name { font-weight: 500; letter-spacing: 0.04em; }
 .hero__line {
   max-width: 30em;
   margin: 1.4rem 0 0;
-  font-size: clamp(1rem, 0.92rem + 0.3vw, 1.18rem);
-  line-height: 1.65;
+  font-size: calc(var(--x) * clamp(1rem, 0.92rem + 0.3vw, 1.18rem));
+  line-height: 1.55;          /* 字放大了，行高系数收一点，行距的像素数差不多；中文照旧 1.65 */
   color: var(--ink-text);
 }
+:lang(zh-Hans) .hero__line { line-height: 1.65; }
 .hero__meta,
 .hero__scroll,
 .hero__caption {
@@ -405,7 +427,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--face);
-  font-weight: 350;
+  font-weight: 400;        /* EB Garamond 最细就是 400（DM Sans 那时是 350） */
   font-synthesis-weight: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -501,7 +523,7 @@ img { display: block; max-width: 100%; height: auto; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.95rem;
+  font-size: calc(var(--x) * 0.95rem);
   font-weight: 400;
   color: var(--nav-ink);
   text-decoration: none;
@@ -524,7 +546,7 @@ img { display: block; max-width: 100%; height: auto; }
 .sitenav__link {
   padding: 0.35rem 0;
   border-bottom: 1px solid transparent;
-  font-size: 0.74rem;
+  font-size: calc(var(--caps) * 0.74rem);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -551,7 +573,7 @@ img { display: block; max-width: 100%; height: auto; }
   border-radius: 2em;
   background: none;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: calc(var(--caps) * 0.72rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--nav-ink);
@@ -657,13 +679,15 @@ img { display: block; max-width: 100%; height: auto; }
 /* 中文正文比拉丁文视觉上更"重"，字号和行距要单独调，
    否则同样的 1.1rem 中文会显得又挤又黑 */
 :lang(zh-Hans) .statement {
+  max-width: 34em;
   font-size: clamp(1rem, 0.9rem + 0.35vw, 1.12rem);
   line-height: 1.95;
   letter-spacing: 0.02em;
 }
 :lang(zh-Hans) .masthead__title {
   font-size: clamp(2.8rem, 10vw, 7rem);
-  letter-spacing: 0.02em;   /* 中文不能像拉丁字母那样收紧字距 */
+  font-weight: 500;         /* 宋体大字 400 偏单薄；500 跟英文 Garamond 400 的分量相当 */
+  letter-spacing: 0.04em;   /* 中文不能像拉丁字母那样收紧字距；宋体比黑体再松一点 */
 }
 /*
   中文标题也要跟栏宽匹配。原来这条是给「一屏一条」的旧版式写的，
@@ -672,7 +696,8 @@ img { display: block; max-width: 100%; height: auto; }
 */
 :lang(zh-Hans) .work__title {
   font-size: clamp(1.15rem, 1.6vw, 1.6rem);
-  letter-spacing: 0.02em;
+  font-style: normal;       /* 汉字没有斜体，浏览器会硬把它压斜，难看 */
+  letter-spacing: 0.04em;
 }
 /* 等宽小标签里的中文不该被拉成大写间距 */
 :lang(zh-Hans) .masthead__meta,
@@ -734,12 +759,11 @@ img { display: block; max-width: 100%; height: auto; }
 .masthead__title {
   margin: 0;
   font-size: clamp(3.4rem, 13vw, 9rem);
-  font-weight: 300;
-  /* DM Sans 的光学尺寸轴到 40 为止（Newsreader 到 72）。标题远大于 40px，
-     钉在轴的顶端就是它最"展示"的那一档；不写的话 auto 也会落到这里。 */
-  font-variation-settings: 'opsz' 40;
-  line-height: 0.92;
-  letter-spacing: -0.025em;
+  font-weight: 400;
+  /* 两行的标题（Drunk on the Night Wind）上一行的下伸部和下一行的升部不能打架：
+     DM Sans 时是 0.92，Garamond 的升部更高，放到 0.96 */
+  line-height: 0.96;
+  letter-spacing: -0.005em;   /* 衬线字不用像 DM Sans 那样收紧（原来 −0.025em） */
   text-wrap: balance;
 }
 
@@ -777,10 +801,11 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* 自述：单独一栏，宽度控制在一眼能读完一行的范围 */
 .statement {
-  max-width: 34em;
+  /* Garamond 比 DM Sans 窄：34em 一行能塞 75 个字母，收到 31em 回到原来的 68 个上下（中文另写，见下面） */
+  max-width: 31em;
   margin: clamp(6rem, 16vh, 12rem) 0 0;
-  font-size: clamp(1.06rem, 0.95rem + 0.4vw, 1.24rem);
-  line-height: 1.78;
+  font-size: calc(var(--x) * clamp(1.06rem, 0.95rem + 0.4vw, 1.24rem));
+  line-height: 1.68;
   color: var(--ink-text);
 }
 
@@ -945,7 +970,7 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .viewmode__btn:hover { color: var(--ink); border-color: var(--rule-strong); }
 .viewmode__btn[aria-pressed="true"] { color: var(--ink); border-color: var(--rule-strong); background: var(--bg-lift); cursor: default; }
-/* 中文用正文的思源黑体：等宽那一串里没有它 */
+/* 中文用正文的思源宋体：等宽那一串里没有它 */
 :lang(zh-Hans) .viewmode__btn { font-family: var(--face); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: none; }
 
 .plates.is-grid {
@@ -1178,13 +1203,13 @@ img { display: block; max-width: 100%; height: auto; }
 .film-card__title {
   margin: 0.5rem 0 0;
   font-size: clamp(1.35rem, 1.1rem + 0.6vw, 1.7rem);
-  font-weight: 300;
-  font-variation-settings: 'opsz' 36;
+  font-weight: 400;
+  font-style: italic;       /* 英文片名斜体，同 .work__title */
   line-height: 1.12;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.005em;
   text-wrap: balance;
 }
-:lang(zh-Hans) .film-card__title { letter-spacing: 0.02em; }
+:lang(zh-Hans) .film-card__title { font-style: normal; letter-spacing: 0.04em; }
 .film-card__link { color: var(--ink); text-decoration: none; }
 /* 整张卡可点：链接的伪元素铺满卡片（链接本身只包片名，读屏软件只念片名） */
 .film-card__link::after { content: ''; position: absolute; inset: 0; z-index: 2; }
@@ -1193,7 +1218,7 @@ img { display: block; max-width: 100%; height: auto; }
 .film-card__detail span:not(:last-child)::after { content: '·'; margin: 0 0.1em 0 0.45em; color: var(--ink-faint); }
 .film-card__line {
   margin: 0.95rem 0 1.2rem;
-  font-size: 0.98rem;
+  font-size: calc(var(--x) * 0.98rem);
   line-height: 1.6;
   color: var(--ink-text);
 }
@@ -1364,10 +1389,11 @@ img { display: block; max-width: 100%; height: auto; }
   display: block;
   margin: 0.5rem 0 0;
   font-size: clamp(1.3rem, 1.9vw, 1.95rem);
-  font-weight: 300;
-  font-variation-settings: 'opsz' 36;
+  font-weight: 400;
+  /* 英文作品名用斜体——摄影集和书里提到作品名的习惯写法（2026-10-01）。中文没有斜体，:lang 那条改回正体 */
+  font-style: italic;
   line-height: 1.12;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.005em;
   text-wrap: balance;
   color: var(--ink);
   transition: color 0.25s;
@@ -1435,13 +1461,12 @@ img { display: block; max-width: 100%; height: auto; }
   padding: 0 var(--gutter);
   font-family: var(--face);
   font-size: clamp(1.9rem, 1rem + 2.4vw, 3rem);
-  font-weight: 300;
-  font-variation-settings: 'opsz' 40;
+  font-weight: 400;
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.005em;
   color: var(--ink-dim);
 }
-:lang(zh-Hans) .cat__title { letter-spacing: 0.04em; }
+:lang(zh-Hans) .cat__title { font-weight: 500; letter-spacing: 0.04em; }
 
 .cat__title a { color: inherit; text-decoration: none; }
 
@@ -1511,9 +1536,9 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   text-transform: uppercase;
   color: var(--ink-mute);
 }
-/* 中文标签用正文的思源黑体：等宽那一串里没有它，会落到系统的苹方上 */
+/* 中文标签用正文的思源宋体：等宽那一串里没有它，会落到系统的苹方上 */
 :lang(zh-Hans) .about__facts dt { font-family: var(--face); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: none; }
-.about__facts dd { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--ink-text); }
+.about__facts dd { margin: 0; font-size: calc(var(--x) * 0.95rem); line-height: 1.6; color: var(--ink-text); }
 .about__facts dd span { white-space: nowrap; }
 .about__facts dd span:not(:last-child)::after { content: '·'; margin: 0 0.15em 0 0.5em; color: var(--ink-faint); }
 .about__facts a { color: inherit; text-decoration-color: var(--rule-strong); text-underline-offset: 0.2em; }
@@ -1708,7 +1733,7 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
 
 .note__year {
   color: var(--ink-faint);
-  font-size: 0.72em;
+  font-size: calc(var(--x) * 0.72em);
   white-space: nowrap;
 }
 
@@ -1721,7 +1746,7 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   display: inline-block;
   margin-left: 0.7rem;
   padding: 0.15em 0.55em;
-  font-size: 0.52em;
+  font-size: calc(var(--caps) * 0.52em);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   vertical-align: 0.35em;
@@ -1735,10 +1760,11 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
 .note__body p {
   margin: 0 0 1.1em;
   font-family: var(--face);
-  font-size: 1rem;
-  line-height: 1.85;
+  font-size: calc(var(--x) * 1rem);
+  line-height: 1.7;           /* 字放大了，系数收一点；中文照旧 1.85 */
   color: var(--ink-dim);
 }
+:lang(zh-Hans) .note__body p { line-height: 1.85; }
 .note__body p:last-child { margin-bottom: 0; }
 
 /*
@@ -1747,10 +1773,11 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   这些当短句是好的，用长文那套版式排出来才显得像没写完。
 */
 .note--short .note__body p {
-  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
-  line-height: 1.7;
+  font-size: calc(var(--x) * clamp(1.05rem, 2.2vw, 1.25rem));
+  line-height: 1.55;
   color: var(--ink);
 }
+:lang(zh-Hans) .note--short .note__body p { line-height: 1.7; }
 
 .note--class .note__body p { color: var(--ink-mute); }
 
@@ -1837,15 +1864,15 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   display: block;
   /* 比大标题小一档：它是通往下一页的入口，不是这一页的主角 */
   font-size: clamp(2.2rem, 6vw, 4rem);
-  font-weight: 300;
-  font-variation-settings: 'opsz' 48;
+  font-weight: 400;
+  font-style: italic;       /* 英文作品名斜体，同 .work__title */
   line-height: 1.04;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.005em;
   text-wrap: balance;
   color: var(--ink);
   transition: color 0.25s;
 }
-:lang(zh-Hans) .nextup__title { font-size: clamp(2rem, 5.4vw, 3.4rem); }
+:lang(zh-Hans) .nextup__title { font-size: clamp(2rem, 5.4vw, 3.4rem); font-style: normal; letter-spacing: 0.04em; }
 
 .nextup__meta { margin-top: 1.1rem; color: var(--ink-mute); }
 
@@ -2106,7 +2133,7 @@ body.is-locked { overflow: hidden; }
 }
 :lang(zh-Hans) .screen__meta { letter-spacing: 0.06em; text-transform: none; }
 .screen__more {
-  font-size: 0.9rem;
+  font-size: calc(var(--x) * 0.9rem);
   color: var(--ink-dim);
   text-decoration-color: var(--rule-strong);
   text-underline-offset: 0.2em;
@@ -2160,7 +2187,7 @@ body.is-locked { overflow: hidden; }
   border-color: var(--ink);
   color: var(--bg);
 }
-/* 中文标签用正文的思源黑体：等宽那一串里没有它，会落到系统的苹方上。
+/* 中文标签用正文的思源宋体：等宽那一串里没有它，会落到系统的苹方上。
    所以「阅」这些字得在字体子集里——subset_font.py 会扫 data-cursor 属性 */
 :lang(zh-Hans) .cursor { font-family: var(--face); font-size: 0.74rem; letter-spacing: 0.06em; }
 
