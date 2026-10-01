@@ -22,6 +22,7 @@
 
   2026-09「透过镜头」改版加了第 13–21 节：镜头、配色约束、走马盘、换页配对、全屏放大、
   减少动态效果 / 触屏 / 关掉 JS 三种降级，以及**像素级对比度探针**（第 21 节）。
+  2026-10「摄影集」改版加了 photobook 节：自述拆两处、照片之间一屏、说明行没参数、翻摄影集式的灯箱。
 */
 const { chromium } = require('playwright-core');
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -67,6 +68,12 @@ async function scrollThrough(pg) {   // 逐屏滚，让 lazy 图和进场动效�
     window.scrollTo(0, 0);
   });
   await pg.waitForTimeout(1500);
+}
+// 等这些图都下完再读档位（currentSrc 是空的就读成 0）。公网慢的那天（2026-10-01）滚过去 1.5 秒还没下完，
+// 「档位不对」报了 6 条，其实宽度和 sizes 全对。最多等 20 秒，等不到照常往下查、照实报
+async function imagesLoaded(pg, sel) {
+  await pg.waitForFunction((s) => [...document.querySelectorAll(s)].every((i) => i.complete && i.currentSrc),
+    sel, { timeout: 20000 }).catch(() => {});
 }
 const lum = h => { const [r, g, b] = h.match(/\w\w/g).map(x => parseInt(x, 16) / 255)
   .map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4); return .2126 * r + .7152 * g + .0722 * b; };
@@ -346,6 +353,9 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
       ok(closed === 'none' && open.open && open.n === 4 && open.overflow === 0,
          `${dir}/good-night/ 手机菜单：收起时 display=${closed}，打开后 ${JSON.stringify(open)}`);
       await mp.tap('.sitenav__link >> nth=1');
+      // 先等网址真的变了再等网络安静：公网慢的时候 networkidle 会在新页面开始加载之前就返回（等的是旧页），
+      // 接着去找导航就是 null，整个脚本崩掉（2026-10-01 对公网跑时遇到）
+      await mp.waitForURL((u) => u.hash === '#films', { timeout: 30000 }).catch(() => {});
       await mp.waitForLoadState('networkidle');
       await mp.waitForTimeout(500);
       const at = await mp.evaluate(() => ({ path: location.pathname + location.hash,
@@ -697,6 +707,7 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
       for (const p of ['/good-night/', '/zh/the-old-days/', '/stop-scrolling/']) {
         await go(mp, BASE + p);
         await scrollThrough(mp);
+        await imagesLoaded(mp, '.plate__frame img');
         const d = await mp.evaluate(() => {
           const vw = document.documentElement.clientWidth;
           return {
@@ -751,6 +762,7 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
       ok(bar && JSON.stringify(before.pressed) === JSON.stringify([[one, 'true'], [grid, 'false']]) && !before.isGrid,
         `${p} 切换按钮：${JSON.stringify({ bar, pressed: before.pressed, isGrid: before.isGrid })}`);
       await clickMode('grid');
+      await imagesLoaded(gp, '#plates img');
       const g = await gp.evaluate(() => {
         const list = document.querySelector('.plates'); const cs = getComputedStyle(list); const box = list.getBoundingClientRect();
         const rows = [];
@@ -822,6 +834,121 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
     await gctx.close();
   }
 
+  /* ── photobook. 系列页往摄影集靠（2026-10-01「摄影集」第二步，摄影集改版设计.md 第五节）：
+     自述拆成两处（标题下第一段、照片后其余几段，原文一字不改）；照片之间留够一屏；说明行没有参数；
+     灯箱左下角「编号 · 地点」、底部细进度条、平时看不见按钮（Tab 到时出来） ── */
+  if (want('photobook')) {
+    const fs = require('fs'), path = require('path');
+    // 自述原文从 toml 取。node 没有 TOML 解析器：正则取 statement = """……"""，[zh] 之前是英文、之后是中文。
+    // 先找脚本旁边的 ../content，找不到（脚本被拷到别处跑）再找当前目录下的 site/content
+    const contentDir = [path.resolve(__dirname, '../content'), path.resolve('site/content')].find((d) => fs.existsSync(d));
+    const statementOf = (slug, zh) => {
+      const src = fs.readFileSync(path.join(contentDir, `${slug}.toml`), 'utf8');
+      const cut = src.search(/^\[zh\]/m);
+      const m = (zh ? src.slice(cut) : src.slice(0, cut)).match(/^statement\s*=\s*"""([\s\S]*?)"""/m);
+      return m ? m[1].split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean) : [];
+    };
+    // build.py 的 typography() 会换引号和破折号，所以只比开头、比之前先统一写法
+    const norm = (t) => t.replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[—–]/g, '-').replace(/\s+/g, ' ').trim();
+    const bctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+    const bp = await bctx.newPage();
+    for (const dir of ['', '/zh']) for (const slug of SLUGS.filter((s) => !FILMS.has(s))) {
+      const paras = statementOf(slug, dir === '/zh');
+      const p = `${dir}/${slug}/`;
+      await go(bp, `${BASE}${p}`);
+      const d = await bp.evaluate(() => {
+        const a = document.querySelector('.afterword'), n = document.querySelector('.nextup'), pl = document.getElementById('plates');
+        return {
+          lede: [...document.querySelectorAll('.masthead .statement p')].map((x) => x.textContent),
+          after: [...document.querySelectorAll('.afterword p')].map((x) => x.textContent),
+          order: !!a && !!(pl.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING)
+                      && !!(a.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING),
+          exif: document.querySelectorAll('.plate__exif').length,
+        };
+      });
+      ok(paras.length > 0, `${p} 从 toml 读不到自述（${contentDir}）`);
+      ok(d.lede.length === 1 && norm(d.lede[0]).startsWith(norm(paras[0] || '').slice(0, 10)),
+        `${p} 标题下面应只有自述的第一段：${d.lede.length} 段，开头「${(d.lede[0] || '').slice(0, 12)}」`);
+      if (paras.length > 1) {
+        ok(d.after.length === paras.length - 1 && d.order,
+          `${p} 照片后面应是其余 ${paras.length - 1} 段、在照片之后「下一组」之前：${d.after.length} 段，位置${d.order ? '对' : '不对'}`);
+        ok(d.after.length > 0 && norm(d.after[0]).startsWith(norm(paras[1]).slice(0, 10)),
+          `${p} 照片后面那块应从第二段开始（第一段不重复）：「${(d.after[0] || '').slice(0, 12)}」`);
+      } else {
+        ok(d.after.length === 0, `${p} 自述只有一段，照片后面不该再有一块`);
+      }
+      ok(d.exif === 0, `${p} 照片下面还有相机参数（${d.exif} 处），应只在灯箱里`);
+    }
+    // 一张照片 + 说明 + 空白 ≈ 一屏（只算被 72vh 卡住高度的那些；特别宽的照片被宽度卡住，本来就矮）
+    for (const slug of ['good-night', 'the-old-days']) {
+      await go(bp, `${BASE}/${slug}/`);
+      const r = await bp.evaluate(() => [...document.querySelectorAll('#plates > .plate')]
+        .map((x) => ({ top: x.offsetTop, h: x.querySelector('.plate__frame').offsetHeight })));
+      const steps = [];
+      for (let i = 0; i + 1 < r.length; i++) if (Math.abs(r[i].h - 0.72 * 900) < 2) steps.push((r[i + 1].top - r[i].top) / 900);
+      ok(steps.length > 0 && steps.every((x) => x >= 0.95 && x <= 1.05),
+        `/${slug}/ 1440×900 上一张照片 + 说明 + 空白应约一屏：${steps.map((x) => x.toFixed(2)).join(' ')}`);
+    }
+    // 灯箱
+    for (const [dir, place] of [['', 'Beijing'], ['/zh', '北京']]) {
+      const p = `${dir}/good-night/ 灯箱`;
+      await go(bp, `${BASE}${dir}/good-night/`);
+      await bp.mouse.move(720, 450);
+      await bp.evaluate(() => document.querySelector('#plate-4 .plate__open').click());
+      await bp.waitForTimeout(900);
+      const v = await bp.evaluate(() => {
+        const c = document.querySelector('.viewer__caption').getBoundingClientRect();
+        return {
+          count: document.querySelector('.viewer__count').textContent,
+          place: document.querySelector('.viewer__place').textContent.trim(),
+          bar: document.querySelector('.viewer__progress span').getBoundingClientRect().width
+             / document.querySelector('.viewer__progress').getBoundingClientRect().width,
+          arrows: [...document.querySelectorAll('.viewer__nav svg')].map((x) => +getComputedStyle(x).opacity),
+          closeBg: getComputedStyle(document.querySelector('.viewer__close')).backgroundColor,
+          cap: { left: Math.round(c.left), bottom: Math.round(innerHeight - c.bottom) },
+        };
+      });
+      ok(v.count === '04 / 09', `${p}：编号是「${v.count}」，应是「04 / 09」`);
+      ok(v.place === place, `${p}：地点是「${v.place}」，应是「${place}」`);
+      ok(Math.abs(v.bar - 4 / 9) < 0.01, `${p}：进度条 ${v.bar.toFixed(3)}，应是 4/9`);
+      ok(v.arrows.length === 2 && v.arrows.every((o) => o === 0), `${p}：平时箭头应看不见，透明度 ${v.arrows.join(', ')}`);
+      ok(v.closeBg === 'rgba(0, 0, 0, 0)', `${p}：关闭按钮不该有底色：${v.closeBg}`);
+      ok(v.cap.left < 40 && v.cap.bottom < 30, `${p}：说明应在左下角：${JSON.stringify(v.cap)}`);
+      // 点右边那块翻到下一张，点左边那块翻回来
+      await bp.mouse.click(1440 - 60, 450);
+      await bp.waitForTimeout(500);
+      const n1 = await bp.evaluate(() => document.querySelector('.viewer__count').textContent);
+      await bp.mouse.click(60, 450);
+      await bp.waitForTimeout(500);
+      const n2 = await bp.evaluate(() => document.querySelector('.viewer__count').textContent);
+      ok(n1 === '05 / 09' && n2 === '04 / 09', `${p}：点右边、左边翻页：${n1} → ${n2}`);
+      // 键盘 Tab 到「下一张」时箭头出来（按钮都还在，只是平时不显眼）
+      let onNext = false;
+      for (let i = 0; i < 4 && !onNext; i++) {
+        await bp.keyboard.press('Tab');
+        onNext = await bp.evaluate(() => !!document.activeElement && document.activeElement.classList.contains('viewer__nav--next'));
+      }
+      await bp.waitForTimeout(400);
+      const shown = await bp.evaluate(() => +getComputedStyle(document.querySelector('.viewer__nav--next svg')).opacity);
+      ok(onNext && shown > 0.5, `${p}：Tab 到「下一张」时箭头应出来（聚焦到了：${onNext}，透明度 ${shown}）`);
+      await bp.keyboard.press('Escape');
+      await bp.waitForTimeout(500);
+    }
+    await bctx.close();
+    // 关掉 JS：两块自述都在、都看得见
+    const nctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
+    const np = await nctx.newPage();
+    for (const dir of ['', '/zh']) {
+      await go(np, `${BASE}${dir}/good-night/`);
+      const d = await np.evaluate(() => ({
+        lede: document.querySelectorAll('.masthead .statement p').length,
+        after: [...document.querySelectorAll('.afterword p')].filter((x) => x.checkVisibility() && x.getBoundingClientRect().height > 0).length,
+      }));
+      ok(d.lede === 1 && d.after >= 1, `${dir}/good-night/ 关掉 JS：标题下 ${d.lede} 段、照片后看得见 ${d.after} 段`);
+    }
+    await nctx.close();
+  }
+
   /* ── 4. 「下一组」首尾相接、不跨语言 ── */
   if (want(4)) {
     for (const dir of ['', '/zh']) for (let i = 0; i < SLUGS.length; i++) {
@@ -882,6 +1009,7 @@ const rgbHex = (s) => '#' + s.match(/[\d.]+/g).slice(0, 3).map((n) => Math.round
         await go(pg, `${BASE}${dir}/`);
         await pg.evaluate(() => document.getElementById('photographs').scrollIntoView());
         await pg.waitForTimeout(1500);
+        await imagesLoaded(pg, '#photographs .work__frame img');
         const d = await pg.evaluate(() => {
           const list = document.querySelector('#photographs .works');
           const cs = getComputedStyle(list);

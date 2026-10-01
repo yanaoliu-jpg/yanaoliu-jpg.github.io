@@ -149,9 +149,6 @@ document.documentElement.classList.remove('no-js');
 
     <div class="statement">
       <p>In the summer of 2025 I went to Aranya, a resort on the coast at Beidaihe, a few hours from Beijing, with a friend and their family. We went for what everyone goes for: the sand, the waves, the slow kind of day you only get beside the sea.</p>
-          <p>The photographs I came back with are all from after the sun went down.</p>
-          <p>I don’t think I decided this. It was just that the place at night was the part I couldn’t stop looking at. An empty restaurant terrace with the ceiling fans still turning. A courtyard lit yellow between two buildings. Two kids at a floodlit skate park, one of them crouched down filming the other. A man walking past a café window with all the stools inside still empty.</p>
-          <p>None of it is the scenery we came for. It is what the town looks like once the day lets go of it — people still out, still moving at the pace the place was built for. That pace is the thing I actually wanted to keep.</p>
     </div>
 
     <p class="masthead__scroll" aria-hidden="true">Scroll</p>
@@ -192,7 +189,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">01</span>
             <time datetime="2025-07-16T20:16">2025.07.16<span class="plate__time"> · 20:16</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -219,7 +215,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">02</span>
             <time datetime="2025-07-16T20:19">2025.07.16<span class="plate__time"> · 20:19</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -246,7 +241,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">03</span>
             <time datetime="2025-07-16T20:19">2025.07.16<span class="plate__time"> · 20:19</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -273,7 +267,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">04</span>
             <time datetime="2025-07-16T20:27">2025.07.16<span class="plate__time"> · 20:27</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -300,7 +293,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">05</span>
             <time datetime="2025-07-16T20:32">2025.07.16<span class="plate__time"> · 20:32</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -327,7 +319,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">06</span>
             <time datetime="2025-07-16T20:32">2025.07.16<span class="plate__time"> · 20:32</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -354,7 +345,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">07</span>
             <time datetime="2025-07-16T20:53">2025.07.16<span class="plate__time"> · 20:53</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -381,7 +371,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">08</span>
             <time datetime="2025-07-16T21:04">2025.07.16<span class="plate__time"> · 21:04</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
 
@@ -408,9 +397,15 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">09</span>
             <time datetime="2025-07-16T21:09">2025.07.16<span class="plate__time"> · 21:09</span></time>
-            <span class="plate__exif"></span>
           </figcaption>
         </figure>
+  </section>
+
+  <!-- 自述的其余几段（2026-10-01「摄影集」改版）：标题下面只放第一段，看完照片再读这里。只有一段的组没有这块 -->
+  <section class="afterword statement" aria-label="Afterword">
+    <p>The photographs I came back with are all from after the sun went down.</p>
+          <p>I don’t think I decided this. It was just that the place at night was the part I couldn’t stop looking at. An empty restaurant terrace with the ceiling fans still turning. A courtyard lit yellow between two buildings. Two kids at a floodlit skate park, one of them crouched down filming the other. A man walking past a café window with all the stools inside still empty.</p>
+          <p>None of it is the scenery we came for. It is what the town looks like once the day lets go of it — people still out, still moving at the pace the place was built for. That pace is the thing I actually wanted to keep.</p>
   </section>
 
   <nav class="nextup" aria-label="Next series">
@@ -428,6 +423,11 @@ document.documentElement.classList.remove('no-js');
 
 </main>
 
+<!--
+  灯箱（2026-10-01 改成「翻摄影集」）：左下角「07 / 09 · 地点 · 日期」，第二行机身镜头和参数，
+  底部一条 1px 的进度条（gallery.js 写宽度）。按钮平时看不见——左右翻页是照片两边的透明点击区，
+  关闭是右上角很淡的 ×；Tab 到时箭头和焦点框照常出来。见 摄影集改版设计.md 第五节。
+-->
 <dialog class="viewer" id="viewer" aria-label="Full screen photograph">
   <button class="viewer__close" type="button" data-act="close" aria-label="Close">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
@@ -448,10 +448,12 @@ document.documentElement.classList.remove('no-js');
     </picture>
     <figcaption class="viewer__caption">
       <span class="viewer__count"></span>
+      <span class="viewer__place">Aranya, Beidaihe</span>
       <span class="viewer__date"></span>
       <span class="viewer__exif"></span>
     </figcaption>
   </figure>
+  <div class="viewer__progress" aria-hidden="true"><span></span></div>
 </dialog>
 
 <script type="application/json" id="photo-data">[{"avif":"../img/night-wind/DSC00680-900.avif 900w, ../img/night-wind/DSC00680-1600.avif 1600w, ../img/night-wind/DSC00680-2400.avif 2400w","webp":"../img/night-wind/DSC00680-900.webp 900w, ../img/night-wind/DSC00680-1600.webp 1600w, ../img/night-wind/DSC00680-2400.webp 2400w","jpg":"../img/night-wind/DSC00680-900.jpg 900w, ../img/night-wind/DSC00680-1600.jpg 1600w","src":"../img/night-wind/DSC00680-1600.jpg","w":7008,"h":4672,"alt":"A lit shopfront at night seen across a dark street; a few people sit on a bench outside while others stand at the counter within.","date":"2025.07.16","time":"20:16","exif":"","gear":""},{"avif":"../img/night-wind/DSC00691-900.avif 900w, ../img/night-wind/DSC00691-1600.avif 1600w, ../img/night-wind/DSC00691-2400.avif 2400w","webp":"../img/night-wind/DSC00691-900.webp 900w, ../img/night-wind/DSC00691-1600.webp 1600w, ../img/night-wind/DSC00691-2400.webp 2400w","jpg":"../img/night-wind/DSC00691-900.jpg 900w, ../img/night-wind/DSC00691-1600.jpg 1600w","src":"../img/night-wind/DSC00691-1600.jpg","w":7008,"h":4672,"alt":"A café window at night with all the bar stools inside still empty; a person walks past in silhouette, blurred by the exposure.","date":"2025.07.16","time":"20:19","exif":"","gear":""},{"avif":"../img/night-wind/DSC00692-900.avif 900w, ../img/night-wind/DSC00692-1600.avif 1600w, ../img/night-wind/DSC00692-2400.avif 2400w","webp":"../img/night-wind/DSC00692-900.webp 900w, ../img/night-wind/DSC00692-1600.webp 1600w, ../img/night-wind/DSC00692-2400.webp 2400w","jpg":"../img/night-wind/DSC00692-900.jpg 900w, ../img/night-wind/DSC00692-1600.jpg 1600w","src":"../img/night-wind/DSC00692-1600.jpg","w":4672,"h":7008,"alt":"A teal concrete building at night with WHARF FISHMARKET lit above the entrance; people sit on the steps below.","date":"2025.07.16","time":"20:19","exif":"","gear":""},{"avif":"../img/night-wind/20250716-DSC00722-900.avif 900w, ../img/night-wind/20250716-DSC00722-1600.avif 1600w, ../img/night-wind/20250716-DSC00722-2400.avif 2400w","webp":"../img/night-wind/20250716-DSC00722-900.webp 900w, ../img/night-wind/20250716-DSC00722-1600.webp 1600w, ../img/night-wind/20250716-DSC00722-2400.webp 2400w","jpg":"../img/night-wind/20250716-DSC00722-900.jpg 900w, ../img/night-wind/20250716-DSC00722-1600.jpg 1600w","src":"../img/night-wind/20250716-DSC00722-1600.jpg","w":4672,"h":7008,"alt":"An empty restaurant terrace at night, tables laid and ceiling fans still turning, warm light falling down the far wall.","date":"2025.07.16","time":"20:27","exif":"","gear":""},{"avif":"../img/night-wind/20250716-DSC00724-900.avif 900w, ../img/night-wind/20250716-DSC00724-1600.avif 1600w, ../img/night-wind/20250716-DSC00724-2400.avif 2400w","webp":"../img/night-wind/20250716-DSC00724-900.webp 900w, ../img/night-wind/20250716-DSC00724-1600.webp 1600w, ../img/night-wind/20250716-DSC00724-2400.webp 2400w","jpg":"../img/night-wind/20250716-DSC00724-900.jpg 900w, ../img/night-wind/20250716-DSC00724-1600.jpg 1600w","src":"../img/night-wind/20250716-DSC00724-1600.jpg","w":4672,"h":7008,"alt":"A courtyard between two buildings at night, the walls washed yellow and green by lamplight, a young tree and an empty bench.","date":"2025.07.16","time":"20:32","exif":"","gear":""},{"avif":"../img/night-wind/20250716-DSC00729-900.avif 900w, ../img/night-wind/20250716-DSC00729-1600.avif 1600w, ../img/night-wind/20250716-DSC00729-2400.avif 2400w","webp":"../img/night-wind/20250716-DSC00729-900.webp 900w, ../img/night-wind/20250716-DSC00729-1600.webp 1600w, ../img/night-wind/20250716-DSC00729-2400.webp 2400w","jpg":"../img/night-wind/20250716-DSC00729-900.jpg 900w, ../img/night-wind/20250716-DSC00729-1600.jpg 1600w","src":"../img/night-wind/20250716-DSC00729-1600.jpg","w":7008,"h":4672,"alt":"Through a window at night: staff working behind the counter of a small shop, stacked cups and equipment around them.","date":"2025.07.16","time":"20:32","exif":"","gear":""},{"avif":"../img/night-wind/20250716-DSC00746-900.avif 900w, ../img/night-wind/20250716-DSC00746-1600.avif 1600w, ../img/night-wind/20250716-DSC00746-2400.avif 2400w","webp":"../img/night-wind/20250716-DSC00746-900.webp 900w, ../img/night-wind/20250716-DSC00746-1600.webp 1600w, ../img/night-wind/20250716-DSC00746-2400.webp 2400w","jpg":"../img/night-wind/20250716-DSC00746-900.jpg 900w, ../img/night-wind/20250716-DSC00746-1600.jpg 1600w","src":"../img/night-wind/20250716-DSC00746-1600.jpg","w":4672,"h":7008,"alt":"A girl sits alone on a step in front of an illuminated wall installation built to look like a robot holding a heart.","date":"2025.07.16","time":"20:53","exif":"","gear":""},{"avif":"../img/night-wind/20250716-DSC00763-900.avif 900w, ../img/night-wind/20250716-DSC00763-1600.avif 1600w, ../img/night-wind/20250716-DSC00763-2400.avif 2400w","webp":"../img/night-wind/20250716-DSC00763-900.webp 900w, ../img/night-wind/20250716-DSC00763-1600.webp 1600w, ../img/night-wind/20250716-DSC00763-2400.webp 2400w","jpg":"../img/night-wind/20250716-DSC00763-900.jpg 900w, ../img/night-wind/20250716-DSC00763-1600.jpg 1600w","src":"../img/night-wind/20250716-DSC00763-1600.jpg","w":4672,"h":7008,"alt":"Two young skaters at a floodlit skate park at night: one crouches with a camera while the other stands with a board.","date":"2025.07.16","time":"21:04","exif":"","gear":""},{"avif":"../img/night-wind/20250716-DSC00778-900.avif 900w, ../img/night-wind/20250716-DSC00778-1600.avif 1600w, ../img/night-wind/20250716-DSC00778-2400.avif 2400w","webp":"../img/night-wind/20250716-DSC00778-900.webp 900w, ../img/night-wind/20250716-DSC00778-1600.webp 1600w, ../img/night-wind/20250716-DSC00778-2400.webp 2400w","jpg":"../img/night-wind/20250716-DSC00778-900.jpg 900w, ../img/night-wind/20250716-DSC00778-1600.jpg 1600w","src":"../img/night-wind/20250716-DSC00778-1600.jpg","w":7008,"h":4672,"alt":"A floodlit skate park after dark, seen wide: one skater rides a ledge while another crouches nearby, filming.","date":"2025.07.16","time":"21:09","exif":"","gear":""}]</script>

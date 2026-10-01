@@ -149,8 +149,6 @@ document.documentElement.classList.remove('no-js');
 
     <div class="statement">
       <p>2025 年五月，考完 AP 之后，我带着相机回了一趟初中母校，拍下这一组照片，对我很有纪念意义。照片里的场景，都是一年前还历历在目的地方——既像在梦里，又实实在在。仿佛在那儿发生过的事、遇见过的人，都还是昨天的事。</p>
-          <p>黄昏的夕阳洒进校园的每个角落，也把我尘封已久的记忆重新唤醒。</p>
-          <p>最后我回头望了一眼那扇校门。它不起眼，却每天按部就班地打开。我的初中时光和回忆，就在那里定格了。</p>
     </div>
 
     <p class="masthead__scroll" aria-hidden="true">向下</p>
@@ -191,7 +189,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">01</span>
             <time datetime="2025-05-13T16:29">2025.05.13<span class="plate__time"> · 16:29</span></time>
-            <span class="plate__exif">34mm · f/3.5 · 1/200s · ISO 1250</span>
           </figcaption>
         </figure>
 
@@ -218,7 +215,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">02</span>
             <time datetime="2025-05-13T16:39">2025.05.13<span class="plate__time"> · 16:39</span></time>
-            <span class="plate__exif">43mm · f/3.5 · 1/2000s · ISO 200</span>
           </figcaption>
         </figure>
 
@@ -245,7 +241,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">03</span>
             <time datetime="2025-05-13T16:45">2025.05.13<span class="plate__time"> · 16:45</span></time>
-            <span class="plate__exif">57mm · f/3.5 · 1/800s · ISO 200</span>
           </figcaption>
         </figure>
 
@@ -272,7 +267,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">04</span>
             <time datetime="2025-05-13T16:46">2025.05.13<span class="plate__time"> · 16:46</span></time>
-            <span class="plate__exif">24mm · f/4.5 · 1/2000s · ISO 200</span>
           </figcaption>
         </figure>
 
@@ -299,7 +293,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">05</span>
             <time datetime="2025-05-13T16:47">2025.05.13<span class="plate__time"> · 16:47</span></time>
-            <span class="plate__exif">24mm · f/4.5 · 1/2000s · ISO 200</span>
           </figcaption>
         </figure>
 
@@ -326,7 +319,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">06</span>
             <time datetime="2025-05-13T16:47">2025.05.13<span class="plate__time"> · 16:47</span></time>
-            <span class="plate__exif">70mm · f/4.5 · 1/2000s · ISO 200</span>
           </figcaption>
         </figure>
 
@@ -353,7 +345,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">07</span>
             <time datetime="2025-05-13T16:51">2025.05.13<span class="plate__time"> · 16:51</span></time>
-            <span class="plate__exif">35mm · f/4.5 · 1/60s · ISO 125</span>
           </figcaption>
         </figure>
 
@@ -380,7 +371,6 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">08</span>
             <time datetime="2025-05-13T16:54">2025.05.13<span class="plate__time"> · 16:54</span></time>
-            <span class="plate__exif">24mm · f/4.5 · 1/1000s · ISO 125</span>
           </figcaption>
         </figure>
 
@@ -407,9 +397,14 @@ document.documentElement.classList.remove('no-js');
           <figcaption class="plate__caption">
             <span class="plate__num">09</span>
             <time datetime="2025-05-13T18:28">2025.05.13<span class="plate__time"> · 18:28</span></time>
-            <span class="plate__exif">24mm · f/2.8 · 1/50s · ISO 1000</span>
           </figcaption>
         </figure>
+  </section>
+
+  <!-- 自述的其余几段（2026-10-01「摄影集」改版）：标题下面只放第一段，看完照片再读这里。只有一段的组没有这块 -->
+  <section class="afterword statement" aria-label="后记">
+    <p>黄昏的夕阳洒进校园的每个角落，也把我尘封已久的记忆重新唤醒。</p>
+          <p>最后我回头望了一眼那扇校门。它不起眼，却每天按部就班地打开。我的初中时光和回忆，就在那里定格了。</p>
   </section>
 
   <nav class="nextup" aria-label="下一组">
@@ -427,6 +422,11 @@ document.documentElement.classList.remove('no-js');
 
 </main>
 
+<!--
+  灯箱（2026-10-01 改成「翻摄影集」）：左下角「07 / 09 · 地点 · 日期」，第二行机身镜头和参数，
+  底部一条 1px 的进度条（gallery.js 写宽度）。按钮平时看不见——左右翻页是照片两边的透明点击区，
+  关闭是右上角很淡的 ×；Tab 到时箭头和焦点框照常出来。见 摄影集改版设计.md 第五节。
+-->
 <dialog class="viewer" id="viewer" aria-label="全屏查看">
   <button class="viewer__close" type="button" data-act="close" aria-label="关闭">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
@@ -447,10 +447,12 @@ document.documentElement.classList.remove('no-js');
     </picture>
     <figcaption class="viewer__caption">
       <span class="viewer__count"></span>
+      <span class="viewer__place">北京</span>
       <span class="viewer__date"></span>
       <span class="viewer__exif"></span>
     </figcaption>
   </figure>
+  <div class="viewer__progress" aria-hidden="true"><span></span></div>
 </dialog>
 
 <script type="application/json" id="photo-data">[{"avif":"../../img/the-old-days/DSC09221-900.avif 900w, ../../img/the-old-days/DSC09221-1600.avif 1600w, ../../img/the-old-days/DSC09221-2400.avif 2400w","webp":"../../img/the-old-days/DSC09221-900.webp 900w, ../../img/the-old-days/DSC09221-1600.webp 1600w, ../../img/the-old-days/DSC09221-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09221-900.jpg 900w, ../../img/the-old-days/DSC09221-1600.jpg 1600w","src":"../../img/the-old-days/DSC09221-1600.jpg","w":7008,"h":4672,"alt":"A school library in the afternoon: built-in wooden window seats scattered with round cushions, bookshelves along the wall, daylight coming through the windows.","date":"2025.05.13","time":"16:29","exif":"34mm · f/3.5 · 1/200s · ISO 1250","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09231-900.avif 900w, ../../img/the-old-days/DSC09231-1600.avif 1600w, ../../img/the-old-days/DSC09231-2400.avif 2400w","webp":"../../img/the-old-days/DSC09231-900.webp 900w, ../../img/the-old-days/DSC09231-1600.webp 1600w, ../../img/the-old-days/DSC09231-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09231-900.jpg 900w, ../../img/the-old-days/DSC09231-1600.jpg 1600w","src":"../../img/the-old-days/DSC09231-1600.jpg","w":7008,"h":4672,"alt":"A running track curving around a small green pitch between red-brick school buildings, with a rainbow banner hanging on the fence.","date":"2025.05.13","time":"16:39","exif":"43mm · f/3.5 · 1/2000s · ISO 200","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09240-900.avif 900w, ../../img/the-old-days/DSC09240-1600.avif 1600w, ../../img/the-old-days/DSC09240-2400.avif 2400w","webp":"../../img/the-old-days/DSC09240-900.webp 900w, ../../img/the-old-days/DSC09240-1600.webp 1600w, ../../img/the-old-days/DSC09240-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09240-900.jpg 900w, ../../img/the-old-days/DSC09240-1600.jpg 1600w","src":"../../img/the-old-days/DSC09240-1600.jpg","w":4672,"h":7008,"alt":"A large tree in full leaf standing over a red-walled courtyard, a high apartment block rising behind the school wall.","date":"2025.05.13","time":"16:45","exif":"57mm · f/3.5 · 1/800s · ISO 200","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09243-900.avif 900w, ../../img/the-old-days/DSC09243-1600.avif 1600w, ../../img/the-old-days/DSC09243-2400.avif 2400w","webp":"../../img/the-old-days/DSC09243-900.webp 900w, ../../img/the-old-days/DSC09243-1600.webp 1600w, ../../img/the-old-days/DSC09243-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09243-900.jpg 900w, ../../img/the-old-days/DSC09243-1600.jpg 1600w","src":"../../img/the-old-days/DSC09243-1600.jpg","w":4672,"h":7008,"alt":"Late sun breaking through the leaves of a tree and throwing long shadows across an empty running track.","date":"2025.05.13","time":"16:46","exif":"24mm · f/4.5 · 1/2000s · ISO 200","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09246-900.avif 900w, ../../img/the-old-days/DSC09246-1600.avif 1600w, ../../img/the-old-days/DSC09246-2400.avif 2400w","webp":"../../img/the-old-days/DSC09246-900.webp 900w, ../../img/the-old-days/DSC09246-1600.webp 1600w, ../../img/the-old-days/DSC09246-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09246-900.jpg 900w, ../../img/the-old-days/DSC09246-1600.jpg 1600w","src":"../../img/the-old-days/DSC09246-1600.jpg","w":7008,"h":4672,"alt":"A wide view of the schoolyard: basketball courts, a running track, red-brick teaching buildings, and residential towers beyond.","date":"2025.05.13","time":"16:47","exif":"24mm · f/4.5 · 1/2000s · ISO 200","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09247-900.avif 900w, ../../img/the-old-days/DSC09247-1600.avif 1600w, ../../img/the-old-days/DSC09247-2400.avif 2400w","webp":"../../img/the-old-days/DSC09247-900.webp 900w, ../../img/the-old-days/DSC09247-1600.webp 1600w, ../../img/the-old-days/DSC09247-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09247-900.jpg 900w, ../../img/the-old-days/DSC09247-1600.jpg 1600w","src":"../../img/the-old-days/DSC09247-1600.jpg","w":4672,"h":7008,"alt":"A red-brick teaching block seen across the track, a single figure in white walking past, a national flag on the roof.","date":"2025.05.13","time":"16:47","exif":"70mm · f/4.5 · 1/2000s · ISO 200","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09260-900.avif 900w, ../../img/the-old-days/DSC09260-1600.avif 1600w, ../../img/the-old-days/DSC09260-2400.avif 2400w","webp":"../../img/the-old-days/DSC09260-900.webp 900w, ../../img/the-old-days/DSC09260-1600.webp 1600w, ../../img/the-old-days/DSC09260-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09260-900.jpg 900w, ../../img/the-old-days/DSC09260-1600.jpg 1600w","src":"../../img/the-old-days/DSC09260-1600.jpg","w":7008,"h":4672,"alt":"An empty auditorium, rows of pale grey seats under long ceiling lights and stage lamps.","date":"2025.05.13","time":"16:51","exif":"35mm · f/4.5 · 1/60s · ISO 125","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09269-900.avif 900w, ../../img/the-old-days/DSC09269-1600.avif 1600w, ../../img/the-old-days/DSC09269-2400.avif 2400w","webp":"../../img/the-old-days/DSC09269-900.webp 900w, ../../img/the-old-days/DSC09269-1600.webp 1600w, ../../img/the-old-days/DSC09269-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09269-900.jpg 900w, ../../img/the-old-days/DSC09269-1600.jpg 1600w","src":"../../img/the-old-days/DSC09269-1600.jpg","w":7008,"h":4672,"alt":"A stairwell landing where the red wall is covered in chalked names and messages from students, daylight coming up from the doorway below.","date":"2025.05.13","time":"16:54","exif":"24mm · f/4.5 · 1/1000s · ISO 125","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"},{"avif":"../../img/the-old-days/DSC09275-900.avif 900w, ../../img/the-old-days/DSC09275-1600.avif 1600w, ../../img/the-old-days/DSC09275-2400.avif 2400w","webp":"../../img/the-old-days/DSC09275-900.webp 900w, ../../img/the-old-days/DSC09275-1600.webp 1600w, ../../img/the-old-days/DSC09275-2400.webp 2400w","jpg":"../../img/the-old-days/DSC09275-900.jpg 900w, ../../img/the-old-days/DSC09275-1600.jpg 1600w","src":"../../img/the-old-days/DSC09275-1600.jpg","w":7008,"h":4672,"alt":"A dim lecture hall at the end of the day, wooden benches in rows, a projector still lit on the board at the front.","date":"2025.05.13","time":"18:28","exif":"24mm · f/2.8 · 1/50s · ISO 1000","gear":"索尼 α7 IV · 适马 24-70mm F2.8 DG DN Art"}]</script>

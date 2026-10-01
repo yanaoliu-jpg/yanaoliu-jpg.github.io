@@ -138,6 +138,8 @@ LANGS = {
         "download_video": "Download the film (MP4)",
         "open_full": "Open photograph {n} of {total} full screen",
         "viewer_label": "Full screen photograph",
+        # 系列页照片后面那块自述（2026-10-01「摄影集」改版）：给读屏软件的区域名，页面上不显示
+        "afterword_label": "Afterword",
         # 系列页「逐张 · 网格」切换（rows.js，2026-09-30）
         "view_label": "View",
         "view_one": "One by one",
@@ -198,6 +200,7 @@ LANGS = {
         "download_video": "下载影片（MP4）",
         "open_full": "放大查看第 {n} 张，共 {total} 张",
         "viewer_label": "全屏查看",
+        "afterword_label": "后记",
         "view_label": "查看方式",
         "view_one": "逐张",
         "view_grid": "网格",
@@ -1022,7 +1025,6 @@ def plate_html(photo: Photo, index: int, total: int, prefix: str, L: dict) -> st
                 f'<span class="plate__time"> · {photo.time_label}</span>'
                 if photo.time_label else ''}</time>'''
               if photo.date_label else ''}
-            <span class="plate__exif">{esc(photo.exif_label)}</span>
           </figcaption>
         </figure>"""
 
@@ -1453,12 +1455,21 @@ def render_series(s: dict, lang: str, site: dict, nxt: dict) -> None:
 
     count_label = f"{s['count']} {L['photographs']}"
 
+    # 自述拆成两处（2026-10-01「摄影集」改版，摄影集改版设计.md 第五节）：标题下面只放第一段，
+    # 其余几段放在照片后面、「下一组」前面。后面几段本来就在讲「前三张」「剩下的」——看完照片再读
+    # 正好对得上，所以第一段不重复。只有一段的组，后面那块整个不出。原文一个字不改，只是拆开放。
+    parts = [b for b in re.split(r"\n\s*\n", text_of(cfg, lang, "statement").strip()) if b.strip()]
+    rest = "\n\n".join(parts[1:])
+    afterword = (f'<section class="afterword statement" aria-label="{esc(L["afterword_label"])}">\n'
+                 f'    {paragraphs(rest)}\n  </section>\n') if rest else ""
+
     body = render(
         (TEMPLATES / "series.html").read_text(encoding="utf-8"),
         title=esc(title),
         eyebrow=esc(eyebrow_for(s, lang)),
         year=esc(str(text_of(cfg, lang, "year"))),
-        statement=paragraphs(text_of(cfg, lang, "statement")),
+        statement=paragraphs(parts[0] if parts else ""),
+        afterword=afterword,
         count_label=esc(count_label),
         span=esc(span),
         place=esc(text_of(cfg, lang, "place")),

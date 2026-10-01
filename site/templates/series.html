@@ -39,6 +39,8 @@
 {{ plates }}
   </section>
 
+  <!-- 自述的其余几段（2026-10-01「摄影集」改版）：标题下面只放第一段，看完照片再读这里。只有一段的组没有这块 -->
+  {{ afterword }}
   <nav class="nextup" aria-label="{{ nextup_label }}">
     <a class="nextup__link" href="{{ nextup_href }}" style="{{ nextup_vars }}">
       <span class="nextup__label">{{ nextup_label }}</span>
@@ -54,6 +56,11 @@
 
 </main>
 
+<!--
+  灯箱（2026-10-01 改成「翻摄影集」）：左下角「07 / 09 · 地点 · 日期」，第二行机身镜头和参数，
+  底部一条 1px 的进度条（gallery.js 写宽度）。按钮平时看不见——左右翻页是照片两边的透明点击区，
+  关闭是右上角很淡的 ×；Tab 到时箭头和焦点框照常出来。见 摄影集改版设计.md 第五节。
+-->
 <dialog class="viewer" id="viewer" aria-label="{{ viewer_label }}">
   <button class="viewer__close" type="button" data-act="close" aria-label="{{ close_label }}">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
@@ -74,10 +81,12 @@
     </picture>
     <figcaption class="viewer__caption">
       <span class="viewer__count"></span>
+      <span class="viewer__place">{{ place }}</span>
       <span class="viewer__date"></span>
       <span class="viewer__exif"></span>
     </figcaption>
   </figure>
+  <div class="viewer__progress" aria-hidden="true"><span></span></div>
 </dialog>
 
 <script type="application/json" id="photo-data">{{ photo_data }}</script>

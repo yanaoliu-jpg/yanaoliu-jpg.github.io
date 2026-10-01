@@ -864,12 +864,18 @@ img { display: block; max-width: 100%; height: auto; }
   /* 宽度上限是版心宽（100%），不是 92vw：92vw 没扣两边的留白，手机上照片偏右 17px、平板上 31px（2026-09-30 修）。
      ⚠️ ↔ build.py 的 sizes_attr（100vw − 2 × GUTTER） */
   width: min(100%, 1400px, calc(var(--plate-vh) * 1vh * var(--ar)));
-  /* 照片小了，间距也跟着收一点，否则节奏会显得空 */
-  margin: 0 auto clamp(6rem, 14vh, 11rem);
+  /* 照片之间留够一屏（2026-10-01「摄影集」改版）：72vh 的照片 + 说明一行 + 23vh 的空 ≈ 一屏
+     （1440×900 上 648 + 40 + 207 ≈ 895px），往下滚一下就是翻一页。原来是 clamp(6rem, 14vh, 11rem)。
+     手机竖屏另给一档小的，见下面的 @media */
+  margin: 0 auto clamp(7rem, 23vh, 16rem);
   /* 每张都有 #plate-1 … #plate-9 锚点，可以直接把某一张的链接发给别人 */
   scroll-margin-top: 6vh;
 }
 .plate:last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+  /* 手机竖屏上照片被宽度卡住、本来就矮，23vh 的空会让一屏里只剩一张小图和一大片黑 */
+  .plate { margin-bottom: clamp(4.5rem, 12vh, 7rem); }
+}
 
 .plate__open {
   display: block;
@@ -923,25 +929,8 @@ img { display: block; max-width: 100%; height: auto; }
 
 .plate__num { color: var(--ink-faint); }
 .plate__time { color: var(--ink-faint); }
-.plate__exif { margin-left: auto; color: var(--ink-faint); }
-
-/*
-  参数靠右、日期靠左，铺满照片宽度——一行放得下时这样最好看。
-
-  但竖构图窄得多（72vh 下只有 600px），一行放不下就会折行，
-  而 margin-left:auto 会让折下去的那行**右对齐孤零零挂着**。
-  所以按**照片自身的宽度**判断，不是按视口——同一个屏幕上
-  横片有 972px、竖片只有 600px，视口断点区分不了这两者。
-*/
-.plate { container-type: inline-size; }
-
-@container (max-width: 660px) {
-  .plate__exif {
-    margin-left: 0;
-    width: 100%;
-    margin-top: 0.4rem;
-  }
-}
+/* 相机参数原来在这一行最右边（竖片窄、折到第二行时靠一条容器查询摆正），2026-10-01 起只在灯箱里——
+   摄影集式的说明只留编号和日期（摄影集改版设计.md 第五节）。参数还在 photo-data 里，灯箱第二行照旧 */
 
 /* ── 逐张 · 网格（rows.js，2026-09-30「放映厅」第三步）──────────────
    切换按钮：两枚小胶囊，跟语言按钮一个样子，左边缘在版心线上。平时 hidden（关掉 JS 时只有逐张），rows.js 放出来。
@@ -1006,7 +995,6 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .plates.is-grid .plate__num,
 .plates.is-grid .plate__time { color: inherit; }
-.plates.is-grid .plate__exif { display: none; }
 /* 触屏上点一下会留下「悬停」，浮层就一直挂着——悬停只算有鼠标的设备；键盘聚焦照样显示 */
 @media (hover: hover) {
   .plates.is-grid .plate:hover .plate__caption { opacity: 1; }
@@ -1833,6 +1821,12 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   刻意不放缩略图：这一整页的最后一眼应该还留在他自己的照片上，
   不该被一张缩略图抢走。标题给到跟正文明显不同的字号，够了。
 */
+/* 自述的其余几段（2026-10-01「摄影集」改版）：照片后面、「下一组」前面。字跟标题下面那段一样（同一个 .statement 类），
+   左边缘落在版心那条线上，上面空出跟照片之间一样的距离。只有一段的组没有这块（build.py 不出） */
+.statement.afterword {
+  margin: clamp(7rem, 23vh, 16rem) var(--gutter) 0 max(var(--gutter), calc((100% - var(--frame)) / 2));
+}
+
 .nextup {
   margin: clamp(6rem, 16vh, 11rem) 0 0;
   padding: 0 max(var(--gutter), calc((100% - var(--frame)) / 2));
@@ -1977,11 +1971,15 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  /* 没有 gap（2026-10-01）：原来的 1rem 是隔开照片和下面的说明；说明挪走之后它反而有害——
+     <picture> 是 display: contents，里面两个 <source> 也算弹性项目，gap 把照片往下推了 16px */
+  gap: 0;
   height: 100%;
   margin: 0;
-  /* 边距收到够用就行，多出来的高度全给照片 */
-  padding: clamp(0.75rem, 2vh, 1.5rem) clamp(1rem, 6vw, 4.5rem);
+  /* 上 2.5rem、下 4.5rem（2026-10-01）：说明挪到了左下角，下面那条要装得下两行说明再留点空；
+     两头加起来 7rem = 下面照片的高度预算，横幅照片被高度卡住时正好填满中间。
+     原来上下各 clamp(0.75rem, 2vh, 1.5rem)，说明排在照片下面的流里 */
+  padding: 2.5rem clamp(1rem, 6vw, 4.5rem) 4.5rem;
 }
 
 .viewer__picture { display: contents; }
@@ -1995,10 +1993,10 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
 .viewer__stage img {
   position: relative;
   z-index: 2;
-  width: min(100%, calc((100dvh - 6.5rem) * var(--ar, 1.5)));
+  width: min(100%, calc((100dvh - 7rem) * var(--ar, 1.5)));
   height: auto;
   aspect-ratio: var(--ar, auto);
-  max-height: calc(100dvh - 6.5rem);
+  max-height: calc(100dvh - 7rem);
   object-fit: contain;
   opacity: 0;
   transition: opacity 0.35s ease;
@@ -2018,44 +2016,104 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
 .viewer.is-flipping::backdrop { background: transparent; }
 .viewer.is-flipping .viewer__caption,
 .viewer.is-flipping .viewer__close,
-.viewer.is-flipping .viewer__nav { opacity: 0; }
+.viewer.is-flipping .viewer__nav,
+.viewer.is-flipping .viewer__progress { opacity: 0; }
 .viewer__caption { transition: opacity 0.3s ease; }
 
+/* 说明在左下角（2026-10-01「翻摄影集」，摄影集改版设计.md 第五节）：
+   第一行「07 / 09 · 地点 · 日期 · 时刻」，第二行机身 · 镜头 · 参数。不占照片的位置：
+   照片上面留 2.5rem、下面 4.5rem（.viewer__stage 的内边距，高度预算 100dvh − 7rem），说明压在下面那条里。
+   原来居中、排在图下面。 */
 .viewer__caption {
+  position: absolute;
+  z-index: 3;
+  left: clamp(1rem, 2.5vw, 2rem);
+  right: clamp(1rem, 2.5vw, 2rem);
+  bottom: clamp(0.7rem, 1.6vh, 1.1rem);
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem 1.25rem;
-  text-align: center;
+  justify-content: flex-start;
+  gap: 0.2rem 0;
+  text-align: left;
+  pointer-events: none;      /* 压在左边那块翻页区上面：点下去要落到「上一张」 */
 }
 .viewer__count { color: var(--ink-faint); }
+.viewer__place::before,
+.viewer__date::before { content: '·'; margin: 0 0.6em; color: var(--ink-faint); }
+.viewer__place:empty,
+.viewer__date:empty { display: none; }
 /* 第二行（2026-09-30）：机身 · 镜头 · 焦距 · 光圈 · 快门 · ISO。多了机身镜头，一行放不下，另起一行；
-   一项都没有（EXIF 被抹掉的照片）就整行不出。上面图的高度预算 100dvh − 6.5rem 装得下两行说明（1440×900 上说明区 92px） */
+   一项都没有（EXIF 被抹掉的照片）就整行不出 */
 .viewer__exif { flex-basis: 100%; color: var(--ink-faint); }
 .viewer__exif:empty { display: none; }
 
+/* 底部一条 1px 的进度条（2026-10-01）：第几张 ÷ 总数，gallery.js 写宽度，翻一张走一格 */
+.viewer__progress {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.viewer__progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--ink-dim);
+  transition: width 0.4s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .viewer__progress span { transition: none; }
+}
+
+/* 按钮平时看不见（2026-10-01「翻摄影集」，参考里写的是「不要多余按钮」）。
+   它们仍然是 <button>、有 aria-label：键盘 Tab 到、读屏软件念到都照常能用，Tab 到时箭头和焦点框出来。
+   · 左右翻页：照片左、右两边各 30% 宽的透明点击区，鼠标移上去才淡淡出一个箭头；触屏上点两边也能翻
+   · 关闭：右上角一个很淡的 ×，没有底色，移上去变亮——手机上必须有个关的地方
+   点中间那条的空白处仍是关闭、点照片本身不关（gallery.js 没改） */
 .viewer__close,
 .viewer__nav {
   position: absolute;
-  z-index: 2;
   display: grid;
   place-items: center;
-  width: 3.25rem;
-  height: 3.25rem;
   padding: 0;
   border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
+  background: none;
   color: var(--ink-dim);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, opacity 0.3s ease;
+  transition: color 0.2s, opacity 0.3s ease;
+}
+.viewer__close {
+  z-index: 4;
+  top: clamp(0.75rem, 2vh, 1.5rem);
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  opacity: 0.55;
 }
 .viewer__close:hover,
-.viewer__nav:hover { background: rgba(255, 255, 255, 0.12); color: var(--ink); }
-
-.viewer__close { top: clamp(0.75rem, 2vh, 1.5rem); right: clamp(0.75rem, 2vw, 1.5rem); }
-.viewer__nav--prev { left: clamp(0.5rem, 1.5vw, 1.5rem); top: 50%; transform: translateY(-50%); }
-.viewer__nav--next { right: clamp(0.5rem, 1.5vw, 1.5rem); top: 50%; transform: translateY(-50%); }
+.viewer__close:focus-visible { opacity: 1; color: var(--ink); }
+.viewer__nav {
+  z-index: 3;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  padding: 0 clamp(0.75rem, 2vw, 1.75rem);
+}
+.viewer__nav--prev { left: 0; justify-items: start; }
+.viewer__nav--next { right: 0; justify-items: end; }
+.viewer__nav svg { opacity: 0; transition: opacity 0.25s ease; }
+@media (hover: hover) {
+  .viewer__nav:hover svg { opacity: 0.8; }
+}
+/* 键盘：整条点击区画焦点框太大，框画在箭头上 */
+.viewer__nav:focus-visible { outline: none; }
+.viewer__nav:focus-visible svg { opacity: 1; outline: 2px solid var(--focus); outline-offset: 0.5rem; border-radius: 2px; }
 
 .viewer__close svg,
 .viewer__nav svg {
@@ -2068,7 +2126,8 @@ a.cat__label:focus-visible { text-decoration-line: underline; }
   stroke-linejoin: round;
 }
 
-.viewer[data-single] .viewer__nav { display: none; }
+.viewer[data-single] .viewer__nav,
+.viewer[data-single] .viewer__progress { display: none; }
 
 body.is-locked { overflow: hidden; }
 

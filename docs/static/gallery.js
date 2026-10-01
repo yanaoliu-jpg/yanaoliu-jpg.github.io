@@ -94,6 +94,7 @@
   var elCount = dialog.querySelector('.viewer__count');
   var elDate = dialog.querySelector('.viewer__date');
   var elExif = dialog.querySelector('.viewer__exif');
+  var elBar = dialog.querySelector('.viewer__progress span');   // 底部的细进度条（2026-10-01「翻摄影集」）
 
   var current = 0;
   var showToken = 0;
@@ -143,6 +144,8 @@
     elDate.textContent = photo.date + (photo.time ? ' · ' + photo.time : '');
     // 第二行：机身 · 镜头 · 焦距 · 光圈 · 快门 · ISO（机身镜头 2026-09-30 起，只有 EXIF 里有记录的照片才有）
     elExif.textContent = [photo.gear, photo.exif].filter(Boolean).join(' · ');
+    // 进度条：第几张 ÷ 总数（读屏软件不念它，第几张已经在 .viewer__count 里）
+    if (elBar) elBar.style.width = ((current + 1) / photos.length * 100) + '%';
 
     preload(current + 1);
     preload(current - 1);
